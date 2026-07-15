@@ -1,158 +1,77 @@
-# Vision — `@bytesbrains/weblocks`
+# weblocks — Vision
 
-**An AI composes a web app by snapping together typed blocks from a fixed
-catalog. The engine validates the composition and renders it to a self-contained
-static document. It never writes raw HTML, and it can never produce a broken
-page.**
+**A web-block package built for AI.** The model builds rich PWAs by *arranging
+and configuring blocks* from a fixed catalog — it never writes HTML, CSS, or JS.
+The engine turns the AI's `SiteManifest` (design tokens + ordered, typed blocks)
+into one self-contained, safe document.
 
-This file is the north star. Every block, every edit op, every PR is measured
-against the principles below. Code, `catalog.json`, and `CATALOG.md` are the
-*contract*; this is the *why* behind it.
+## Why blocks, not freeform code
 
----
+Letting a model emit raw HTML is unbounded: broken layouts, injection, silent
+drift, no way to reliably change one thing later. **Blocks give the AI a closed
+vocabulary and a typed configuration contract** — the *catalog*. The AI composes
+from it; the engine guarantees the result is valid and coherent. The model's job
+shrinks from "write a correct website" to "pick and fill known bricks," which is
+exactly what LLMs are reliable at.
 
-## The problem
+## Principles
 
-Letting a model emit raw HTML/CSS/JS for a whole site is powerful and unsafe: the
-output can be malformed, insecure (injection), incoherent (every section styled
-differently), and impossible to edit surgically or reason about. "Regenerate the
-whole page to change one word" is not an architecture.
+1. **Contract-first.** The block **catalog** (`catalog.json` — JSON Schema, plus
+   a prompt form) is the AI's API reference. Send it with every request; the AI
+   may only compose from it. New capabilities = new registered blocks, so the
+   model is never left guessing.
 
-## The idea — Lego bricks for web apps
+2. **Validity ⟂ model quality.** A `SiteManifest` is schema-validated and the
+   renderer is **total** (never throws; unknown/invalid blocks are skipped, every
+   field defaulted, all text escaped). A bad model reply degrades gracefully — a
+   structurally broken page is impossible.
 
-The system is **Lego bricks for websites**: a finite, curated set of
-interchangeable pieces the AI *assembles and configures* — it never moulds new
-plastic (writes raw markup). The mental model is load-bearing, not decorative —
-each Lego property maps to a design constraint:
+3. **Non-breaking by construction.** Configuration and evolution never break
+   existing sites:
+   - closed vocabulary + schema-checked, defaulted config per block;
+   - additive growth — new blocks/fields are semver-**minor**; the **manifest
+     shape and the catalog are the versioned public contract**, and breaking
+     either is a **major**;
+   - design tokens carry coherence — one token change restyles the whole site,
+     with no per-block edits.
 
-| Lego | This engine |
-|---|---|
-| A finite, curated set of brick types | The **closed block catalog** (the vocabulary) |
-| Universal studs — every brick connects the same way | Shared **design tokens + manifest contract** → any block fits |
-| You physically *can't* connect them wrong | **Illegal states unrepresentable** (valid by construction) |
-| Bricks come in colours/sizes | **Typed params + tokens** — same brick, different config |
-| Infinite builds from finite parts | Power is in **combination**, not per-brick flexibility |
-| The builder *snaps bricks*, never *melts plastic* | The AI **assembles**; no raw-HTML escape hatch = no melting |
-| New capability → design a new brick | Grow the vocabulary with **typed, legacy-safe primitives** |
-| The instruction booklet | The **manifest** — precise, reproducible, diffable, undoable |
-| QA the bricks, and *any* build is sound | The **test surface is N bricks, not ∞ pages** |
+4. **Surgical editing.** Natural-language changes compile to **validated JSON
+   edit ops** (`addBlock`, `updateBlock`, `removeBlock`, `moveBlock`,
+   `setVisible`, `setDesignTokens`, `setMeta`) applied independently to a
+   **versioned** manifest. Change one block — or one field — without disturbing
+   the rest; every edit is inspectable, reversible, and can't corrupt the
+   document (a bad op is a no-op, not a break).
 
-Everything falls out of this: generation = *snapping a build*; editing = *swap or
-tweak one brick*; chat = *instruct the builder*; cheaper models work fine =
-*the builder can be junior because bricks can't be misassembled*.
+5. **Static-first, progressively rich.** Only the CSS of *used* blocks ships;
+   interactivity hydrates as islands, only where a block needs it. The path grows
+   toward full PWA / dynamic-block capability without sacrificing the safe,
+   fast static core.
 
-## What a manifest is
+## Who it's for
 
-A `SiteManifest` is the single source of truth the AI composes and edits:
+Any product that wants an AI to **build and edit real web pages reliably** —
+site builders, in-app "make me a page / app" flows, and autonomous agents. The
+engine is **provider-agnostic** (inject your own model call) and **reusable
+across projects** via one shared catalog contract.
 
-```
-SiteManifest = { meta, design (tokens), blocks[] (ordered, typed), version, pwa?, seo? }
-```
+## Boundaries (what it is *not*)
 
-- **design** is the shared baseplate — CSS custom properties every brick styles
-  from, so one edit ("make the whole thing warmer") restyles the entire app.
-- **blocks** are placed bricks: `{ id, type, visible, config, overrides? }`. The
-  `type` comes from the closed catalog; `config` is validated against that
-  brick's schema before it is ever applied.
-- **version** bumps on every accepted edit → undo / history / draft-vs-publish
-  come for free.
+- Not a freeform HTML generator.
+- Not tied to any host, framework, provider, or downstream consumer.
+- The catalog + manifest are the contract; changing them incompatibly is a major
+  version, never a silent break.
 
-The manifest is never raw HTML. The renderer turns it into one self-contained
-static document; the schema layer guarantees every reachable manifest is valid.
+## Directional roadmap
 
----
-
-## Design invariants — non-negotiable
-
-These hold for every block, every edit, every PR. Violating one reintroduces the
-broken-page or security risk this design removes.
-
-1. **Catalog-first / closed vocabulary.** A block type exists iff it is
-   registered. The AI may only emit validated operations over the bounded set of
-   block types, typed params/tokens, and edit verbs. If a request can't be
-   expressed in the vocabulary, the answer is **add a typed primitive — never an
-   escape hatch.**
-2. **Illegal states unrepresentable.** Every reachable manifest is valid by
-   construction (schema-validated before apply). Worst case is a *rejected op*,
-   never a corrupted site.
-3. **No escape hatch.** No "custom HTML/JS" block, no free-form markup field
-   within the AI's reach. Raw output = melting plastic = the risk we designed
-   away. `rich-text`/`blog-post` are *typed* content nodes, not raw HTML.
-4. **Parameterize, don't free-form.** Prefer typed knobs (tokens, enums) over
-   free strings. Every free-string field is a place a page can break — and every
-   one is escaped on render.
-5. **Total renderer.** The renderer is defined for every manifest — a default for
-   every optional field, escaping for all text, and it **cannot throw**. Schema =
-   valid by construction; renderer = can't fail to render. Two walls.
-6. **Validity ⟂ AI quality.** Page *validity* comes from schema + renderer, not
-   from the model being right — so models are swappable/downgradable with zero
-   risk of broken pages. The model affects taste and wording only.
-7. **Legacy-safe, additive growth.** Grow the vocabulary only additively
-   (semver-minor); every old manifest must keep validating and rendering
-   identically. Removing or renaming a brick or field is a breaking change that
-   needs a migration.
-8. **Host-neutral.** The engine bundles no backend, no provider, no host. The
-   model call is injected (`callModel`); powered bricks *declare* their runtime
-   needs and a host wires them (see below). The engine reveals nothing about who
-   consumes it.
-9. **Static-first.** Pages are HTML + CSS; JavaScript loads only for the
-   interactive islands a brick actually needs, and only when its behaviour is on.
-
-## Powered bricks & the runtime contract
-
-Classic bricks are inert HTML. A few are *powered* — a form submits, auth signs
-in, search queries. They can't be pure static markup, but the engine stays
-host-neutral by **declaring** each powered brick's capabilities in the catalog
-and emitting a documented client contract (`data-wl-capability` hooks). The
-**host provides the runtime through a small adapter**; there is no bundled
-backend and no per-block glue — one adapter serves every powered brick. With no
-runtime wired, a powered brick renders inert-but-valid, never broken.
-
-The safety-critical parts (spam/captcha, server-side validation, delivery, abuse
-caps, identity) live in the host's vetted runtime — never in anything the AI
-emits.
-
-## The AI contract
-
-- **Generation:** the model emits a full manifest from a brief — bounded,
-  schema-validated. A single call; no agent required.
-- **Editing:** a small tool-calling agent emits validated **edit ops**
-  (`addBlock`, `updateBlock`, `move`, array-item ops, `applyPreset`, …). Each is
-  validated → applied → `version++`. A bad op is a no-op, never a corruption.
-- The catalog (`catalog()` / `catalogPrompt()` / shipped `catalog.json`) is the
-  *only* surface the model is told it may use — the closed vocabulary made
-  legible as JSON Schema or a compact prompt.
+- **More blocks** — about, pricing, steps, logos, stats, test-drive dynamic ones
+  (contact-form, newsletter, booking) behind the standard runtime contract.
+- **Dynamic / PWA runtime** for interactive blocks (forms, data, offline).
+- **Theming presets** — named `DesignTokens` palettes the AI (or a picker) selects.
+- **Schema-driven catalog** — generate the catalog from component metadata so the
+  contract is always in lock-step with the code.
 
 ---
 
-## Roadmap direction
-
-The engine grows toward **rich, app-like, installable PWAs** — always within the
-invariants above. Broad strokes (tracked in the issues):
-
-- **More blocks** — content, media, collections, app-shell/navigation — each a
-  registered, typed, totally-rendering brick.
-- **Dynamic bricks** on the runtime contract (forms, newsletter, auth, search).
-- **PWA layer** — a Web App Manifest + service worker derived from the
-  `SiteManifest` (installable, offline-capable).
-- **Finer-grained edit ops** — array-item-level surgical edits so the AI changes
-  *one item* without rewriting a block.
-- **Theming** — named `DesignTokens` presets and opt-in per-section overrides.
-
-Every one of these ships as an **additive, non-breaking** change: a new typed
-primitive or an optional field. If a capability can't be added that way, it needs
-a migration and a major version — never an escape hatch.
-
-## Definition of done for any new capability
-
-- [ ] A registered brick (or engine op) with a **typed schema** — no raw-HTML
-      field.
-- [ ] Consumes the **shared design tokens**; no ad-hoc styling.
-- [ ] **Total render**: a sensible default for every optional field, all text
-      escaped, cannot throw.
-- [ ] **Additive & non-breaking**: every existing manifest still validates and
-      renders identically.
-- [ ] Powered bricks conform to the **runtime contract**; no host-specific code
-      in the engine.
-- [ ] **Tests** for the brick/op, and `catalog.json` / `CATALOG.md` regenerated.
-- [ ] Docs updated; **consumer-neutral** throughout.
+*In one line: weblocks makes an AI a reliable web builder by giving it Lego —
+typed bricks it snaps together, that the engine guarantees will always render,
+and that anyone can surgically re-arrange later without breaking a thing.*
