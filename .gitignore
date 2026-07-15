@@ -1,0 +1,6 @@
+# Compiled output
+lib/
+node_modules/
+example-output.html
+ai-output.html
+ai-manifest.json

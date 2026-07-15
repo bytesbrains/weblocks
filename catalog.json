@@ -1,0 +1,526 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "package": "@bytesbrains/weblocks",
+  "version": "0.1.0",
+  "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
+  "blockTypes": [
+    "nav",
+    "hero",
+    "features",
+    "services-catalogue",
+    "gallery",
+    "testimonials",
+    "faq",
+    "cta",
+    "contact-details",
+    "footer"
+  ],
+  "blocks": [
+    {
+      "type": "nav",
+      "description": "Top navigation bar: brand/logo text, a row of links, and an optional call-to-action button. Place first.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "brand": {
+            "type": "string",
+            "maxLength": 60,
+            "default": "Brand"
+          },
+          "sticky": {
+            "type": "boolean",
+            "default": false
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": "Link"
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": "#"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "maxLength": 40,
+                "default": ""
+              },
+              "href": {
+                "type": "string",
+                "maxLength": 300,
+                "default": "#"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "brand"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "hero",
+      "description": "Top-of-page banner: a big headline with an optional eyebrow, subheading, and one call-to-action button.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "eyebrow": {
+            "type": "string",
+            "maxLength": 80,
+            "default": ""
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "Your headline here"
+          },
+          "subhead": {
+            "type": "string",
+            "maxLength": 320,
+            "default": ""
+          },
+          "align": {
+            "enum": [
+              "center",
+              "left"
+            ],
+            "default": "center"
+          },
+          "cta": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "maxLength": 40,
+                "default": ""
+              },
+              "href": {
+                "type": "string",
+                "maxLength": 500,
+                "default": "#"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "headline"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "features",
+      "description": "A grid of value propositions, each with an optional icon/emoji, a title, and a short line of text.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "icon": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "Feature"
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 240,
+                  "default": ""
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "services-catalogue",
+      "description": "A grid of services or products, each with a name, optional price, description, and link. Use for \"what we offer\".",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "Service"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": ""
+                },
+                "price": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "ctaLabel": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "ctaHref": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": "#"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "gallery",
+      "description": "A responsive image grid (grid/masonry/carousel) with an optional click-to-zoom lightbox. Each item needs a src and alt text.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "layout": {
+            "enum": [
+              "grid",
+              "masonry",
+              "carousel"
+            ],
+            "default": "grid"
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "gap": {
+            "enum": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md"
+          },
+          "lightbox": {
+            "type": "boolean",
+            "default": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                },
+                "caption": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                }
+              },
+              "required": [
+                "src",
+                "alt"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 60
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "testimonials",
+      "description": "A grid of customer quotes, each with the quote text and an optional author name and role.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "quote": {
+                  "type": "string",
+                  "maxLength": 400,
+                  "default": ""
+                },
+                "author": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "role": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                }
+              },
+              "required": [
+                "quote"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "faq",
+      "description": "An accordion of question/answer pairs. Expands/collapses natively (no JS).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Frequently asked questions"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                },
+                "answer": {
+                  "type": "string",
+                  "maxLength": 800,
+                  "default": ""
+                }
+              },
+              "required": [
+                "question"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 20
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "cta",
+      "description": "A full-width call-to-action band: a headline, optional subheading, and one button. Use near the bottom.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "Ready to start?"
+          },
+          "subhead": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "background": {
+            "enum": [
+              "primary",
+              "accent",
+              "surface"
+            ],
+            "default": "primary"
+          },
+          "button": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "maxLength": 40,
+                "default": "Get started"
+              },
+              "href": {
+                "type": "string",
+                "maxLength": 300,
+                "default": "#"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "headline"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "contact-details",
+      "description": "A contact info block: address, phone, email, and opening hours (each optional). Read-only — no form.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Get in touch"
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 40,
+            "default": ""
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "hours": {
+            "type": "string",
+            "maxLength": 160,
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "footer",
+      "description": "Page footer: brand, tagline, a row of links, and a copyright line. Place last.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "brand": {
+            "type": "string",
+            "maxLength": 60,
+            "default": ""
+          },
+          "tagline": {
+            "type": "string",
+            "maxLength": 160,
+            "default": ""
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": "Link"
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": "#"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          },
+          "copyright": {
+            "type": "string",
+            "maxLength": 160,
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}
