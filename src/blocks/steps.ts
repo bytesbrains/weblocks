@@ -29,7 +29,7 @@ const css = `
 .blk-steps .sub{color:var(--muted);font-size:var(--fs-lg);margin:0}
 .blk-steps ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:calc(var(--space)*1.4)}
 .blk-steps li{background:var(--surface);border-radius:var(--radius);padding:calc(var(--space)*1.3)}
-.blk-steps .num{display:inline-flex;align-items:center;justify-content:center;width:2.2em;height:2.2em;border-radius:999px;background:var(--primary);color:var(--bg);font-weight:800;font-size:var(--fs-lg);margin-bottom:.5em}
+.blk-steps .num{display:inline-flex;align-items:center;justify-content:center;width:2.2em;height:2.2em;border-radius:999px;background:var(--primary);color:var(--on-primary);font-weight:800;font-size:var(--fs-lg);margin-bottom:.5em}
 .blk-steps h3{margin:0 0 .2em;font-size:var(--fs-lg);font-weight:700}
 .blk-steps p{margin:0;color:var(--muted);line-height:1.5}
 @media(max-width:480px){.blk-steps ol{grid-template-columns:1fr}}

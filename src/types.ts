@@ -27,6 +27,13 @@ export interface Palette {
 export interface DesignTokens {
   mode: Mode;
   palette: Palette;
+  /**
+   * Optional dark-mode palette. Only consulted when `mode: 'auto'`: the base
+   * `palette` renders by default and this one takes over under
+   * `@media (prefers-color-scheme: dark)`. Absent + `auto` → a built-in default
+   * dark palette. Ignored for `mode: 'light' | 'dark'` (the palette is used as-is).
+   */
+  darkPalette?: Palette;
   typography: { fontStack: string; scale: Scale };
   radius: Radius;
   spacing: Spacing;
@@ -39,7 +46,7 @@ export interface DesignTokens {
  * CSS custom properties on a wrapper so only that section is affected and the
  * rest of the site stays coherent. Additive + optional — absent = inherit.
  */
-export type SectionOverrides = Partial<Palette>;
+export type SectionOverrides = Partial<Palette> & { radius?: Radius; spacing?: Spacing };
 
 /** One placed brick: a type from the closed catalog + its typed, validated config. */
 export interface Block {

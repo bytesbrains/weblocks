@@ -39,7 +39,7 @@ const css = `
 .blk-auth .sep::before,.blk-auth .sep::after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--text) 15%,transparent)}
 .blk-auth form{display:grid;gap:.5em}
 .blk-auth input{font:inherit;color:inherit;background:var(--bg);border:1px solid color-mix(in srgb,var(--text) 18%,transparent);border-radius:var(--radius);padding:.7em .8em}
-.blk-auth button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1em;background:var(--primary);color:#fff}
+.blk-auth button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1em;background:var(--primary);color:var(--on-primary)}
 .blk-auth button[disabled]{opacity:.55;cursor:not-allowed}
 .blk-auth .note{margin:var(--space) 0 0;font-size:var(--fs-base);color:var(--muted)}
 `.trim();

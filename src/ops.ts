@@ -9,7 +9,7 @@ import { getSpec, blockTypes } from './registry.js';
 import { normalizeTokens } from './tokens.js';
 import { parse, type Field } from './schema.js';
 import { getPreset, presetNames } from './presets.js';
-import type { Block, DesignTokens, SectionOverrides, SiteManifest, SiteMeta } from './types.js';
+import type { Block, DesignTokens, Palette, Radius, SectionOverrides, SiteManifest, SiteMeta, Spacing } from './types.js';
 
 export type EditOp =
   | { op: 'addBlock'; type: string; config?: Record<string, unknown>; at?: number; id?: string }
@@ -28,7 +28,7 @@ export type EditOp =
   | { op: 'applyPreset'; name: string }
   | { op: 'setOverrides'; id: string; overrides: SectionOverrides | null };
 
-const OVERRIDE_KEYS: ReadonlyArray<keyof SectionOverrides> =
+const OVERRIDE_KEYS: ReadonlyArray<keyof Palette> =
   ['bg', 'surface', 'text', 'muted', 'primary', 'accent'];
 
 export interface OpResult {
@@ -238,7 +238,14 @@ function commitBlockConfig(orig: SiteManifest, next: SiteManifest, ctx: ArrCtx):
   return { ok: true, manifest: next, errors: [], warnings: parsed.warnings };
 }
 
-/** Keep only known palette keys with string values; null when nothing usable. */
+const OVERRIDE_RADII = ['sharp', 'soft', 'round'] as const;
+const OVERRIDE_SPACINGS = ['tight', 'default', 'airy'] as const;
+
+/**
+ * Keep only known override keys with valid values: palette roles (strings) plus
+ * an optional radius / spacing enum. Null when nothing usable — so a junk
+ * override clears rather than corrupts.
+ */
 function cleanOverrides(input: SectionOverrides): SectionOverrides | null {
   if (!isObject(input)) return null;
   const out: SectionOverrides = {};
@@ -246,6 +253,12 @@ function cleanOverrides(input: SectionOverrides): SectionOverrides | null {
   for (const k of OVERRIDE_KEYS) {
     const v = input[k];
     if (typeof v === 'string' && v) { out[k] = v; any = true; }
+  }
+  if (typeof input.radius === 'string' && (OVERRIDE_RADII as readonly string[]).includes(input.radius)) {
+    out.radius = input.radius as Radius; any = true;
+  }
+  if (typeof input.spacing === 'string' && (OVERRIDE_SPACINGS as readonly string[]).includes(input.spacing)) {
+    out.spacing = input.spacing as Spacing; any = true;
   }
   return any ? out : null;
 }

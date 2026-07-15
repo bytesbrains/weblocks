@@ -34,13 +34,13 @@ const css = `
 .blk-pricing .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:calc(var(--space)*1.2);align-items:stretch}
 .blk-pricing .plan{display:flex;flex-direction:column;background:var(--surface);border:1px solid color-mix(in srgb,var(--muted) 30%,transparent);border-radius:var(--radius);padding:calc(var(--space)*1.2)}
 .blk-pricing .plan.featured{border:2px solid var(--primary);position:relative}
-.blk-pricing .badge{position:absolute;top:-.8em;left:50%;transform:translateX(-50%);background:var(--primary);color:var(--bg);font-size:var(--fs-base);font-weight:700;padding:.15em .8em;border-radius:var(--radius)}
+.blk-pricing .badge{position:absolute;top:-.8em;left:50%;transform:translateX(-50%);background:var(--primary);color:var(--on-primary);font-size:var(--fs-base);font-weight:700;padding:.15em .8em;border-radius:var(--radius)}
 .blk-pricing .name{font-size:var(--fs-lg);font-weight:700;margin:0 0 .3em}
 .blk-pricing .price{font-size:var(--fs-xl);font-weight:800;margin:0 0 .6em}
 .blk-pricing .price .period{font-size:var(--fs-base);font-weight:500;color:var(--muted)}
 .blk-pricing ul{list-style:none;margin:0 0 var(--space);padding:0;flex:1}
 .blk-pricing ul li{padding:.35em 0;color:var(--muted);border-top:1px solid color-mix(in srgb,var(--muted) 18%,transparent)}
-.blk-pricing .cta{display:block;text-align:center;text-decoration:none;background:var(--primary);color:var(--bg);font-weight:700;padding:.7em 1em;border-radius:var(--radius);transition:opacity var(--motion)}
+.blk-pricing .cta{display:block;text-align:center;text-decoration:none;background:var(--primary);color:var(--on-primary);font-weight:700;padding:.7em 1em;border-radius:var(--radius);transition:opacity var(--motion)}
 .blk-pricing .cta:hover{opacity:.88}
 .blk-pricing .plan:not(.featured) .cta{background:transparent;color:var(--primary);border:1px solid var(--primary)}
 @media(max-width:440px){.blk-pricing .grid{grid-template-columns:1fr}}

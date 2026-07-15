@@ -26,7 +26,7 @@ const css = `
 .blk-hero-app h1{font-size:var(--fs-xl);margin:0 0 .3em;font-weight:800;line-height:1.1}
 .blk-hero-app .sub{color:var(--muted);font-size:var(--fs-lg);margin:0 auto;max-width:60ch}
 .blk-hero-app .cta{margin:var(--space-lg) 0 0}
-.blk-hero-app .install{display:inline-block;padding:.7em 1.6em;border-radius:var(--radius);background:var(--primary);color:var(--bg);text-decoration:none;font-weight:700;font-size:var(--fs-lg);transition:filter var(--motion)}
+.blk-hero-app .install{display:inline-block;padding:.7em 1.6em;border-radius:var(--radius);background:var(--primary);color:var(--on-primary);text-decoration:none;font-weight:700;font-size:var(--fs-lg);transition:filter var(--motion)}
 .blk-hero-app .install:hover,.blk-hero-app .install:focus-visible{filter:brightness(1.08)}
 .blk-hero-app .shots{display:flex;gap:var(--space);overflow-x:auto;scroll-snap-type:x mandatory;padding:var(--space-lg) .2em .4em;margin-top:var(--space);justify-content:flex-start}
 .blk-hero-app .shots::-webkit-scrollbar{height:8px}

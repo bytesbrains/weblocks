@@ -27,7 +27,15 @@ identically.
 - **Array-item edit ops** (`addItem` / `updateItem` / `removeItem` / `moveItem`)
   for surgical, single-item edits within a block's array field.
 - **Theming**: named `DesignTokens` presets (`presets.ts` — `applyPreset`,
-  `presetNames`, `getPreset`) and opt-in per-section palette `setOverrides`.
+  `presetNames`, `getPreset`) and opt-in per-section `setOverrides` (palette
+  **plus** `radius` / `spacing`).
+- **Automatic light/dark**: `mode: 'auto'` now emits a
+  `@media (prefers-color-scheme: dark)` palette that follows the viewer's OS
+  theme; supply an optional `darkPalette` for the dark side (else a built-in
+  default). `mode: 'light' | 'dark'` render single-palette as before.
+- **Contrast-safe fills**: derived `--on-primary` / `--on-accent` tokens (via a
+  WCAG-luminance `readableOn`) replace hardcoded `#fff` button text, so contrast
+  holds on any palette. `readableOn` and `sectionOverrideCss` are exported.
 - **PWA layer** (`pwa.ts`): derive `manifest.webmanifest` + a service worker from
   a `SiteManifest`; optional `pwa` / `seo` manifest fields; `renderSite` emits the
   matching `<head>` tags when opted in.

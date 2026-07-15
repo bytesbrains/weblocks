@@ -25,7 +25,7 @@ const css = `
 .blk-newsletter .intro{color:var(--muted);margin:0 0 var(--space);font-size:var(--fs-lg)}
 .blk-newsletter form{display:flex;gap:.5em;flex-wrap:wrap;justify-content:center}
 .blk-newsletter input{flex:1 1 220px;font:inherit;color:inherit;background:var(--surface);border:1px solid color-mix(in srgb,var(--text) 18%,transparent);border-radius:var(--radius);padding:.7em .8em}
-.blk-newsletter button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1.4em;background:var(--primary);color:#fff;transition:opacity var(--motion)}
+.blk-newsletter button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1.4em;background:var(--primary);color:var(--on-primary);transition:opacity var(--motion)}
 .blk-newsletter button[disabled]{opacity:.55;cursor:not-allowed}
 .blk-newsletter .note{margin:.5em 0 0;font-size:var(--fs-base);color:var(--muted)}
 `.trim();

@@ -45,7 +45,7 @@ const css = `
 .blk-contact-form .row-check{grid-auto-flow:column;justify-content:start;align-items:center;gap:.5em}
 .blk-contact-form input,.blk-contact-form textarea,.blk-contact-form select{font:inherit;color:inherit;background:var(--surface);border:1px solid color-mix(in srgb,var(--text) 18%,transparent);border-radius:var(--radius);padding:.6em .7em;width:100%}
 .blk-contact-form textarea{min-height:7em;resize:vertical}
-.blk-contact-form button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1.2em;background:var(--primary);color:#fff;transition:opacity var(--motion)}
+.blk-contact-form button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:var(--radius);padding:.7em 1.2em;background:var(--primary);color:var(--on-primary);transition:opacity var(--motion)}
 .blk-contact-form button[disabled]{opacity:.55;cursor:not-allowed}
 .blk-contact-form .note{margin:.4em 0 0;font-size:var(--fs-base);color:var(--muted)}
 `.trim();

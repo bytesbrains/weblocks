@@ -9,7 +9,7 @@ export type {
   SiteManifest, Block, DesignTokens, Palette, SiteMeta, SectionOverrides,
   PwaConfig, SeoConfig, Mode, Scale, Radius, Spacing, Motion,
 } from './types.js';
-export { DEFAULT_TOKENS, normalizeTokens, tokensToCss } from './tokens.js';
+export { DEFAULT_TOKENS, normalizeTokens, tokensToCss, sectionOverrideCss, readableOn } from './tokens.js';
 export { PRESETS, presetNames, getPreset } from './presets.js';
 export { REGISTRY, getSpec, blockTypes, needsIsland, type BlockSpec, type RenderContext } from './registry.js';
 export { renderSite, type RenderOptions } from './render.js';

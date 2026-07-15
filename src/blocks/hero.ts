@@ -23,7 +23,7 @@ const css = `
 .blk-hero .eyebrow{font-size:var(--fs-base);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
 .blk-hero h1{font-size:var(--fs-xl);line-height:1.05;margin:0;font-weight:800}
 .blk-hero p{font-size:var(--fs-lg);color:var(--muted);margin:0;max-width:60ch}
-.blk-hero .cta{display:inline-block;background:var(--primary);color:#fff;padding:.7em 1.4em;border-radius:var(--radius);text-decoration:none;font-weight:600;transition:transform var(--motion)}
+.blk-hero .cta{display:inline-block;background:var(--primary);color:var(--on-primary);padding:.7em 1.4em;border-radius:var(--radius);text-decoration:none;font-weight:600;transition:transform var(--motion)}
 .blk-hero .cta:hover{transform:translateY(-1px)}
 `.trim();
 

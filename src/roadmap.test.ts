@@ -6,7 +6,7 @@ import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
 import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
-import { DEFAULT_TOKENS } from './tokens.js';
+import { DEFAULT_TOKENS, tokensToCss, readableOn, sectionOverrideCss } from './tokens.js';
 import type { SiteManifest } from './types.js';
 
 const empty = (): SiteManifest => ({ meta: { title: 't', description: '', lang: 'en' }, design: DEFAULT_TOKENS, blocks: [], version: 1 });
@@ -93,6 +93,44 @@ test('setOverrides tints one section; render scopes it as CSS vars; null clears'
   assert.ok(html.includes('--primary:#ff0000'), 'override emitted as a scoped CSS var');
   const clear = applyOp(set.manifest, { op: 'setOverrides', id, overrides: null });
   assert.equal(clear.manifest.blocks[0]!.overrides, undefined);
+});
+
+test('setOverrides also accepts radius + spacing enums (and drops bad ones)', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'setOverrides', id, overrides: { radius: 'round', spacing: 'airy', primary: '#0af' } });
+  assert.deepEqual(r.manifest.blocks[0]!.overrides, { primary: '#0af', radius: 'round', spacing: 'airy' });
+  const css = sectionOverrideCss(r.manifest.blocks[0]!.overrides);
+  assert.ok(css.includes('--radius:24px') && css.includes('--space:1.4rem'), 'radius/spacing scoped as CSS vars');
+  // A bad enum is dropped; if nothing valid remains the override clears.
+  const bad = applyOp(m, { op: 'setOverrides', id, overrides: { radius: 'huge' } as never });
+  assert.equal(bad.manifest.blocks[0]!.overrides, undefined);
+});
+
+// ── theming: on-fill contrast tokens + mode-driven dark ─────────────────────────
+
+test('readableOn picks legible text for any fill', () => {
+  assert.equal(readableOn('#ffffff'), '#111111'); // dark text on white
+  assert.equal(readableOn('#000000'), '#ffffff'); // white text on black
+  assert.equal(readableOn('#3a5a40'), '#ffffff'); // white on the default primary
+  assert.equal(readableOn('not-a-color'), '#ffffff'); // total: safe fallback
+});
+
+test('tokensToCss emits --on-primary/--on-accent, contrast-correct', () => {
+  const css = tokensToCss({ ...DEFAULT_TOKENS, palette: { ...DEFAULT_TOKENS.palette, primary: '#ffffff', accent: '#111111' } });
+  assert.ok(css.includes('--on-primary:#111111'), 'dark text on a white primary');
+  assert.ok(css.includes('--on-accent:#ffffff'), 'white text on a dark accent');
+});
+
+test("mode:'auto' adds a prefers-color-scheme dark palette; light/dark do not", () => {
+  const light = tokensToCss({ ...DEFAULT_TOKENS, mode: 'light' });
+  assert.ok(!light.includes('prefers-color-scheme'), 'light stays single-palette');
+
+  const auto = tokensToCss({ ...DEFAULT_TOKENS, mode: 'auto' });
+  assert.ok(auto.includes('@media(prefers-color-scheme:dark)'), 'auto emits an OS-dark block');
+
+  const withDark = tokensToCss({ ...DEFAULT_TOKENS, mode: 'auto', darkPalette: { ...DEFAULT_TOKENS.palette, bg: '#010203', surface: '#0a0a0a', text: '#eeeeee', muted: '#999999', primary: '#88aaff', accent: '#ffaa88' } });
+  const darkBlock = withDark.split('@media')[1] ?? '';
+  assert.ok(darkBlock.includes('--bg:#010203'), 'supplied darkPalette drives the dark block');
 });
 
 // ── §6 runtime contract ─────────────────────────────────────────────────────────

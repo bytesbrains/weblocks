@@ -20,7 +20,7 @@ const css = `
 .blk-nav .links{display:flex;gap:calc(var(--space)*1.1);margin-left:auto;flex-wrap:wrap}
 .blk-nav .links a{color:var(--muted);text-decoration:none;font-weight:500}
 .blk-nav .links a:hover{color:var(--text)}
-.blk-nav .cta{background:var(--primary);color:#fff;padding:.5em 1.1em;border-radius:var(--radius);text-decoration:none;font-weight:600}
+.blk-nav .cta{background:var(--primary);color:var(--on-primary);padding:.5em 1.1em;border-radius:var(--radius);text-decoration:none;font-weight:600}
 `.trim();
 
 type Link = { label: string; href: string };

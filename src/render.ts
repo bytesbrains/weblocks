@@ -11,9 +11,9 @@
  */
 import { escapeAttr, escapeHtml, parse } from './schema.js';
 import { getSpec, needsIsland, REGISTRY, type RenderContext } from './registry.js';
-import { normalizeTokens, tokensToCss } from './tokens.js';
+import { normalizeTokens, sectionOverrideCss, tokensToCss } from './tokens.js';
 import { NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
-import type { Block, SectionOverrides, SiteManifest } from './types.js';
+import type { Block, SiteManifest } from './types.js';
 
 export interface RenderOptions {
   /** Host runtime for powered bricks (§6). Defaults to the inert no-op adapter. */
@@ -28,22 +28,6 @@ img{max-width:100%}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 `.trim().replace(/\n/g, '');
 
-const OVERRIDE_VARS: Record<keyof SectionOverrides, string> = {
-  bg: '--bg', surface: '--surface', text: '--text',
-  muted: '--muted', primary: '--primary', accent: '--accent',
-};
-
-/** Inline CSS-variable string for a block's opt-in palette overrides (or ''). */
-function overrideStyle(overrides: SectionOverrides | undefined): string {
-  if (!overrides || typeof overrides !== 'object') return '';
-  const decls: string[] = [];
-  for (const [key, cssVar] of Object.entries(OVERRIDE_VARS)) {
-    const v = overrides[key as keyof SectionOverrides];
-    if (typeof v === 'string' && v) decls.push(`${cssVar}:${escapeAttr(v)}`);
-  }
-  return decls.join(';');
-}
-
 /** Render one block: normalize its config, then hand markup to the brick. */
 function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapter): string {
   const spec = getSpec(block.type);
@@ -52,9 +36,10 @@ function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapt
   const tokens = normalizeTokens(manifest.design);
   const ctx: RenderContext = { id: block.id, runtime };
   let html = spec.render(value, tokens, ctx);
-  // Opt-in per-section overrides: scope them as inherited CSS vars on a wrapper.
-  const style = overrideStyle(block.overrides);
-  if (style) html = `<div class="blk-scope" style="${style}">\n${html}\n</div>`;
+  // Opt-in per-section overrides: scope palette/radius/spacing as inherited CSS
+  // vars on a wrapper (escaped for the style attribute).
+  const style = sectionOverrideCss(block.overrides);
+  if (style) html = `<div class="blk-scope" style="${escapeAttr(style)}">\n${html}\n</div>`;
   return html;
 }
 
