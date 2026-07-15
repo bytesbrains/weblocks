@@ -3,13 +3,14 @@
  *
  * The deterministic parts live here — building the prompt from the catalog,
  * extracting/validating the model's JSON, and turning an edit reply into
- * validated ops. The actual model call is INJECTED (`ModelCall`), so this stays
- * provider-agnostic and unit-testable with a fake, and the real wiring (via
- * functions/ `callProvider`) happens at the edge. Validity comes from the schema
- * + ops, never from the model being right (invariant: validity ⟂ AI quality).
+ * validated ops. The actual model call is INJECTED (`ModelCall`) — bring your
+ * own provider — so this stays provider-agnostic and unit-testable with a fake.
+ * Validity comes from the schema + ops, never from the model being right
+ * (invariant: validity ⟂ AI quality).
  */
 import { catalogPrompt } from './catalog.js';
 import { blockTypes } from './registry.js';
+import { presetNames } from './presets.js';
 import { normalizeTokens, DEFAULT_TOKENS } from './tokens.js';
 import { validateManifest } from './validate.js';
 import { applyOps, type BatchResult, type EditOp } from './ops.js';
@@ -30,6 +31,7 @@ export function buildGenerationPrompt(brief: string): { system: string; user: st
     'Also set `design` tokens: { mode: light|dark|auto, palette:{bg,surface,text,muted,primary,accent (hex)},',
     '  typography:{fontStack,scale: compact|default|expressive}, radius: sharp|soft|round,',
     '  spacing: tight|default|airy, motion: none|subtle|lively }.',
+    `  (For a quick coherent look, base it on a named preset: ${presetNames().join(', ')}.)`,
     '',
     'Rules:',
     '- Use ONLY the block types listed above; never invent a type or a config key.',
@@ -79,6 +81,14 @@ export function buildEditPrompt(manifest: SiteManifest, message: string): { syst
     '- { "op":"setVisible", "id":..., "visible":true|false }',
     '- { "op":"setDesignTokens", "patch":{ ...design keys... } }',
     '- { "op":"setMeta", "patch":{ title?, description?, lang? } }',
+    '// Surgical array-item edits — change ONE item without resending the block:',
+    '- { "op":"addItem", "id":..., "field":"items", "item":{...}, "at":<index?> }',
+    '- { "op":"updateItem", "id":..., "field":"items", "index":<n>, "patch":{...} }',
+    '- { "op":"removeItem", "id":..., "field":"items", "index":<n> }',
+    '- { "op":"moveItem", "id":..., "field":"items", "from":<n>, "to":<n> }',
+    '// Theming:',
+    `- { "op":"applyPreset", "name":"<one of: ${presetNames().join(' | ')}>" }`,
+    '- { "op":"setOverrides", "id":..., "overrides":{ primary?, accent?, bg?, ... } | null }',
     '',
     `Block types available: ${blockTypes().join(', ')}.`,
     'Block configs (for add/update):',

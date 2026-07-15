@@ -11,6 +11,8 @@ export interface BlockCatalogEntry {
   type: string;
   description: string;
   schema: JsonSchema; // JSON Schema for the block's `config`
+  /** Powered brick (§6): the host runtime capabilities it needs, if any. */
+  runtime?: { capabilities: string[] };
 }
 
 export interface JsonSchema {
@@ -62,6 +64,7 @@ export function catalog(): BlockCatalogEntry[] {
     type: spec.type,
     description: spec.description,
     schema: schemaToJsonSchema(spec.schema),
+    ...(spec.runtime ? { runtime: { capabilities: [...spec.runtime.capabilities] } } : {}),
   }));
 }
 
@@ -83,12 +86,13 @@ export function catalogPrompt(): string {
   return catalog0()
     .map((spec) => {
       const params = Object.entries(spec.schema).map(([k, f]) => `${k}: ${fieldSummary(f)}`).join('; ');
-      return `- ${spec.type} — ${spec.description}\n    config: { ${params} }`;
+      const dyn = spec.runtime ? `  [dynamic — host provides: ${spec.runtime.capabilities.join(', ')}]` : '';
+      return `- ${spec.type} — ${spec.description}${dyn}\n    config: { ${params} }`;
     })
     .join('\n');
 }
 
 // internal: iterate specs with their raw Schema (for the compact summary)
 function catalog0() {
-  return [...REGISTRY.values()].map((s) => ({ type: s.type, description: s.description, schema: s.schema }));
+  return [...REGISTRY.values()].map((s) => ({ type: s.type, description: s.description, schema: s.schema, runtime: s.runtime }));
 }

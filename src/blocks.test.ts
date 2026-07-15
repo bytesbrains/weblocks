@@ -50,9 +50,16 @@ test('a full page using every brick renders valid and escapes injected markup', 
   assert.ok(landmarks >= blockTypes().length, `expected ≥${blockTypes().length} landmarks, got ${landmarks}`);
 });
 
-test('catalog is the closed vocabulary — 10 named bricks', () => {
+test('catalog is the closed vocabulary — the full named brick set', () => {
   assert.deepEqual(
     blockTypes().sort(),
-    ['contact-details', 'cta', 'faq', 'features', 'footer', 'gallery', 'hero', 'nav', 'services-catalogue', 'testimonials'],
+    [
+      'about', 'accordion', 'announcement-bar', 'app-shell', 'auth', 'blog-list',
+      'blog-post', 'carousel', 'contact-details', 'contact-form', 'cta', 'divider',
+      'faq', 'features', 'feed', 'footer', 'gallery', 'hero', 'hero-app', 'logos',
+      'map', 'nav', 'newsletter', 'pricing', 'rich-text', 'services-catalogue',
+      'sidebar', 'social-links', 'spacer', 'split', 'stats', 'steps', 'tabs',
+      'team', 'testimonials', 'timeline', 'video',
+    ],
   );
 });

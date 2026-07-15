@@ -7,8 +7,9 @@
  */
 import { getSpec, blockTypes } from './registry.js';
 import { normalizeTokens } from './tokens.js';
-import { parse } from './schema.js';
-import type { Block, DesignTokens, SiteManifest, SiteMeta } from './types.js';
+import { parse, type Field } from './schema.js';
+import { getPreset, presetNames } from './presets.js';
+import type { Block, DesignTokens, SectionOverrides, SiteManifest, SiteMeta } from './types.js';
 
 export type EditOp =
   | { op: 'addBlock'; type: string; config?: Record<string, unknown>; at?: number; id?: string }
@@ -17,7 +18,18 @@ export type EditOp =
   | { op: 'moveBlock'; id: string; to: number }
   | { op: 'setVisible'; id: string; visible: boolean }
   | { op: 'setDesignTokens'; patch: Partial<DesignTokens> }
-  | { op: 'setMeta'; patch: Partial<SiteMeta> };
+  | { op: 'setMeta'; patch: Partial<SiteMeta> }
+  // ── §8 array-item ops: surgically edit ONE item of a block's array field ──────
+  | { op: 'addItem'; id: string; field: string; item: unknown; at?: number }
+  | { op: 'updateItem'; id: string; field: string; index: number; patch: unknown }
+  | { op: 'removeItem'; id: string; field: string; index: number }
+  | { op: 'moveItem'; id: string; field: string; from: number; to: number }
+  // ── theming ──────────────────────────────────────────────────────────────────
+  | { op: 'applyPreset'; name: string }
+  | { op: 'setOverrides'; id: string; overrides: SectionOverrides | null };
+
+const OVERRIDE_KEYS: ReadonlyArray<keyof SectionOverrides> =
+  ['bg', 'surface', 'text', 'muted', 'primary', 'accent'];
 
 export interface OpResult {
   ok: boolean;
@@ -104,6 +116,60 @@ export function applyOp(manifest: SiteManifest, op: EditOp): OpResult {
       next.meta = { ...next.meta, ...(op.patch ?? {}) };
       return { ok: true, manifest: next, errors: [], warnings: [] };
     }
+
+    // ── §8 array-item ops ────────────────────────────────────────────────────
+    case 'addItem': {
+      const r = withArrayField(manifest, next, op.id, op.field);
+      if ('error' in r) return r.error;
+      const at = clamp(op.at ?? r.arr.length, 0, r.arr.length);
+      r.arr.splice(at, 0, op.item);
+      return commitBlockConfig(manifest, next, r);
+    }
+    case 'updateItem': {
+      const r = withArrayField(manifest, next, op.id, op.field);
+      if ('error' in r) return r.error;
+      if (!inBounds(op.index, r.arr.length)) return fail(manifest, `updateItem: index ${op.index} out of range for "${op.field}" (len ${r.arr.length})`);
+      const cur = r.arr[op.index];
+      // Merge patch onto object items; replace for scalar-item arrays.
+      r.arr[op.index] = (isObject(cur) && isObject(op.patch)) ? { ...cur, ...op.patch } : op.patch;
+      return commitBlockConfig(manifest, next, r);
+    }
+    case 'removeItem': {
+      const r = withArrayField(manifest, next, op.id, op.field);
+      if ('error' in r) return r.error;
+      if (!inBounds(op.index, r.arr.length)) return fail(manifest, `removeItem: index ${op.index} out of range for "${op.field}" (len ${r.arr.length})`);
+      r.arr.splice(op.index, 1);
+      return commitBlockConfig(manifest, next, r);
+    }
+    case 'moveItem': {
+      const r = withArrayField(manifest, next, op.id, op.field);
+      if ('error' in r) return r.error;
+      if (!inBounds(op.from, r.arr.length)) return fail(manifest, `moveItem: from ${op.from} out of range for "${op.field}" (len ${r.arr.length})`);
+      const [it] = r.arr.splice(op.from, 1);
+      r.arr.splice(clamp(op.to, 0, r.arr.length), 0, it);
+      return commitBlockConfig(manifest, next, r);
+    }
+
+    // ── theming ──────────────────────────────────────────────────────────────
+    case 'applyPreset': {
+      const preset = getPreset(op.name);
+      if (!preset) return fail(manifest, `applyPreset: unknown preset "${op.name}" (choose from: ${presetNames().join(', ')})`);
+      next.design = normalizeTokens(preset);
+      return { ok: true, manifest: next, errors: [], warnings: [] };
+    }
+    case 'setOverrides': {
+      const i = find(next, op.id);
+      if (i < 0) return fail(manifest, `setOverrides: no block "${op.id}"`);
+      const block = next.blocks[i]!;
+      if (op.overrides === null) {
+        delete block.overrides;
+      } else {
+        const clean = cleanOverrides(op.overrides);
+        if (!clean) { delete block.overrides; } else { block.overrides = clean; }
+      }
+      return { ok: true, manifest: next, errors: [], warnings: [] };
+    }
+
     default:
       return fail(manifest, `unknown op: ${(op as { op: string }).op}`);
   }
@@ -133,4 +199,53 @@ export function applyOps(manifest: SiteManifest, ops: EditOp[]): BatchResult {
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, Math.trunc(Number.isFinite(n) ? n : hi)));
+}
+
+function inBounds(i: unknown, len: number): boolean {
+  return typeof i === 'number' && Number.isInteger(i) && i >= 0 && i < len;
+}
+
+function isObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+interface ArrCtx { i: number; block: Block; field: string; arr: unknown[]; }
+
+/**
+ * Locate a block's ARRAY field for an item op: the block must exist, its type be
+ * known, and `field` be an array field in the schema. Returns a fresh copy of
+ * the current array to mutate, or a ready-made failure (a bad op is a no-op).
+ */
+function withArrayField(orig: SiteManifest, next: SiteManifest, id: string, field: string): ArrCtx | { error: OpResult } {
+  const i = find(next, id);
+  if (i < 0) return { error: fail(orig, `item op: no block "${id}"`) };
+  const block = next.blocks[i]!;
+  const spec = getSpec(block.type);
+  if (!spec) return { error: fail(orig, `item op: unknown block type "${block.type}" for "${id}"`) };
+  const fs: Field | undefined = spec.schema[field];
+  if (!fs || fs.kind !== 'array') return { error: fail(orig, `item op: "${field}" is not an array field of "${block.type}"`) };
+  const raw = (block.config as Record<string, unknown>)?.[field];
+  return { i, block, field, arr: Array.isArray(raw) ? [...raw] : [] };
+}
+
+/** Re-validate the whole config with the mutated array applied; reject on hard errors. */
+function commitBlockConfig(orig: SiteManifest, next: SiteManifest, ctx: ArrCtx): OpResult {
+  const merged = { ...ctx.block.config, [ctx.field]: ctx.arr };
+  const spec = getSpec(ctx.block.type)!;
+  const parsed = parse(spec.schema, merged);
+  if (!parsed.ok) return fail(orig, ...parsed.errors.map((e) => `item op(${ctx.block.id}.${ctx.field}): ${e}`));
+  next.blocks[ctx.i] = { ...ctx.block, config: parsed.value };
+  return { ok: true, manifest: next, errors: [], warnings: parsed.warnings };
+}
+
+/** Keep only known palette keys with string values; null when nothing usable. */
+function cleanOverrides(input: SectionOverrides): SectionOverrides | null {
+  if (!isObject(input)) return null;
+  const out: SectionOverrides = {};
+  let any = false;
+  for (const k of OVERRIDE_KEYS) {
+    const v = input[k];
+    if (typeof v === 'string' && v) { out[k] = v; any = true; }
+  }
+  return any ? out : null;
 }

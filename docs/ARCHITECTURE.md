@@ -1,138 +1,57 @@
-# Apps — Block catalog & AI-composable architecture
+# Architecture — `@bytesbrains/weblocks`
 
-**Status:** Design / exploration
-**Owner:** @nandal
-**Relates to:** [`APPS_SITE_PUBLISHING.md`](./APPS_SITE_PUBLISHING.md) (v1 = single-shot static HTML)
+How the engine turns an AI-composed `SiteManifest` into a validated, self-contained
+static document — and how to extend it. For the *why*, see [`../VISION.md`](../VISION.md).
 
-This spec is the evolution path from "AI writes one HTML blob" to a **block
-catalog the AI composes and edits by contract** — the substrate for gallery,
-blog, services, contact forms, chatbot, and (later) plugins, plus conversational
-("chat to edit your site") management.
+This document covers **only the engine**. It bundles no backend, no provider, and
+no host: the model call is injected, and powered bricks declare their runtime
+needs for a host to wire (below).
 
 ---
 
-## The Lego model — the mental model
-
-The system is **Lego bricks for websites**: a finite, curated set of
-interchangeable pieces the AI *assembles and configures* — it never moulds new
-plastic (writes raw HTML/JS). This is not just an analogy; each Lego property is
-a design constraint.
-
-| Lego | This system |
-|---|---|
-| Finite, curated set of brick types | The **closed block catalog** (nouns) |
-| Universal studs — every brick connects the same way | Shared **design-token + manifest contract** → any block fits |
-| You physically *can't* connect them wrong | **Illegal states unrepresentable** (valid by construction) |
-| Bricks come in colours/sizes | **Typed params/tokens** (adjectives) — same brick, different config |
-| Infinite builds from finite parts | **Small but composable** — power is in combination, not per-brick flexibility |
-| The builder *snaps bricks*, never *melts plastic* | The AI **assembles**, never writes raw HTML — **no escape hatch = no melting** |
-| New capability → design a new brick, add to the set | Grow the vocabulary with **typed primitives, legacy-safe** |
-| The instruction booklet | The **manifest** — precise, reproducible, diffable, undoable |
-| QA the bricks, and *any* build is sound | Your **test surface is N bricks, not ∞ pages** |
-
-**Powered bricks.** Classic bricks are inert, but a few blocks have behaviour
-(forms submit, chatbots talk). Those are the Technic/Mindstorms pieces — they
-clip onto a shared baseplate with wiring (the per-site runtime, §6) via **one
-standard interface (`/_api/*`)**, never a bespoke backend. Static bricks are
-passive HTML; powered bricks plug into the same power/control system.
-
-Everything upstream falls out of this: generation = *snapping a build*; editing =
-*swap one brick*; chat = *instruct the builder*; cheaper models = *the builder
-can be junior because bricks can't be misassembled*; plugins = *powered bricks
-from a curated bin*.
-
-## Design invariants — non-negotiable
-
-These hold for every block, every edit, every PR. Violating one reintroduces
-broken pages or the security risk v1 removed.
-
-1. **Closed vocabulary.** The AI may only emit validated operations over a
-   bounded set of block types, typed params/tokens, and verbs (`add / update /
-   remove / move / setTokens`). If a request can't be expressed in the
-   vocabulary, the answer is **add a typed primitive — never an escape hatch.**
-2. **Illegal states unrepresentable.** Every reachable manifest is valid by
-   construction (schema-validated before apply). Worst case is a *rejected op*,
-   never a corrupted site.
-3. **No escape hatch.** No "custom HTML/JS" block and no free-form markup field
-   within the AI's reach. Raw output = melting plastic = the risk we designed away.
-4. **Parameterize, don't free-form.** Prefer typed knobs (tokens, enums) over
-   free strings. Every free-string field is a place a page can break.
-5. **Total renderer.** The renderer is defined for every valid manifest —
-   defaults for all optionals, SSR-able to static HTML, cannot throw. (Schema =
-   valid by construction; renderer = can't fail to render: the two walls.)
-6. **Validity ⟂ AI quality.** Page *validity* comes from schema + renderer, not
-   from the model being right — so models are swappable/downgradable (Gemini ↔
-   Opus) with zero risk of broken pages. The model affects taste and wording only.
-7. **Legacy-safe growth.** Grow only additively; old manifests must keep
-   rendering (unknown/absent → safe default, per `SiteStatus.fromName`).
-   Removing/renaming a brick or param needs a migration.
-
-## Brick definition-of-done — admitting a new block
-
-A block joins the catalog only when it:
-
-- [ ] declares a **typed interface** (its studs) via Custom Elements Manifest → JSON Schema;
-- [ ] consumes the **shared design tokens** (fits the baseplate) — no ad-hoc styling;
-- [ ] **renders totally**: a sensible default for every optional field, SSR-able to static HTML, cannot throw;
-- [ ] is **valid regardless of neighbours** (no coupling beyond declared placement rules, e.g. `nav` top / `footer` bottom);
-- [ ] if **powered** (dynamic), speaks the **standard runtime contract (`/_api/*`)** — captcha / verify / rate-limit / store handled by the vetted runtime, not a bespoke backend;
-- [ ] exposes **only typed knobs — no raw-HTML field** (no melting);
-- [ ] ships **snapshot tests** for its param combinations (the test surface is the brick, not the ∞ pages built from it).
-
----
-
-## 1. The model in one picture
+## The pipeline
 
 ```
- Component library (Lit/vanilla custom elements, SSR-able)
-        │  each exposes a typed interface (Custom Elements Manifest)
-        ▼
- Interface catalog (auto-generated CEM/JSON Schema)  ──► fed to the AI as its "menu"
-        │
-        ▼
- Site manifest (typed JSON: design tokens + ordered blocks + integrations)
-        │  AI *composes/edits* this via validated tool-calls — never raw HTML/JS
-        ▼
- Renderer  ──► SSR each block to static HTML at publish  ──► R2/KV  ──► *.wrok.in
-        │  hydrate ONLY interactive "islands" (form, gallery lightbox, chatbot)
-        ▼
- Dynamic blocks call a per-site runtime API (forms, chatbot, plugins)
+brief ──generateSite(callModel)──► SiteManifest ──validateManifest──► (strict gate for edits)
+                                        │
+message ──editSite(callModel)──► EditOp[] ──applyOps──► new SiteManifest (version++)
+                                        │
+                                   renderSite ──► one self-contained static HTML document
+                                        │            (+ optional manifest.webmanifest + sw.js)
+                                        ▼
+                        island <script> markers only where a brick is interactive
 ```
 
-**Invariants**
-- The AI targets **interfaces**, not framework code. Worst case is a rejected
-  tool-call, never corrupted markup.
-- Static-first: pages are HTML+CSS; JS loads only for interactive islands.
-- The **design system is top-level state** every block inherits, so coherence
-  survives edits ("make the whole site warmer" = one token change).
+Two walls make a broken page structurally impossible:
 
----
+1. **Schema validation** (`parse` / `validateManifest`) — the strict gate an edit
+   op passes before it is applied. Wrong type / bad enum / unknown type → the op
+   is *rejected*, the manifest is untouched.
+2. **Total renderer** (`renderSite`) — defined for every manifest: a default for
+   every optional field, all text escaped, unknown block types skipped, and it
+   **cannot throw**.
 
-## 2. Site manifest (top-level shape)
+## The `SiteManifest`
 
 ```ts
 type SiteManifest = {
-  meta:   { title: string; description: string; lang: string; favicon?: string };
-  pwa:    { name: string; shortName: string; themeColor: string;
-            backgroundColor: string; icons: Icon[]; installable: boolean;
-            offline: boolean };                       // → webmanifest + service worker
-  seo:    { ogTitle?: string; ogImage?: string; canonical?: string; noindex?: boolean };
-  design: DesignTokens;                                // the shared design system
-  blocks: Block[];                                     // ordered page sections
-  integrations: {
-    forms?:   { provider: 'builtin'; notifyEmail: string };
-    chatbot?: { persona: string; model: string };
-    plugins?: PluginBinding[];                         // later (OAuth-backed)
-  };
-  version: number;                                     // bumped per edit → undo/history
+  meta:    { title: string; description: string; lang: string };
+  design:  DesignTokens;              // the shared baseplate (CSS custom props)
+  blocks:  Block[];                   // ordered, typed page sections
+  version: number;                    // bumped per accepted edit → undo/history
+  pwa?:    PwaConfig;                 // opt-in installable PWA (webmanifest + sw)
+  seo?:    SeoConfig;                 // opt-in <head> meta
 };
 
-type Block = { id: string; type: BlockType; visible: boolean; config: object };
+type Block = {
+  id: string; type: string; visible: boolean;
+  config: Record<string, unknown>;    // validated against the brick's schema
+  overrides?: Partial<Palette>;       // opt-in per-section palette tint
+};
 
 type DesignTokens = {
   mode: 'light' | 'dark' | 'auto';
-  palette: { bg: string; surface: string; text: string; muted: string;
-             primary: string; accent: string };
+  palette: { bg; surface; text; muted; primary; accent };   // hex
   typography: { fontStack: string; scale: 'compact'|'default'|'expressive' };
   radius: 'sharp'|'soft'|'round';
   spacing: 'tight'|'default'|'airy';
@@ -140,230 +59,165 @@ type DesignTokens = {
 };
 ```
 
-Every block's `config` is validated against that block type's JSON Schema
-(derived from the component's Custom Elements Manifest) before it is applied.
+The manifest is never raw HTML. `pwa`, `seo`, and `overrides` are additive and
+optional — a manifest without them renders exactly as before.
+
+## The schema layer (`schema.ts`)
+
+A tiny, dependency-free descriptor language — the "studs" of a brick. `parse`
+always returns a fully-defaulted value, and it separates two severities so edit
+ops can be strict about garbage yet lenient about incompleteness:
+
+- **errors (HARD)** — wrong type, invalid enum, out-of-range int, non-array. The
+  op is malformed → reject it.
+- **warnings (SOFT)** — a required field is missing, or a value was truncated to
+  its max. Apply with the default/truncation (the total renderer copes) and tell
+  the author.
+
+Field kinds: `string`, `enum`, `boolean`, `int`, `object`, `array`. All text is
+run through `escapeHtml` / `escapeAttr` on render, and every URL through
+`sanitizeUrl` (which collapses `javascript:` and other dangerous schemes to `#`).
+
+## The registry (`registry.ts`) — the closed vocabulary
+
+A block type exists iff it is registered. Each brick is a `BlockSpec`:
+
+```ts
+interface BlockSpec {
+  type: string;                       // the catalog id (kebab-case)
+  description: string;                // one line the AI sees in its menu
+  schema: Schema;                     // typed contract for `config`
+  css?: string;                       // emitted once per document if the brick is used
+  render(config, tokens, ctx?): string;  // markup only; never throws
+  island?: string;                    // client behaviour to hydrate (interactive bricks)
+  runtime?: { capabilities: string[] };  // powered brick: host runtime needs
+}
+```
+
+Registration order is the order block CSS is emitted (stable output) and the
+order bricks appear in the AI's menu.
+
+## The renderer (`render.ts`)
+
+`renderSite(manifest, options?)` → one HTML document. It:
+
+- includes only the CSS of bricks actually **used**, in registration order;
+- normalizes each block's config through its schema (defaults fill every hole);
+- wraps a block in a scoped `<div>` carrying its opt-in `overrides` as inherited
+  CSS variables — so one section can be tinted without touching the rest;
+- emits island `<script>` markers only for interactive bricks whose behaviour is
+  on (`needsIsland`);
+- emits PWA/SEO `<head>` tags only when the manifest opts in.
+
+`options.runtime` supplies a `RuntimeAdapter` for powered bricks; it defaults to
+the inert no-op adapter, so `renderSite(manifest)` needs no host wiring.
+
+## Edit ops (`ops.ts`) — the verbs
+
+Each op is validated **before** it is applied; a malformed op is a no-op with
+errors, never a corrupted manifest. Applying returns a **new** manifest with
+`version` bumped.
+
+| op | effect |
+|---|---|
+| `addBlock` / `updateBlock` / `removeBlock` / `moveBlock` | block-level edits |
+| `setVisible` | show/hide a block |
+| `setDesignTokens` / `applyPreset` | site-wide theming (patch or named preset) |
+| `setMeta` | title / description / lang |
+| `setOverrides` | opt-in per-section palette tint (or clear with `null`) |
+| `addItem` / `updateItem` / `removeItem` / `moveItem` | **surgical array-item edits** |
+
+The array-item ops let the AI change *one* item of a block's array field
+(features, gallery images, pricing tiers, nav links) without resending the whole
+block: they locate the array field in the brick's schema, mutate a copy, then
+re-validate the whole config — a bad op is a no-op.
+
+## The catalog (`catalog.ts`) — the AI's menu
+
+Projects the registered bricks into the two forms a model consumes:
+
+- `catalog()` → structured **JSON Schema** per brick (for tool/function-calling),
+  including a `runtime` declaration for powered bricks;
+- `catalogPrompt()` → a compact, token-cheap string for a system prompt.
+
+`npm run emit:catalog` writes `catalog.json` (the machine contract) and
+`CATALOG.md` (human reference) from the code — they are generated, never
+hand-edited, and are the shareable API contract.
+
+## Design tokens (`tokens.ts`) & presets (`presets.ts`)
+
+`tokensToCss` emits the `:root` custom-property block every brick styles from, so
+coherence survives edits. `normalizeTokens` is total: any missing field or
+out-of-range enum falls back to a default, so a bad token value can never reach
+the CSS. `presets.ts` ships named `DesignTokens` sets (`sand`, `midnight`, …) the
+AI or a picker selects by name via `applyPreset`.
+
+## Powered bricks & the runtime contract (`runtime.ts`)
+
+A powered brick declares `runtime: { capabilities: [...] }`. On render it emits
+standard markup plus a documented client contract: the interactive element
+carries `data-wl-capability="<cap>"` and `data-wl-block="<id>"`, and its
+form `action`/`method` are resolved by the host's `RuntimeAdapter`.
+
+```ts
+interface RuntimeAdapter { resolve(capability, blockId): { url; method } | null; }
+```
+
+- With the default `NOOP_RUNTIME`, powered bricks render **inert-but-valid** (a
+  disabled control + a visible note), with the `data-wl-*` hooks intact so a host
+  can still enhance them client-side.
+- `pathRuntime('/api')` is a reference adapter: every capability maps to
+  `POST /api/<capability>/<blockId>`, so a host wires the whole catalog in one
+  line and implements one route per capability — never one per block type.
+- `runtimeNeeds(manifest)` reports what a host must implement. Empty ⇒ a purely
+  static site that needs no backend at all.
+
+The engine ships no backend. Captcha, server-side validation, delivery, abuse
+caps, and identity are the host runtime's job.
+
+## PWA layer (`pwa.ts`)
+
+When `manifest.pwa` is present the engine derives an installable app shell:
+
+- `buildWebManifest` / `buildWebManifestJson` → the Web App Manifest (name,
+  icons, `theme_color`/`background_color` from design tokens, `display`,
+  `start_url`), defaulted so a bare `pwa: {}` is already valid.
+- `buildServiceWorker` → a dependency-free precache + offline-fallback worker
+  whose cache name is derived from `manifest.version` (reproducible; no
+  timestamps).
+- `emitPwa(manifest)` → `{ 'manifest.webmanifest', 'sw.js' }` to serve alongside
+  the HTML, or `null` when not opted in.
+
+`renderSite` adds the `<link rel="manifest">`, `theme-color`, and SW-registration
+tags to `<head>` only when `pwa` is set.
 
 ---
 
-## 3. The block catalog
+## Brick definition-of-done — admitting a new block
 
-Covering the sections of a modern single-page responsive PWA. **Static** blocks
-render to pure HTML (no JS unless an island is noted). **Dynamic** blocks need
-the per-site **runtime** (§6).
+A block joins the catalog only when it:
 
-### Chrome / structure
-| type | purpose | kind |
-|---|---|---|
-| `nav` | logo, links, CTA, mobile hamburger | static (+island: mobile menu) |
-| `announcement-bar` | dismissible top banner | static (+island: dismiss) |
-| `footer` | links, social, legal, copyright | static |
+- [ ] declares a **typed schema** — every optional field defaulted; **no
+      raw-HTML / free-markup field**;
+- [ ] consumes the **shared design tokens** — no ad-hoc styling; CSS scoped under
+      `.blk-<type>`;
+- [ ] **renders totally**: a sensible default for every field, all text escaped,
+      all URLs sanitized, drops incomplete array items, and **cannot throw**;
+- [ ] is **valid regardless of neighbours** (no coupling beyond placement intent,
+      e.g. `nav` top / `footer` bottom);
+- [ ] if **powered**, declares `runtime.capabilities` and speaks the client
+      contract — no host-specific code in the brick;
+- [ ] ships **tests** (the shared suite in `blocks.test.ts` exercises the DoD for
+      every registered brick) and regenerates `catalog.json` / `CATALOG.md`;
+- [ ] is **additive & non-breaking** — every existing manifest still validates and
+      renders identically.
 
-### Content sections
-| type | purpose | kind |
-|---|---|---|
-| `hero` | headline, subhead, CTA(s), media/gradient bg | static |
-| `features` | icon + title + text grid (value props) | static |
-| `services-catalogue` | services/products: title, desc, price, CTA | static |
-| `gallery` | image grid / masonry / carousel | static (+island: lightbox) |
-| `about` | story / mission narrative | static |
-| `team` | people cards (photo, role, socials) | static |
-| `testimonials` | quotes, avatar, rating | static (+island: carousel) |
-| `logos` | client/press logo strip | static |
-| `stats` | animated metric counters | static (+island: count-up) |
-| `pricing` | tiers/plans, feature matrix | static (+island: monthly/annual toggle) |
-| `steps` | how-it-works / process | static |
-| `faq` | question/answer accordion | static (+island: expand) |
-| `cta` | conversion band | static |
-| `video` | inline/lazy-embedded video | static (+island: lazy player) |
-| `contact-details` | address, phone, email, hours | static |
-| `map` | location embed | static (+island: map tiles) |
-| `social-links` | icon row | static |
+### Adding a block, concretely
 
-### Blog
-| type | purpose | kind |
-|---|---|---|
-| `blog-list` | recent posts grid → links to post pages | dynamic (posts store + routing) |
-| `blog-post` | a rendered post page (own route) | dynamic |
-
-### Dynamic / interactive
-| type | purpose | kind |
-|---|---|---|
-| `contact-form` | fields + **captcha** + submit | **dynamic** (endpoint, verify, email, store) |
-| `newsletter` | email capture | **dynamic** (store + email provider) |
-| `booking` | calendar slot booking | **dynamic** (plugin/OAuth) |
-| `chatbot` | LLM widget grounded on site content | **dynamic** (LLM endpoint, rate-limited) |
-
-### Atomic primitives (used inside blocks; not usually top-level)
-`button`, `badge`, `icon`, `image`, `heading`, `text`, `divider`, `spacer`,
-`card`, `accordion-item`, `tab`.
-
----
-
-## 4. Block end-to-end #1 — `gallery` (static + lightbox island)
-
-**(a) Interface** — from the component's Custom Elements Manifest (excerpt):
-
-```jsonc
-{ "tagName": "x-gallery",
-  "attributes": [
-    { "name": "layout",   "type": "\"grid\"|\"masonry\"|\"carousel\"", "default": "grid" },
-    { "name": "columns",  "type": "2|3|4", "default": 3 },
-    { "name": "gap",      "type": "\"sm\"|\"md\"|\"lg\"", "default": "md" },
-    { "name": "lightbox", "type": "boolean", "default": true } ],
-  "slots": [ { "name": "items", "description": "gallery <figure> items" } ] }
-```
-
-**(b) JSON Schema** (what the AI must satisfy; auto-derived from the CEM):
-
-```jsonc
-{ "type": "object", "required": ["items"],
-  "properties": {
-    "layout":  { "enum": ["grid","masonry","carousel"], "default": "grid" },
-    "columns": { "enum": [2,3,4], "default": 3 },
-    "gap":     { "enum": ["sm","md","lg"], "default": "md" },
-    "lightbox":{ "type": "boolean", "default": true },
-    "items":   { "type": "array", "maxItems": 60, "items": {
-      "type": "object", "required": ["mediaId","alt"],
-      "properties": { "mediaId": { "type": "string" },   // → R2 object, uploaded via UI
-                      "alt": { "type": "string" }, "caption": { "type": "string" } } } } } }
-```
-
-**(c) Manifest snippet the AI emits:**
-
-```json
-{ "id": "gal_1", "type": "gallery", "visible": true,
-  "config": { "layout": "masonry", "columns": 3, "lightbox": true,
-    "items": [ { "mediaId": "m_a1", "alt": "Studio, morning light" },
-               { "mediaId": "m_b2", "alt": "Ceramic bowls" } ] } }
-```
-
-**(d) SSR output** (static HTML at publish; inherits design tokens; no framework):
-
-```html
-<section class="x-gallery x-gallery--masonry" data-cols="3" aria-label="Gallery">
-  <figure><img src="/media/m_a1.avif" alt="Studio, morning light" loading="lazy" width="800" height="1000"></figure>
-  <figure><img src="/media/m_b2.avif" alt="Ceramic bowls" loading="lazy" width="800" height="800"></figure>
-</section>
-<script type="module" src="/_island/lightbox.js" data-for="x-gallery"></script>  <!-- only if lightbox:true -->
-```
-
-**(e) Chat edit hook** — "make it 2 columns and turn off the popup":
-```
-updateBlock("gal_1", { columns: 2, lightbox: false })
-```
-Validated → applied → version++ → re-render. Media upload stays a UI action; the
-AI references already-uploaded `mediaId`s (or inserts placeholders + asks).
-
----
-
-## 5. Block end-to-end #2 — `contact-form` with captcha (dynamic)
-
-**(a) JSON Schema:**
-```jsonc
-{ "type": "object", "required": ["fields","recipient"],
-  "properties": {
-    "recipient":     { "type": "string", "format": "email" },   // owner-verified, server-side
-    "captcha":       { "enum": ["turnstile","none"], "default": "turnstile" },
-    "submitLabel":   { "type": "string", "default": "Send" },
-    "successMessage":{ "type": "string", "default": "Thanks — we'll be in touch." },
-    "fields": { "type": "array", "minItems": 1, "maxItems": 12, "items": {
-      "type": "object", "required": ["name","label","type"],
-      "properties": { "name": { "type": "string" }, "label": { "type": "string" },
-        "type": { "enum": ["text","email","tel","textarea","select","checkbox"] },
-        "required": { "type": "boolean", "default": false },
-        "options": { "type": "array", "items": { "type": "string" } } } } } } }
-```
-
-**(b) SSR output** — posts to the **per-site runtime**, with a Turnstile widget:
-```html
-<form class="x-contact-form" method="post" action="/_api/forms/{siteId}/cf_1">
-  <label>Name <input name="name" required></label>
-  <label>Email <input name="email" type="email" required></label>
-  <label>Message <textarea name="message" required></textarea></label>
-  <div class="cf-turnstile" data-sitekey="{TURNSTILE_SITE_KEY}"></div>   <!-- captcha -->
-  <button type="submit">Send</button>
-</form>
-<script type="module" src="/_island/contact-form.js"></script>  <!-- progressive enhance + Turnstile -->
-```
-
-**(c) Runtime** (the real engineering — a Worker/Function endpoint per submission):
-1. **Verify captcha** server-side (Turnstile siteverify) — reject bots.
-2. **Validate** against the block's field schema (never trust the client).
-3. **Rate-limit / abuse-cap** per site + per IP — *reuse the existing rate-limit
-   machinery* (`site_limits.ts` pattern).
-4. **Store** submission (`sites/{siteId}/submissions`), **notify** owner (email).
-5. Return success/`successMessage` (or the error) to the island.
-
-**(d) Chat edit hook** — "add a phone field and send to me@studio.com":
-```
-updateBlock("cf_1", { recipient: "me@studio.com",
-  fields: [ …existing, { name: "phone", label: "Phone", type: "tel" } ] })
-```
-Config is trivial via chat; the **safety-critical parts (captcha, verify, email,
-abuse) live in the vetted block runtime**, not in anything the AI writes.
-
----
-
-## 6. Static vs. dynamic — what needs a runtime
-
-- **Static blocks** (most of §3): SSR → R2 → served by the existing Worker. No
-  new backend.
-- **Dynamic blocks** need a **per-site runtime API** (`/_api/*` on the app
-  subdomain), each a *vetted* implementation the AI only *configures*:
-  - `contact-form`, `newsletter` → submission endpoint + Turnstile + email + store + abuse caps.
-  - `blog` → posts store + multi-route rendering (post pages).
-  - `chatbot` → LLM endpoint (reuse `callProvider`), **rate-limited & cost-capped**, grounded on site content.
-  - `booking`/plugins → OAuth (out-of-band consent) + secret vault + **sandboxed execution (Wasm component model, curated registry)**.
-
-The AI never writes runtime code; it selects a block and fills its typed config.
-
----
-
-## 7. The AI contract & chat editing
-
-- **Generation:** AI emits a full manifest (design tokens + ordered blocks) from
-  a brief — bounded, schema-validated. (Single model call; no agent needed.)
-- **Editing/management (chat):** a small tool-calling agent over the manifest —
-  `addBlock / updateBlock / removeBlock / moveBlock / setDesignTokens /
-  writeBlogPost / configureForm`. Each op validated → applied → `version++`
-  (undo/history/draft-vs-publish for free). Config edits run at **low
-  temperature**; creative content/design at higher. Not the pi-style coding
-  agent — a constrained document agent.
-- **Interfaces are auto-generated from components (CEM)** → the AI's menu never
-  drifts from the real component library.
-- Pair chat with a **direct-manipulation inspector** over the same manifest
-  (click a block, edit a field, drag to reorder) — chat for creation/coarse
-  moves, inspector for fine control.
-
----
-
-## 8. Tech choices (deliberate)
-
-- **Components:** Lit or vanilla custom elements, **SSR-able**, output lean
-  static HTML + island hydration. **Avoid Angular Elements as the *delivery*
-  mechanism** (ships the framework runtime → LCP/SEO tax on static pages);
-  frameworks are fine for *authoring* only if you SSR to static.
-- **Interface catalog:** Custom Elements Manifest → JSON Schema (single source
-  of truth for humans + AI).
-- **Captcha:** Cloudflare Turnstile (server-side siteverify).
-- **Runtime/data:** Cloudflare Worker `/_api/*` + D1/KV + R2 (media) + Email;
-  Durable Objects for chatbot sessions. Firestore stays the authoring store.
-- **Plugins:** Wasm Component Model in a **curated/private** registry, later.
-
----
-
-## 9. Phasing (each phase ships a real capability + de-risks the next)
-
-1. **Block engine** — manifest + design tokens + renderer + SSR; migrate
-   generation to emit a manifest; ship static blocks (hero, features,
-   services-catalogue, gallery, about, testimonials, faq, cta, contact-details,
-   footer, nav). *Unlocks:* section-level chat editing + coherent design.
-2. **Chat editor** — the tool-calling document agent + an inspector panel.
-3. **First dynamic block: `contact-form` + captcha** — builds the per-site
-   runtime backbone (endpoint, Turnstile, email, abuse caps). Newsletter rides along.
-4. **Blog** — posts store, multi-route rendering, AI-drafted posts.
-5. **Chatbot** — LLM endpoint, rate-limited/cost-capped (reuse existing machinery).
-6. **Plugins (Calendar/booking)** — OAuth + secret vault + Wasm sandbox.
-
-**Start-now, long-lead:** the **PSL submission for `wrok.in`** — required before
-forms/auth for sibling-subdomain cookie isolation (already flagged in the v1 doc).
+1. Create `src/blocks/<name>.ts` exporting a `BlockSpec` (see any existing brick,
+   e.g. `features.ts` for a static grid, `contactForm.ts` for a powered brick).
+2. Register it in `src/registry.ts` (import + add to `SPECS` at the right
+   position).
+3. `npm run build && npm test` — the shared DoD suite covers the new brick.
+4. `npm run emit:catalog` to regenerate the contract.
+5. Update the closed-vocabulary list in `blocks.test.ts` and the docs.

@@ -2,5 +2,7 @@
 lib/
 node_modules/
 example-output.html
+example-manifest.webmanifest
+example-sw.js
 ai-output.html
 ai-manifest.json

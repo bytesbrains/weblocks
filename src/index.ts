@@ -6,12 +6,21 @@
  * self-contained static HTML document. See docs/APPS_BLOCKS_ARCHITECTURE.md.
  */
 export type {
-  SiteManifest, Block, DesignTokens, Palette, SiteMeta,
-  Mode, Scale, Radius, Spacing, Motion,
+  SiteManifest, Block, DesignTokens, Palette, SiteMeta, SectionOverrides,
+  PwaConfig, SeoConfig, Mode, Scale, Radius, Spacing, Motion,
 } from './types.js';
 export { DEFAULT_TOKENS, normalizeTokens, tokensToCss } from './tokens.js';
-export { REGISTRY, getSpec, blockTypes, needsIsland, type BlockSpec } from './registry.js';
-export { renderSite } from './render.js';
+export { PRESETS, presetNames, getPreset } from './presets.js';
+export { REGISTRY, getSpec, blockTypes, needsIsland, type BlockSpec, type RenderContext } from './registry.js';
+export { renderSite, type RenderOptions } from './render.js';
+export {
+  NOOP_RUNTIME, pathRuntime, runtimeNeeds,
+  type RuntimeAdapter, type RuntimeAction, type BlockRuntimeNeeds,
+} from './runtime.js';
+export {
+  buildWebManifest, buildWebManifestJson, buildServiceWorker, emitPwa,
+  type WebAppManifest,
+} from './pwa.js';
 export { validateBlock, validateManifest, type Validation } from './validate.js';
 export { parse, escapeHtml, escapeAttr, sanitizeUrl, type Field, type Schema, type ParseResult } from './schema.js';
 export { catalog, catalogPrompt, type BlockCatalogEntry, type JsonSchema } from './catalog.js';
