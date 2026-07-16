@@ -62,6 +62,12 @@ export interface RenderContext {
   id: string;
   /** Host-provided runtime; `resolve` returns null when unwired (inert render). */
   runtime: RuntimeAdapter;
+  /**
+   * Resolve an in-page nav/CTA link (by `#hash`, label, or alias) to a working
+   * href against the page's section anchor ids. External/relative links pass
+   * through; unresolved links fall back to `#`. Used by navigation bricks.
+   */
+  resolveLink?: (href: unknown, label?: string) => string;
 }
 
 export interface BlockSpec {
