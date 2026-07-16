@@ -14,14 +14,14 @@ const schema: Schema = {
 
 const css = `
 .blk-cta{padding:var(--space-lg) var(--space);text-align:center}
-.blk-cta[data-bg="primary"]{background:var(--primary);color:#fff}
-.blk-cta[data-bg="accent"]{background:var(--accent);color:#fff}
+.blk-cta[data-bg="primary"]{background:var(--primary);color:var(--on-primary)}
+.blk-cta[data-bg="accent"]{background:var(--accent);color:var(--on-accent)}
 .blk-cta[data-bg="surface"]{background:var(--surface);color:var(--text)}
 .blk-cta .wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:calc(var(--space)*0.9)}
 .blk-cta h2{font-size:var(--fs-xl);margin:0;font-weight:800}
 .blk-cta p{margin:0;opacity:.9;font-size:var(--fs-lg)}
-.blk-cta .btn{display:inline-block;background:#fff;color:var(--text);padding:.7em 1.6em;border-radius:var(--radius);text-decoration:none;font-weight:700}
-.blk-cta[data-bg="surface"] .btn{background:var(--primary);color:#fff}
+.blk-cta .btn{display:inline-block;background:var(--surface);color:var(--text);padding:.7em 1.6em;border-radius:var(--radius);text-decoration:none;font-weight:700}
+.blk-cta[data-bg="surface"] .btn{background:var(--primary);color:var(--on-primary)}
 `.trim();
 
 function render(config: Record<string, unknown>): string {

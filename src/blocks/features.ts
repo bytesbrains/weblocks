@@ -38,7 +38,7 @@ type Item = { icon: string; title: string; text: string };
 function render(config: Record<string, unknown>): string {
   const title = config.title as string;
   const subtitle = config.subtitle as string;
-  const columns = config.columns as number;
+  const columns = Number.isInteger(config.columns) ? (config.columns as number) : 3;
   const items = (config.items as Item[]) ?? [];
   const head = (title || subtitle)
     ? `<div class="head">${title ? `<h2>${escapeHtml(title)}</h2>` : ''}${subtitle ? `<p class="sub">${escapeHtml(subtitle)}</p>` : ''}</div>`

@@ -4,18 +4,88 @@
   "version": "0.1.0",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
+    "app-shell",
     "nav",
+    "announcement-bar",
+    "sidebar",
     "hero",
+    "hero-app",
     "features",
+    "about",
+    "rich-text",
+    "split",
+    "steps",
+    "stats",
     "services-catalogue",
+    "pricing",
+    "logos",
+    "team",
     "gallery",
+    "carousel",
+    "video",
+    "map",
+    "timeline",
+    "tabs",
+    "accordion",
     "testimonials",
     "faq",
+    "blog-list",
+    "blog-post",
+    "feed",
+    "contact-form",
+    "newsletter",
+    "auth",
     "cta",
+    "social-links",
     "contact-details",
+    "divider",
+    "spacer",
     "footer"
   ],
   "blocks": [
+    {
+      "type": "app-shell",
+      "description": "A persistent bottom tab bar for app-like navigation, each tab an optional icon plus a label linking to a view.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "brand": {
+            "type": "string",
+            "maxLength": 60,
+            "default": ""
+          },
+          "tabs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "icon": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 6
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     {
       "type": "nav",
       "description": "Top navigation bar: brand/logo text, a row of links, and an optional call-to-action button. Place first.",
@@ -78,6 +148,89 @@
       }
     },
     {
+      "type": "announcement-bar",
+      "description": "A dismissible full-width strip for a short promo or notice, with an optional inline link and info/promo/warning tone.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "linkLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": ""
+          },
+          "href": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "tone": {
+            "enum": [
+              "info",
+              "promo",
+              "warning"
+            ],
+            "default": "info"
+          },
+          "dismissible": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "sidebar",
+      "description": "A vertical section/drawer navigation for multi-view apps: an optional title over a list of icon-and-label links.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 60,
+            "default": ""
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "icon": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 20
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "hero",
       "description": "Top-of-page banner: a big headline with an optional eyebrow, subheading, and one call-to-action button.",
       "schema": {
@@ -120,6 +273,62 @@
               }
             },
             "additionalProperties": false
+          }
+        },
+        "required": [
+          "headline"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "hero-app",
+      "description": "An app landing hero: a headline and subhead over a primary install button, with a horizontal scroll row of app screenshots.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subhead": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "installLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Install app"
+          },
+          "installHref": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "screenshots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                }
+              },
+              "required": [
+                "src"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 6
           }
         },
         "required": [
@@ -186,6 +395,228 @@
       }
     },
     {
+      "type": "about",
+      "description": "A story/mission section: eyebrow, title, prose body, and an optional side image (choose which side).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "eyebrow": {
+            "type": "string",
+            "maxLength": 60,
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "About us"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 1200,
+            "default": ""
+          },
+          "image": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "imageAlt": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "imageSide": {
+            "enum": [
+              "left",
+              "right"
+            ],
+            "default": "right"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "rich-text",
+      "description": "A typed prose section with ordered headings, paragraphs, quotes, and bullet/numbered lists — a safe freeform-content block, never raw HTML.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "heading",
+                    "subheading",
+                    "paragraph",
+                    "quote",
+                    "bullet",
+                    "numbered"
+                  ],
+                  "default": "paragraph"
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 2000,
+                  "default": ""
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 60
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "split",
+      "description": "Alternating image-and-text rows; the image side flips each row, and rows without an image collapse to centered text.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 600,
+                  "default": ""
+                },
+                "image": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "imageAlt": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 8
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "steps",
+      "description": "A numbered how-it-works / process list: an optional title and subtitle over auto-numbered step cards, each with a title and short text.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "default": "Step"
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": ""
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "stats",
+      "description": "A grid of metric counters: each stat shows an optional prefix/suffix around a big value with a muted label, with an optional count-up animation.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 4
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "maxLength": 24,
+                  "default": ""
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "prefix": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                },
+                "suffix": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                }
+              },
+              "required": [
+                "value",
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "services-catalogue",
       "description": "A grid of services or products, each with a name, optional price, description, and link. Use for \"what we offer\".",
       "schema": {
@@ -230,6 +661,206 @@
                   "type": "string",
                   "maxLength": 500,
                   "default": "#"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "pricing",
+      "description": "A row of pricing/tier cards, each with a name, price, feature list, and a call-to-action button; one plan can be highlighted.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "price": {
+                  "type": "string",
+                  "maxLength": 24,
+                  "default": ""
+                },
+                "period": {
+                  "type": "string",
+                  "maxLength": 24,
+                  "default": ""
+                },
+                "features": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 120,
+                    "default": ""
+                  },
+                  "maxItems": 12
+                },
+                "ctaLabel": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": "Choose"
+                },
+                "ctaHref": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "featured": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "name",
+                "price"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 6
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "logos",
+      "description": "A centered strip of client or partner logos (grayscale until hover), each optionally linking out, under a short heading.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Trusted by"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                }
+              },
+              "required": [
+                "src"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "team",
+      "description": "A grid of people cards with photo (or initials), name, role, a short bio, and optional social links.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "role": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "photo": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "bio": {
+                  "type": "string",
+                  "maxLength": 240,
+                  "default": ""
+                },
+                "socials": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "default": ""
+                      },
+                      "href": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "default": ""
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 5
                 }
               },
               "required": [
@@ -306,6 +937,240 @@
               "additionalProperties": false
             },
             "maxItems": 60
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "carousel",
+      "description": "A horizontal, swipeable carousel of image slides with optional captions; scrolls natively and can be enhanced with arrows/autoplay.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "alt": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                },
+                "caption": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 20
+          },
+          "autoplay": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "video",
+      "description": "A responsive embedded video from YouTube or Vimeo (by id or URL) or a self-hosted file, with an optional caption.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "enum": [
+              "youtube",
+              "vimeo",
+              "file"
+            ],
+            "default": "youtube"
+          },
+          "src": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Video"
+          },
+          "poster": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "caption": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          }
+        },
+        "required": [
+          "src"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "map",
+      "description": "An embedded location map for a place or address query, with configurable zoom and height and a link to the full map.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "zoom": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 14
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 160,
+            "maximum": 800,
+            "default": 360
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "timeline",
+      "description": "A vertical timeline of chronological milestones, each with an optional date, a title, and supporting text.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 400,
+                  "default": ""
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "tabs",
+      "description": "Tabbed content panels that switch with no JavaScript; each tab has a label and a text panel.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 2000,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "accordion",
+      "description": "Generic collapsible disclosure panels (native details/summary, no JavaScript); each panel has a heading and body.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                },
+                "body": {
+                  "type": "string",
+                  "maxLength": 1200,
+                  "default": ""
+                }
+              },
+              "required": [
+                "heading"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
           }
         },
         "additionalProperties": false
@@ -393,6 +1258,384 @@
       }
     },
     {
+      "type": "blog-list",
+      "description": "A post index as a grid of cards, each with an optional cover image, tag, date, title, and excerpt linking to the post.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3
+            ],
+            "default": 3
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 160,
+                  "default": ""
+                },
+                "excerpt": {
+                  "type": "string",
+                  "maxLength": 280,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "image": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "date": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "tag": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "blog-post",
+      "description": "A single article layout with an optional cover, title, author/date, and a typed body (headings, paragraphs, quotes, bullets).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "date": {
+            "type": "string",
+            "maxLength": 40,
+            "default": ""
+          },
+          "author": {
+            "type": "string",
+            "maxLength": 80,
+            "default": ""
+          },
+          "cover": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "coverAlt": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "body": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "heading",
+                    "paragraph",
+                    "quote",
+                    "bullet"
+                  ],
+                  "default": "paragraph"
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 2000,
+                  "default": ""
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 120
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "feed",
+      "description": "A generic data-driven list of items in a list or card layout, each with a title, optional subtitle/text, badge, image, and link.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "layout": {
+            "enum": [
+              "list",
+              "cards"
+            ],
+            "default": "list"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 160,
+                  "default": ""
+                },
+                "subtitle": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 280,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "image": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "badge": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                }
+              },
+              "required": [
+                "title"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 50
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "contact-form",
+      "description": "A configurable contact form with typed fields (text, email, tel, textarea, select, checkbox) that posts to a host-provided runtime. No raw HTML.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Get in touch"
+          },
+          "intro": {
+            "type": "string",
+            "maxLength": 280,
+            "default": ""
+          },
+          "submitLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Send"
+          },
+          "successMessage": {
+            "type": "string",
+            "maxLength": 200,
+            "default": "Thanks — we'll be in touch."
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": "field"
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "Field"
+                },
+                "type": {
+                  "enum": [
+                    "text",
+                    "email",
+                    "tel",
+                    "textarea",
+                    "select",
+                    "checkbox"
+                  ],
+                  "default": "text"
+                },
+                "placeholder": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "required": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 80,
+                    "default": ""
+                  },
+                  "maxItems": 24
+                }
+              },
+              "required": [
+                "name",
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "contact-form.submit"
+        ]
+      }
+    },
+    {
+      "type": "newsletter",
+      "description": "An email-capture form that posts to a host-provided runtime; renders inert until a runtime is wired.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Subscribe to our newsletter"
+          },
+          "intro": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "you@example.com"
+          },
+          "submitLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Subscribe"
+          },
+          "successMessage": {
+            "type": "string",
+            "maxLength": 200,
+            "default": "You're in — check your inbox."
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "newsletter.subscribe"
+        ]
+      }
+    },
+    {
+      "type": "auth",
+      "description": "A provider-agnostic sign in / sign up panel: social provider buttons and an optional email form that start auth via a host runtime.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "enum": [
+              "signin",
+              "signup"
+            ],
+            "default": "signin"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "provider": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 6
+          },
+          "showEmail": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "auth.start"
+        ]
+      }
+    },
+    {
       "type": "cta",
       "description": "A full-width call-to-action band: a headline, optional subheading, and one button. Use near the bottom.",
       "schema": {
@@ -440,6 +1683,50 @@
       }
     },
     {
+      "type": "social-links",
+      "description": "A centered row of links to social or external profiles, each an optional icon plus a label.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "href": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "icon": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label",
+                "href"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "contact-details",
       "description": "A contact info block: address, phone, email, and opening hours (each optional). Read-only — no form.",
       "schema": {
@@ -469,6 +1756,43 @@
             "type": "string",
             "maxLength": 160,
             "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "divider",
+      "description": "A visual section break rendered as a thin line, a dotted rule, or a gradient bar.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "style": {
+            "enum": [
+              "line",
+              "dots",
+              "gradient"
+            ],
+            "default": "line"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "spacer",
+      "description": "Deliberate vertical whitespace between sections, in one of four sizes (sm, md, lg, xl).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "enum": [
+              "sm",
+              "md",
+              "lg",
+              "xl"
+            ],
+            "default": "md"
           }
         },
         "additionalProperties": false

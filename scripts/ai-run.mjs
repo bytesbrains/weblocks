@@ -4,10 +4,11 @@
  *
  * PROVIDER-AGNOSTIC BY CONFIG. There are three *wire-format* adapters
  * (openai-compatible, anthropic, gemini); every vendor maps to one of them, so
- * switching provider/model is configuration — never a code edit. Mirrors how
- * functions/src/providers.ts works.
+ * switching provider/model is configuration — never a code edit. This is a dev
+ * harness only: bring your own provider key via env; the published engine takes
+ * an injected `callModel` and has no provider dependency of its own.
  *
- * Usage (from site-engine/):
+ * Usage:
  *   PROVIDER=deepseek  DEEPSEEK_API_KEY=sk-...  npm run ai -- generate "a Lisbon bakery landing page"
  *   PROVIDER=openai    OPENAI_API_KEY=sk-...    npm run ai -- generate "…"
  *   PROVIDER=anthropic ANTHROPIC_API_KEY=sk-... npm run ai -- generate "…"

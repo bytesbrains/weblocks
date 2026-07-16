@@ -1,0 +1,242 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { applyOp, applyOps } from './ops.js';
+import { renderSite } from './render.js';
+import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
+import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
+import { getPreset, presetNames } from './presets.js';
+import { validateManifest } from './validate.js';
+import { DEFAULT_TOKENS, tokensToCss, readableOn, sectionOverrideCss } from './tokens.js';
+import type { SiteManifest } from './types.js';
+
+const empty = (): SiteManifest => ({ meta: { title: 't', description: '', lang: 'en' }, design: DEFAULT_TOKENS, blocks: [], version: 1 });
+
+function withFeatures(): { m: SiteManifest; id: string } {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'features', config: { items: [{ title: 'A' }, { title: 'B' }] } });
+  return { m: r.manifest, id: r.id! };
+}
+
+// ── §8 array-item ops ───────────────────────────────────────────────────────────
+
+test('addItem appends a new array item and re-validates', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'addItem', id, field: 'items', item: { title: 'C' } });
+  assert.equal(r.ok, true);
+  const items = r.manifest.blocks[0]!.config.items as unknown[];
+  assert.equal(items.length, 3);
+  assert.equal((items[2] as { title: string }).title, 'C');
+  assert.equal(r.manifest.version, m.version + 1);
+});
+
+test('addItem at an index inserts in place', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'addItem', id, field: 'items', item: { title: 'X' }, at: 0 });
+  assert.equal((r.manifest.blocks[0]!.config.items as { title: string }[])[0]!.title, 'X');
+});
+
+test('updateItem patches a single item, leaving siblings untouched', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'updateItem', id, field: 'items', index: 1, patch: { title: 'B2' } });
+  assert.equal(r.ok, true);
+  const items = r.manifest.blocks[0]!.config.items as { title: string }[];
+  assert.equal(items[0]!.title, 'A');
+  assert.equal(items[1]!.title, 'B2');
+});
+
+test('removeItem drops one item', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'removeItem', id, field: 'items', index: 0 });
+  const items = r.manifest.blocks[0]!.config.items as { title: string }[];
+  assert.equal(items.length, 1);
+  assert.equal(items[0]!.title, 'B');
+});
+
+test('moveItem reorders within the array', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'moveItem', id, field: 'items', from: 0, to: 1 });
+  const items = r.manifest.blocks[0]!.config.items as { title: string }[];
+  assert.deepEqual(items.map((i) => i.title), ['B', 'A']);
+});
+
+test('item ops are no-ops on a non-array field, bad index, or missing block', () => {
+  const { m, id } = withFeatures();
+  for (const op of [
+    { op: 'addItem', id, field: 'title', item: {} },          // not an array field
+    { op: 'updateItem', id, field: 'items', index: 9, patch: {} }, // out of range
+    { op: 'removeItem', id, field: 'items', index: -1 },       // out of range
+    { op: 'moveItem', id: 'nope', field: 'items', from: 0, to: 0 }, // no block
+  ] as const) {
+    const r = applyOp(m, op);
+    assert.equal(r.ok, false, `${op.op} should fail`);
+    assert.deepEqual(r.manifest, m, 'manifest unchanged on a bad op');
+  }
+});
+
+// ── §9 presets + per-section overrides ──────────────────────────────────────────
+
+test('applyPreset swaps to a named token set; unknown name is a no-op', () => {
+  const ok = applyOp(empty(), { op: 'applyPreset', name: 'midnight' });
+  assert.equal(ok.ok, true);
+  assert.equal(ok.manifest.design.mode, 'dark');
+  assert.equal(ok.manifest.design.palette.bg, getPreset('midnight')!.palette.bg);
+  const bad = applyOp(empty(), { op: 'applyPreset', name: 'nope' });
+  assert.equal(bad.ok, false);
+  assert.ok(presetNames().length >= 3);
+});
+
+test('setOverrides tints one section; render scopes it as CSS vars; null clears', () => {
+  const { m, id } = withFeatures();
+  const set = applyOp(m, { op: 'setOverrides', id, overrides: { primary: '#ff0000', junk: 'x' } as never });
+  assert.equal(set.ok, true);
+  assert.deepEqual(set.manifest.blocks[0]!.overrides, { primary: '#ff0000' }); // junk key dropped
+  const html = renderSite(set.manifest);
+  assert.ok(html.includes('--primary:#ff0000'), 'override emitted as a scoped CSS var');
+  const clear = applyOp(set.manifest, { op: 'setOverrides', id, overrides: null });
+  assert.equal(clear.manifest.blocks[0]!.overrides, undefined);
+});
+
+test('setOverrides also accepts radius + spacing enums (and drops bad ones)', () => {
+  const { m, id } = withFeatures();
+  const r = applyOp(m, { op: 'setOverrides', id, overrides: { radius: 'round', spacing: 'airy', primary: '#0af' } });
+  assert.deepEqual(r.manifest.blocks[0]!.overrides, { primary: '#0af', radius: 'round', spacing: 'airy' });
+  const css = sectionOverrideCss(r.manifest.blocks[0]!.overrides);
+  assert.ok(css.includes('--radius:24px') && css.includes('--space:1.4rem'), 'radius/spacing scoped as CSS vars');
+  // A bad enum is dropped; if nothing valid remains the override clears.
+  const bad = applyOp(m, { op: 'setOverrides', id, overrides: { radius: 'huge' } as never });
+  assert.equal(bad.manifest.blocks[0]!.overrides, undefined);
+});
+
+// ── theming: on-fill contrast tokens + mode-driven dark ─────────────────────────
+
+test('readableOn picks legible text for any fill', () => {
+  assert.equal(readableOn('#ffffff'), '#111111'); // dark text on white
+  assert.equal(readableOn('#000000'), '#ffffff'); // white text on black
+  assert.equal(readableOn('#3a5a40'), '#ffffff'); // white on the default primary
+  assert.equal(readableOn('not-a-color'), '#ffffff'); // total: safe fallback
+});
+
+test('tokensToCss emits --on-primary/--on-accent, contrast-correct', () => {
+  const css = tokensToCss({ ...DEFAULT_TOKENS, palette: { ...DEFAULT_TOKENS.palette, primary: '#ffffff', accent: '#111111' } });
+  assert.ok(css.includes('--on-primary:#111111'), 'dark text on a white primary');
+  assert.ok(css.includes('--on-accent:#ffffff'), 'white text on a dark accent');
+});
+
+test("mode:'auto' adds a prefers-color-scheme dark palette; light/dark do not", () => {
+  const light = tokensToCss({ ...DEFAULT_TOKENS, mode: 'light' });
+  assert.ok(!light.includes('prefers-color-scheme'), 'light stays single-palette');
+
+  const auto = tokensToCss({ ...DEFAULT_TOKENS, mode: 'auto' });
+  assert.ok(auto.includes('@media(prefers-color-scheme:dark)'), 'auto emits an OS-dark block');
+
+  const withDark = tokensToCss({ ...DEFAULT_TOKENS, mode: 'auto', darkPalette: { ...DEFAULT_TOKENS.palette, bg: '#010203', surface: '#0a0a0a', text: '#eeeeee', muted: '#999999', primary: '#88aaff', accent: '#ffaa88' } });
+  const darkBlock = withDark.split('@media')[1] ?? '';
+  assert.ok(darkBlock.includes('--bg:#010203'), 'supplied darkPalette drives the dark block');
+});
+
+// ── §6 runtime contract ─────────────────────────────────────────────────────────
+
+test('runtimeNeeds reports powered blocks and their capabilities', () => {
+  let m = empty();
+  m = applyOp(m, { op: 'addBlock', type: 'contact-form' }).manifest;
+  m = applyOp(m, { op: 'addBlock', type: 'hero' }).manifest;
+  const needs = runtimeNeeds(m);
+  assert.equal(needs.length, 1);
+  assert.equal(needs[0]!.type, 'contact-form');
+  assert.deepEqual(needs[0]!.capabilities, ['contact-form.submit']);
+});
+
+test('powered block renders inert with the no-op runtime, wired with an adapter', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
+  const inert = renderSite(r.manifest); // default NOOP runtime
+  assert.ok(inert.includes('data-wl-inert="true"'));
+  assert.ok(inert.includes('data-wl-capability="contact-form.submit"'));
+  assert.ok(inert.includes('disabled'));
+
+  const wired = renderSite(r.manifest, { runtime: pathRuntime('/api') });
+  assert.ok(wired.includes('action="/api/contact-form.submit/cf-1"'));
+  assert.ok(!wired.includes('data-wl-inert'));
+  assert.equal(NOOP_RUNTIME.resolve('x', 'y'), null);
+});
+
+// ── hardening: powered-block form safety ────────────────────────────────────────
+
+test('a hostile runtime method is whitelisted to post; the attribute never breaks out', () => {
+  const evil = { resolve: () => ({ url: '/x', method: 'get"><script>alert(1)</script>' as never }) };
+  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
+  const html = renderSite(r.manifest, { runtime: evil });
+  assert.ok(html.includes('method="post"'), 'coerced to a safe method token');
+  assert.ok(!html.includes('<script>alert(1)</script>'), 'no attribute breakout');
+});
+
+test('contact-form field ids are DOM-safe even when field names have spaces', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1', config: { fields: [{ name: 'full name', label: 'Full name', type: 'text' }] } });
+  const html = renderSite(r.manifest);
+  const id = /id="(f-cf-1-[^"]*)"/.exec(html)?.[1] ?? '';
+  assert.ok(id && !/\s/.test(id), `id must be space-free, got "${id}"`);
+  assert.ok(html.includes(`for="${id}"`), 'label stays associated with the input');
+});
+
+test('carousel takes a title so multiple carousels get unique landmark names', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'carousel', config: { title: 'Client work' } });
+  assert.ok(renderSite(r.manifest).includes('aria-label="Client work"'));
+});
+
+test('prose renderer (shared by rich-text & blog-post) groups lists and escapes', () => {
+  const rt = applyOp(empty(), { op: 'addBlock', type: 'rich-text', config: { blocks: [
+    { kind: 'heading', text: 'H' }, { kind: 'bullet', text: 'a' }, { kind: 'bullet', text: 'b' }, { kind: 'numbered', text: '1' },
+  ] } });
+  const html = renderSite(rt.manifest);
+  assert.ok(html.includes('<ul><li>a</li><li>b</li></ul>'), 'adjacent bullets grouped');
+  assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
+});
+
+// ── §7 PWA layer ────────────────────────────────────────────────────────────────
+
+test('buildWebManifest defaults name/colors from meta + tokens', () => {
+  const m = empty();
+  m.meta.title = 'Studio';
+  m.pwa = {};
+  const wm = buildWebManifest(m);
+  assert.equal(wm.name, 'Studio');
+  assert.equal(wm.display, 'standalone');
+  assert.equal(wm.theme_color, DEFAULT_TOKENS.palette.primary);
+  assert.ok(wm.icons.length >= 1);
+});
+
+test('emitPwa is null without opt-in, and emits manifest + sw when enabled', () => {
+  assert.equal(emitPwa(empty()), null);
+  const m = empty();
+  m.pwa = { name: 'App', offline: true };
+  const files = emitPwa(m)!;
+  assert.ok(files['manifest.webmanifest']);
+  assert.ok(files['sw.js']);
+  assert.ok(buildServiceWorker(m).includes('weblocks-v'));
+});
+
+test('renderSite emits PWA/SEO head only when opted in', () => {
+  const plain = renderSite(empty());
+  assert.ok(!plain.includes('rel="manifest"'));
+  const m = empty();
+  m.pwa = { themeColor: '#123456' };
+  m.seo = { canonical: 'https://ex.com', ogImage: 'https://ex.com/o.png' };
+  const html = renderSite(m);
+  assert.ok(html.includes('<link rel="manifest" href="/manifest.webmanifest">'));
+  assert.ok(html.includes('content="#123456"'));
+  assert.ok(html.includes('rel="canonical"'));
+  assert.ok(html.includes('og:image'));
+  assert.ok(validateManifest(m).ok);
+});
+
+// ── a full app-shaped manifest still renders valid ──────────────────────────────
+
+test('a rich app manifest (dynamic + pwa + overrides) renders one valid document', () => {
+  let m = empty();
+  for (const type of ['app-shell', 'hero-app', 'pricing', 'contact-form', 'newsletter', 'auth', 'blog-list', 'tabs', 'accordion']) {
+    m = applyOp(m, { op: 'addBlock', type }).manifest;
+  }
+  m.pwa = { name: 'Demo' };
+  const batch = applyOps(m, [{ op: 'setOverrides', id: m.blocks[2]!.id, overrides: { primary: '#0af' } }]);
+  const html = renderSite(batch.manifest, { runtime: pathRuntime() });
+  assert.ok(html.startsWith('<!doctype html>') && html.includes('</html>'));
+  assert.ok(validateManifest(batch.manifest).ok);
+});

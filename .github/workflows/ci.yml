@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  catalog-current:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run emit:catalog
+      - name: catalog.json / CATALOG.md are up to date
+        run: |
+          if ! git diff --quiet -- catalog.json CATALOG.md; then
+            echo "::error::catalog.json / CATALOG.md are stale — run 'npm run emit:catalog' and commit."
+            git --no-pager diff -- catalog.json CATALOG.md
+            exit 1
+          fi
