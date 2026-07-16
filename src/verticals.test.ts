@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { VERTICALS, verticalNames, getVertical } from './verticals.js';
 import { blockTypes } from './registry.js';
 import { presetNames } from './presets.js';
-import { buildGenerationPrompt } from './generate.js';
+import { buildGenerationPrompt, generateSite, type ModelCall } from './generate.js';
 
 // The taxonomy is a public contract (hosts persist ids; generation seeds from
 // it), so these guard that every vertical stays implementable + stable.
@@ -78,4 +78,41 @@ test('an unknown vertical id is ignored (falls back to blank-slate)', () => {
 // Keep VERTICALS immutable-by-intent: exported record is the single source.
 test('VERTICALS is the source of truth verticalNames() reflects', () => {
   assert.deepEqual(verticalNames().sort(), Object.keys(VERTICALS).sort());
+});
+
+test('VERTICALS is deep-frozen — snapshots cannot be mutated at runtime', () => {
+  const v = getVertical('salon')!;
+  assert.ok(Object.isFrozen(VERTICALS), 'the record is frozen');
+  assert.ok(Object.isFrozen(v), 'each vertical is frozen');
+  assert.ok(Object.isFrozen(v.blocks), 'the blocks array is frozen');
+  assert.throws(() => { (v as { preset: string }).preset = 'hacked'; }, 'writing a frozen field throws in strict mode');
+  assert.equal(getVertical('salon')!.preset, 'candy', 'value is unchanged');
+});
+
+// ── generateSite end-to-end with a vertical (mocked model) ──────────────────────
+
+test('generateSite passes vertical guidance to the model and returns a valid site', async () => {
+  let seenSystem = '';
+  const fakeModel: ModelCall = async ({ system }) => {
+    seenSystem = system;
+    return JSON.stringify({
+      meta: { title: 'Lumière Salon' },
+      blocks: [{ type: 'hero', config: { headline: 'Book your visit' } }],
+    });
+  };
+  const r = await generateSite('a hair salon in Leeds', fakeModel, { vertical: 'salon' });
+  assert.equal(r.ok, true, 'the composed manifest validates');
+  assert.ok(seenSystem.includes(getVertical('salon')!.label), 'the prompt carried the vertical');
+  assert.match(seenSystem, /booking-driven/i, 'the booking hint reached the model');
+});
+
+test('generateSite with an unknown vertical composes exactly like blank-slate', async () => {
+  const systems: string[] = [];
+  const fakeModel: ModelCall = async ({ system }) => {
+    systems.push(system);
+    return JSON.stringify({ meta: { title: 'X' }, blocks: [{ type: 'hero', config: { headline: 'Hi' } }] });
+  };
+  await generateSite('a shop', fakeModel);
+  await generateSite('a shop', fakeModel, { vertical: 'not-a-vertical' });
+  assert.equal(systems[0], systems[1], 'unknown vertical adds no guidance');
 });

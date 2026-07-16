@@ -30,7 +30,7 @@ export interface Vertical {
   booking?: boolean;
 }
 
-export const VERTICALS: Readonly<Record<string, Vertical>> = {
+const VERTICAL_DEFS: Record<string, Vertical> = {
   restaurant: {
     id: 'restaurant', label: 'Restaurant & Café', icon: 'restaurant', preset: 'sand',
     tone: 'warm, appetising, inviting',
@@ -117,6 +117,20 @@ export const VERTICALS: Readonly<Record<string, Vertical>> = {
     blocks: ['nav', 'hero', 'features', 'contact-details', 'footer'],
   },
 };
+
+/**
+ * Deep-frozen so a vertical (which is interpolated into the AI system prompt)
+ * cannot be mutated at runtime — `getVertical` hands out an immutable snapshot,
+ * keeping the prompt's integrity even if a dependency tries to tamper with it.
+ */
+export const VERTICALS: Readonly<Record<string, Vertical>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(VERTICAL_DEFS).map(([id, v]) => {
+      Object.freeze(v.blocks);
+      return [id, Object.freeze(v)];
+    }),
+  ),
+);
 
 /** Vertical ids the AI / a host picker may choose from. */
 export function verticalNames(): string[] {
