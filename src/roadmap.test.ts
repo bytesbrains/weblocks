@@ -260,6 +260,52 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   await assert.doesNotReject(import('./islands/carousel.js'));
 });
 
+test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
+  const labeled = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { links: [
+    { platform: 'github', href: 'https://github.com/x' },
+    { platform: 'twitter', href: 'https://x.com/x' },
+    { platform: 'custom', href: 'https://ex.com', label: 'Blog', icon: '📝' },
+    { platform: 'x', href: '' },
+  ] } });
+  const html = renderSite(labeled.manifest);
+  assert.ok(html.includes('<svg class="ico"') && html.includes('<span class="lbl">GitHub</span>'), 'brand icon + default label');
+  assert.ok(html.includes('<span class="lbl">X</span>'), 'twitter aliases to X label');
+  assert.ok(html.includes('<span class="ico emoji" aria-hidden="true">📝</span>'), 'custom emoji fallback');
+  assert.equal((html.match(/class="s-item/g) ?? []).length, 3, 'link with no href is dropped');
+
+  const iconOnly = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { variant: 'icon', links: [{ platform: 'linkedin', href: 'https://linkedin.com/x' }] } });
+  const h2 = renderSite(iconOnly.manifest);
+  assert.ok(h2.includes('s-item icon-only') && h2.includes('aria-label="LinkedIn"') && !h2.includes('<span class="lbl">'), 'icon-only uses aria-label, no visible text');
+});
+
+test('copyright: composes the line, auto-fills the current year, escapes', () => {
+  const explicit = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme <Inc>', year: '2026', text: 'All rights reserved.' } });
+  assert.ok(renderSite(explicit.manifest).includes('© 2026 Acme &lt;Inc&gt;. All rights reserved.'), 'line composed + holder escaped');
+
+  const auto = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme', text: '' } });
+  assert.ok(/© \d{4} Acme/.test(renderSite(auto.manifest)), 'blank year auto-fills a 4-digit year');
+
+  const noSym = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme', year: '2026', showSymbol: false } });
+  assert.ok(!renderSite(noSym.manifest).includes('© '), 'symbol can be turned off');
+
+  const dot = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme Inc.', year: '2026', text: 'All rights reserved.' } });
+  assert.ok(renderSite(dot.manifest).includes('Acme Inc. All rights reserved.'), 'no double period after a holder ending in "."');
+});
+
+test('video-gallery: facade cards — auto YT thumb, autoplay embed, no-JS fallback, island', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'video-gallery', config: { title: 'Watch', items: [
+    { provider: 'youtube', src: 'https://youtu.be/dQw4w9WgXcQ', title: 'Clip' },
+    { provider: 'file', src: 'https://cdn.example/v.mp4' },
+    { provider: 'youtube', src: '' },
+  ] } });
+  const html = renderSite(r.manifest);
+  assert.ok(html.includes('i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'), 'auto youtube thumbnail');
+  assert.ok(html.includes('data-wl-embed="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1"'), 'autoplay embed for the island');
+  assert.ok(html.includes('href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"'), 'no-JS fallback links to the platform');
+  assert.ok(html.includes('data-wl-provider="file"') && html.includes('src="/_island/video.js"'), 'file card + island wired');
+  assert.equal((html.match(/class="v-card"/g) ?? []).length, 2, 'card with no id is dropped');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {
