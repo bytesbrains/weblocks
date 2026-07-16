@@ -298,8 +298,9 @@ typed schema (no raw-HTML field), consumes shared tokens, renders totally
 npm install          # dev deps only (typescript, @types/node)
 npm run build        # tsc → lib/
 npm test             # block definition-of-done + engine invariants
-npm run example      # render a sample → example-output.html
-npm run emit:catalog # regenerate catalog.json + CATALOG.md from code
+npm run example         # render a sample landing page → example-output.html
+npm run example:resume  # render a live résumé/CV → resume-output.html (try its Download-PDF)
+npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
 ```
 
 Drive it end-to-end with a real model (dev harness — provider is env, not code):

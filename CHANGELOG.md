@@ -5,6 +5,15 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.6.1 — 2026-07-16
+
+Docs only — no engine changes.
+
+### Added
+- A runnable **résumé example** (`npm run example:resume` → `resume-output.html`)
+  demonstrating the résumé pack + print-to-PDF end to end, and a README pointer
+  to it.
+
 ## 0.6.0 — 2026-07-16
 
 A résumé/CV builder, hero image banners, and favicons. Additive and

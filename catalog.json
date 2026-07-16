@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "package": "@bytesbrains/weblocks",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
     "app-shell",
