@@ -9,7 +9,7 @@
  * options and speak the §6 contract; with the default no-op runtime they render
  * inert-but-valid. PWA/SEO head tags are emitted only when the manifest opts in.
  */
-import { escapeAttr, escapeHtml, parse } from './schema.js';
+import { escapeAttr, escapeHtml, parse, sanitizeUrl } from './schema.js';
 import { getSpec, needsIsland, REGISTRY, type RenderContext } from './registry.js';
 import { normalizeTokens, sectionOverrideCss, tokensToCss } from './tokens.js';
 import { NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
@@ -33,6 +33,11 @@ img{max-width:100%}
 .blk-scope{display:block}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 `.trim().replace(/\n/g, '');
+
+// Print styles — makes any page (especially a résumé) export cleanly to PDF via
+// the browser's print dialog: keep colours, hide `data-wl-noprint` controls,
+// un-stick fixed chrome, and avoid splitting entries across pages.
+const PRINT_CSS = `@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}[data-wl-noprint]{display:none!important}.blk-nav,.blk-app-shell,.blk-announcement-bar,.blk-sidebar{position:static!important}.blk-profile-header,.blk-experience .entry,.blk-skills .group,.blk-timeline li{break-inside:avoid}a[href]{text-decoration:none}@page{margin:1.4cm}}`;
 
 /** Render one block: normalize its config, then hand markup to the brick. */
 function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapter): string {
@@ -83,12 +88,25 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(meta.title || 'Untitled site')}</title>${meta.description ? `\n<meta name="description" content="${escapeAttr(meta.description)}">` : ''}${headExtras(manifest, tokens.palette.primary)}
-<style>${tokensToCss(tokens)}\n${RESET_CSS}\n${blockCss}</style>
+<style>${tokensToCss(tokens)}\n${RESET_CSS}\n${blockCss}\n${PRINT_CSS}</style>
 </head>
 <body>
 ${body}${islandTags ? '\n' + islandTags : ''}
 </body>
 </html>`;
+}
+
+/** A browser-tab favicon link from meta.favicon (emoji → data URI, else a URL). */
+function faviconTag(fav: string | undefined): string {
+  const s = String(fav ?? '').trim();
+  if (!s) return '';
+  // A short glyph with no scheme/slash/dot → treat as an emoji favicon.
+  if ([...s].length <= 2 && !/[/:.]/.test(s)) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${escapeHtml(s)}</text></svg>`;
+    return `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(svg)}">`;
+  }
+  const url = sanitizeUrl(s);
+  return url === '#' ? '' : `<link rel="icon" href="${escapeAttr(url)}">`;
 }
 
 /** SEO + PWA <head> tags, emitted only when the manifest opts in. */
@@ -98,6 +116,9 @@ function headExtras(manifest: SiteManifest | undefined, primary: string): string
   const pwa = manifest?.pwa;
   const title = manifest?.meta?.title ?? '';
   const desc = manifest?.meta?.description ?? '';
+
+  const favicon = faviconTag(manifest?.meta?.favicon);
+  if (favicon) out.push(favicon);
 
   if (seo) {
     if (seo.canonical) out.push(`<link rel="canonical" href="${escapeAttr(seo.canonical)}">`);

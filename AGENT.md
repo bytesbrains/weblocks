@@ -46,10 +46,11 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 42 block types, by group:
+The 45 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `footer`
 - **Heroes:** `hero`, `hero-app`
+- **Résumé / profile:** `profile-header` (avatar, name, contacts, Download-PDF/Share buttons), `experience` (dated entries — reuse for Education/Certifications by changing its title), `skills` (tags or level bars)
 - **Content:** `features`, `about`, `rich-text`, `split`, `steps`, `stats`,
   `services-catalogue`, `pricing`, `logos`, `team`
 - **Media:** `gallery`, `carousel`, `video`, `video-gallery`, `map`
@@ -165,6 +166,15 @@ fill their typed config (fields, labels, providers, placeholder). The block decl
 capability it needs; the **host** wires the endpoint. If no runtime is wired, the
 block renders inert-but-valid — that is expected, not an error. Never put secrets,
 endpoints, captcha keys, or backend logic in the config.
+
+## Favicon & hero banner
+
+- **Favicon:** set `meta.favicon` to an icon **URL** or a single **emoji** (e.g.
+  `"🍞"`) — the engine emits the browser-tab `<link rel="icon">`.
+- **Hero image banner:** give the `hero` block an `image` for a full-bleed
+  background banner; add `overlay` (`scrim`/`dark`/`light`/`none`) for text
+  legibility and `minHeight` (`sm`/`md`/`lg`/`full`). Text colour auto-flips over
+  dark overlays.
 
 ## PWA & SEO (optional, additive)
 

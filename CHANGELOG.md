@@ -5,6 +5,33 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.6.0 — 2026-07-16
+
+A résumé/CV builder, hero image banners, and favicons. Additive and
+**non-breaking** — every `0.5.0` manifest still validates and renders identically.
+Catalog 42 → 45.
+
+### Added
+- **Résumé / CV pack** — turn the engine into a live-resume builder:
+  - **`profile-header`** — avatar (or initials), name, role, location, a contact +
+    social row (brand icons), and optional **Download-PDF** and **Share** buttons.
+  - **`experience`** — dated, structured entries (role, org, period, location,
+    summary, achievement bullets). Reuse for Experience / Education /
+    Certifications by changing its title.
+  - **`skills`** — grouped skills as tags (with proficiency dots) or level bars.
+  - **Print styles** — `renderSite` now emits an `@media print` stylesheet so any
+    page (especially a résumé) exports cleanly to PDF; the **`resume.js` island**
+    wires the header's Download (`window.print()`) and Share (Web Share API +
+    copy-link) buttons. `data-wl-noprint` elements are hidden from the printout.
+- **`hero` image banner** — the `hero` block gains optional `image`, `overlay`
+  (scrim / dark / light / none), and `minHeight` (sm / md / lg / full). With an
+  image, the photo sits behind the content (an `<img>` + scrim) with a legibility
+  overlay and the text flips to a readable colour; with no image it renders
+  exactly as before.
+- **`meta.favicon`** — a browser-tab favicon: a URL (svg/png/ico) **or a single
+  emoji** (rendered as an inline SVG data URI). `renderSite` emits a scheme-
+  sanitized `<link rel="icon">` in `<head>` when set.
+
 ## 0.5.0 — 2026-07-16
 
 More media & footer blocks, brand icons, and shipped interactivity. Additive and

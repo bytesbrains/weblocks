@@ -306,6 +306,63 @@ test('video-gallery: facade cards — auto YT thumb, autoplay embed, no-JS fallb
   assert.equal((html.match(/class="v-card"/g) ?? []).length, 2, 'card with no id is dropped');
 });
 
+test('hero: background image banner adds img + scrim + overlay; plain hero unchanged', () => {
+  const banner = applyOp(empty(), { op: 'addBlock', type: 'hero', config: { headline: 'Hi', image: '/b.jpg', overlay: 'dark', minHeight: 'lg' } });
+  const h = renderSite(banner.manifest);
+  assert.ok(h.includes('class="blk-hero has-image overlay-dark mh-lg"'), 'banner classes');
+  assert.ok(h.includes('<img class="bg" src="/b.jpg" alt="" aria-hidden="true">') && h.includes('<div class="scrim">'), 'image + scrim layers');
+  assert.ok(renderSite(applyOp(empty(), { op: 'addBlock', type: 'hero', config: { headline: 'Hi' } }).manifest).includes('<section class="blk-hero" data-align'), 'no image → plain text hero (no banner classes on the element)');
+});
+
+test('favicon: meta.favicon emits <link rel="icon"> (url or emoji), sanitized', () => {
+  const withMeta = (favicon: string) => ({ meta: { title: 't', description: '', lang: 'en', favicon }, design: DEFAULT_TOKENS, blocks: [], version: 1 });
+  assert.ok(renderSite(withMeta('/fav.svg')).includes('<link rel="icon" href="/fav.svg">'), 'url favicon');
+  assert.ok(renderSite(withMeta('🍞')).includes('rel="icon" href="data:image/svg+xml,'), 'emoji → data-uri favicon');
+  assert.ok(!renderSite(empty()).includes('rel="icon"'), 'no favicon → no link');
+  assert.ok(!renderSite(withMeta('javascript:alert(1)')).includes('javascript'), 'dangerous scheme neutralised');
+});
+
+// ── résumé pack (profile-header / experience / skills + print) ──────────────────
+
+test('experience: dated entries with org link + bullets; no-role dropped', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'experience', config: { title: 'Education', items: [
+    { role: 'B.Sc. Computer Science', org: 'State University', period: '2018 – 2022', location: 'Berlin', url: 'https://uni.example', bullets: ['GPA 3.9', 'Thesis on X'] },
+    { role: '', org: 'nope' }, // no role → dropped
+  ] } });
+  const h = renderSite(r.manifest);
+  assert.ok(h.includes('<h2>Education</h2>') && h.includes('B.Sc. Computer Science'));
+  assert.ok(h.includes('<a href="https://uni.example"') && h.includes('<li>GPA 3.9</li>'), 'org link + bullets');
+  assert.equal((h.match(/class="entry"/g) ?? []).length, 1, 'entry with no role dropped');
+});
+
+test('skills: tags (with dots) and bars layouts', () => {
+  const tags = applyOp(empty(), { op: 'addBlock', type: 'skills', config: { groups: [{ name: 'Languages', items: [{ label: 'TypeScript', level: 5 }, { label: 'Go' }] }] } });
+  const th = renderSite(tags.manifest);
+  assert.ok(th.includes('<p class="gname">Languages</p>') && th.includes('<span class="tag">TypeScript'), 'tags with group');
+  assert.ok(th.includes('<span class="dots"'), 'proficiency dots for a rated skill');
+  const bars = applyOp(empty(), { op: 'addBlock', type: 'skills', config: { display: 'bars', groups: [{ items: [{ label: 'React', level: 4 }] }] } });
+  assert.ok(renderSite(bars.manifest).includes('style="width:80%"'), 'bar width from level/5');
+});
+
+test('profile-header: avatar/initials, contacts, and action buttons + island gating', () => {
+  const withBtns = applyOp(empty(), { op: 'addBlock', type: 'profile-header', config: {
+    name: 'Ada Lovelace', headline: 'Engineer', showDownload: true, showShare: true,
+    contacts: [{ type: 'email', value: 'ada@x.com' }, { type: 'github', value: 'https://github.com/ada' }, { type: 'location', value: 'London' }],
+  } });
+  const h = renderSite(withBtns.manifest);
+  assert.ok(h.includes('<h1>Ada Lovelace</h1>') && h.includes('class="initials"'), 'name + initials fallback');
+  assert.ok(h.includes('href="mailto:ada@x.com"') && h.includes('href="https://github.com/ada"'), 'email + brand contact links');
+  assert.ok(h.includes('data-wl-print') && h.includes('data-wl-share') && h.includes('data-wl-noprint'), 'action buttons, hidden from print');
+  assert.ok(h.includes('src="/_island/resume.js"'), 'resume island shipped when actions on');
+
+  const noBtns = applyOp(empty(), { op: 'addBlock', type: 'profile-header', config: { name: 'Ada' } });
+  assert.ok(!renderSite(noBtns.manifest).includes('/_island/resume.js'), 'no island when no action buttons (static-first)');
+});
+
+test('renderSite includes print styles for PDF export', () => {
+  assert.ok(renderSite(empty()).includes('@media print') && renderSite(empty()).includes('[data-wl-noprint]{display:none'), 'print stylesheet present');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

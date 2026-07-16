@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.5.0)
+# @bytesbrains/weblocks — Block Catalog (v0.6.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -47,7 +47,7 @@ A vertical section/drawer navigation for multi-view apps: an optional title over
 
 ## `hero`
 
-Top-of-page banner: a big headline with an optional eyebrow, subheading, and one call-to-action button.
+Top-of-page hero: a big headline with optional eyebrow, subheading, and CTA — optionally over a full-bleed background image banner with a legibility overlay.
 
 | field | type | required | notes |
 |---|---|---|---|
@@ -55,6 +55,9 @@ Top-of-page banner: a big headline with an optional eyebrow, subheading, and one
 | `headline` | string | yes |  |
 | `subhead` | string |  |  |
 | `align` | undefined (center\|left) |  |  |
+| `image` | string |  |  |
+| `overlay` | undefined (scrim\|dark\|light\|none) |  |  |
+| `minHeight` | undefined (auto\|sm\|md\|lg\|full) |  |  |
 | `cta` | object |  |  |
 
 ## `hero-app`
@@ -68,6 +71,42 @@ An app landing hero: a headline and subhead over a primary install button, with 
 | `installLabel` | string |  |  |
 | `installHref` | string |  |  |
 | `screenshots` | array |  |  |
+
+## `profile-header`
+
+A résumé/CV header: avatar, name, role, location, a contact + social row, and optional Download-PDF and Share buttons.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `name` | string | yes |  |
+| `headline` | string |  |  |
+| `location` | string |  |  |
+| `avatar` | string |  |  |
+| `summary` | string |  |  |
+| `contacts` | array |  |  |
+| `showDownload` | boolean |  |  |
+| `downloadLabel` | string |  |  |
+| `showShare` | boolean |  |  |
+| `shareLabel` | string |  |  |
+
+## `experience`
+
+A résumé section of dated entries (role, org, period, location, bullets). Reuse for Experience, Education, Certifications by changing the title.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `items` | array |  |  |
+
+## `skills`
+
+Grouped skills shown as tags (with optional proficiency dots) or labelled level bars; also for languages and tools.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `display` | undefined (tags\|bars) |  |  |
+| `groups` | array |  |  |
 
 ## `features`
 
