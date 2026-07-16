@@ -5,7 +5,9 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.6.2 — 2026-07-17
+
+Bug fix: in-page nav links now scroll.
 
 ### Fixed
 - **In-page nav links now scroll (#26).** `renderSite` previously emitted sections
