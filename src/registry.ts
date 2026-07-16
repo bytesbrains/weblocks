@@ -27,6 +27,7 @@ import { team } from './blocks/team.js';
 import { gallery } from './blocks/gallery.js';
 import { carousel } from './blocks/carousel.js';
 import { video } from './blocks/video.js';
+import { videoGallery } from './blocks/videoGallery.js';
 import { map } from './blocks/map.js';
 import { timeline } from './blocks/timeline.js';
 import { tabs } from './blocks/tabs.js';
@@ -47,6 +48,7 @@ import { directions } from './blocks/directions.js';
 import { legal } from './blocks/legal.js';
 import { divider } from './blocks/divider.js';
 import { spacer } from './blocks/spacer.js';
+import { copyright } from './blocks/copyright.js';
 import { appShell } from './blocks/appShell.js';
 import { sidebar } from './blocks/sidebar.js';
 import { footer } from './blocks/footer.js';
@@ -93,7 +95,7 @@ const SPECS: readonly BlockSpec[] = [
   features, about, richText, split, steps, stats,
   services, pricing, logos, team,
   // media
-  gallery, carousel, video, map,
+  gallery, carousel, video, videoGallery, map,
   // structured content
   timeline, tabs, accordion, testimonials, faq,
   // collections
@@ -104,7 +106,7 @@ const SPECS: readonly BlockSpec[] = [
   cta, socialLinks, contactDetails, directions, legal,
   // rhythm
   divider, spacer,
-  footer,
+  copyright, footer,
 ];
 
 export const REGISTRY: ReadonlyMap<string, BlockSpec> = new Map(SPECS.map((s) => [s.type, s]));
