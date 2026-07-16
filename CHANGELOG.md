@@ -10,6 +10,17 @@ are minor, breaking changes to either are major.
 Additive and non-breaking.
 
 ### Added
+- **Résumé / CV pack** — turn the engine into a live-resume builder:
+  - **`profile-header`** — avatar (or initials), name, role, location, a contact +
+    social row (brand icons), and optional **Download-PDF** and **Share** buttons.
+  - **`experience`** — dated, structured entries (role, org, period, location,
+    summary, achievement bullets). Reuse for Experience / Education /
+    Certifications by changing its title.
+  - **`skills`** — grouped skills as tags (with proficiency dots) or level bars.
+  - **Print styles** — `renderSite` now emits an `@media print` stylesheet so any
+    page (especially a résumé) exports cleanly to PDF; the **`resume.js` island**
+    wires the header's Download (`window.print()`) and Share (Web Share API +
+    copy-link) buttons. `data-wl-noprint` elements are hidden from the printout.
 - **`hero` image banner** — the `hero` block gains optional `image`, `overlay`
   (scrim / dark / light / none), and `minHeight` (sm / md / lg / full). With an
   image, the photo sits behind the content (an `<img>` + scrim) with a legibility

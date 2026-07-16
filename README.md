@@ -139,12 +139,13 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**42 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**45 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
 | Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `footer` |
 | Heroes | `hero` · `hero-app` |
+| Résumé / profile | `profile-header` · `experience` · `skills` (live CV — avatar, dated entries, skills, Download-PDF/Share) |
 | Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` |
 | Media | `gallery` · `carousel` · `video` · `video-gallery` · `map` |
 | Location | `directions` (deep links to the visitor’s map app) |
@@ -246,6 +247,7 @@ island scripts** (zero-dependency, ~6 KB each) under a subpath:
 | `gallery` (`lightbox: true`) | `lightbox.js` | click-to-zoom, prev/next, keyboard, swipe, Esc |
 | `carousel` | `carousel.js` | arrows, dots, keyboard, optional autoplay |
 | `video-gallery` | `video.js` | click-to-play cards (load the real player inline on press) |
+| `profile-header` (Download/Share on) | `resume.js` | print-to-PDF (`window.print()`) + Web Share / copy-link |
 
 Serve them at the island URL. Copy from the package's `./islands/*.js` export, e.g.:
 
