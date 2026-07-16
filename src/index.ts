@@ -11,6 +11,8 @@ export type {
 } from './types.js';
 export { DEFAULT_TOKENS, normalizeTokens, tokensToCss, sectionOverrideCss, readableOn } from './tokens.js';
 export { PRESETS, presetNames, getPreset } from './presets.js';
+export { VERTICALS, verticalNames, getVertical, type Vertical } from './verticals.js';
+export { TEMPLATES, templateNames, templatesForVertical, getTemplate, type Template } from './templates.js';
 export { REGISTRY, getSpec, blockTypes, needsIsland, type BlockSpec, type RenderContext } from './registry.js';
 export { renderSite, type RenderOptions } from './render.js';
 export {
@@ -29,5 +31,5 @@ export { applyOp, applyOps, type EditOp, type OpResult, type BatchResult } from 
 export {
   generateSite, editSite, buildGenerationPrompt, buildEditPrompt,
   parseManifestResponse, parseOpsResponse,
-  type ModelCall, type ComposeResult, type EditResult,
+  type ModelCall, type ComposeResult, type EditResult, type GenerateOptions,
 } from './generate.js';

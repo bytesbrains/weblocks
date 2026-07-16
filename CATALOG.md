@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.6.2)
+# @bytesbrains/weblocks — Block Catalog (v0.7.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -178,6 +178,27 @@ A grid of services or products, each with a name, optional price, description, a
 | `subtitle` | string |  |  |
 | `items` | array |  |  |
 
+## `menu`
+
+A food/drink menu: named sections, each with items that have an optional price, dietary/allergen tags (e.g. V, VG, GF), and a 0–3 spice level. Use for restaurants and cafés.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `subtitle` | string |  |  |
+| `sections` | array |  |  |
+
+## `product`
+
+A shoppable product grid: each item has an image, price (with optional "was" price and badge), and a buy/enquire link. Use for retail and e-commerce; the cart/checkout is the host's.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `subtitle` | string |  |  |
+| `columns` | integer (2\|3\|4) |  |  |
+| `items` | array |  |  |
+
 ## `pricing`
 
 A row of pricing/tier cards, each with a name, price, feature list, and a call-to-action button; one plan can be highlighted.
@@ -299,6 +320,19 @@ A grid of customer quotes, each with the quote text and an optional author name 
 | `title` | string |  |  |
 | `items` | array |  |  |
 
+## `reviews`
+
+Star-rated customer reviews (1–5 stars) each with an optional author, date, and source (Google, Yelp, …), plus an optional aggregate score. Richer than plain testimonial quotes.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `subtitle` | string |  |  |
+| `average` | string |  |  |
+| `count` | string |  |  |
+| `source` | string |  |  |
+| `items` | array |  |  |
+
 ## `faq`
 
 An accordion of question/answer pairs. Expands/collapses natively (no JS).
@@ -340,6 +374,25 @@ A generic data-driven list of items in a list or card layout, each with a title,
 | `title` | string |  |  |
 | `layout` | undefined (list\|cards) |  |  |
 | `items` | array |  |  |
+
+## `booking`
+
+An appointment/reservation request form (service, date, time, contact) that posts to a host-provided runtime. For booking-driven businesses — salons, clinics, gyms, hotels, events. No raw HTML.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `intro` | string |  |  |
+| `submitLabel` | string |  |  |
+| `successMessage` | string |  |  |
+| `serviceLabel` | string |  |  |
+| `services` | array |  |  |
+| `askDate` | boolean |  |  |
+| `askTime` | boolean |  |  |
+| `askParty` | boolean |  |  |
+| `askPhone` | boolean |  |  |
+| `askNotes` | boolean |  |  |
+| `notesLabel` | string |  |  |
 
 ## `contact-form`
 
@@ -423,6 +476,17 @@ A contact info block: address, phone, email, and opening hours (each optional). 
 | `phone` | string |  |  |
 | `email` | string |  |  |
 | `hours` | string |  |  |
+
+## `hours`
+
+Structured weekly opening hours (24h times per day, split shifts allowed) rendered as an accessible table with a live "open now / closed" badge. Use for shops, cafés, salons, and clinics.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `timezone` | string |  |  |
+| `note` | string |  |  |
+| `days` | array |  |  |
 
 ## `directions`
 

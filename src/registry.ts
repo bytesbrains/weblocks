@@ -24,6 +24,8 @@ import { split } from './blocks/split.js';
 import { steps } from './blocks/steps.js';
 import { stats } from './blocks/stats.js';
 import { services } from './blocks/services.js';
+import { menu } from './blocks/menu.js';
+import { product } from './blocks/product.js';
 import { pricing } from './blocks/pricing.js';
 import { logos } from './blocks/logos.js';
 import { team } from './blocks/team.js';
@@ -36,10 +38,12 @@ import { timeline } from './blocks/timeline.js';
 import { tabs } from './blocks/tabs.js';
 import { accordion } from './blocks/accordion.js';
 import { testimonials } from './blocks/testimonials.js';
+import { reviews } from './blocks/reviews.js';
 import { faq } from './blocks/faq.js';
 import { blogList } from './blocks/blogList.js';
 import { blogPost } from './blocks/blogPost.js';
 import { feed } from './blocks/feed.js';
+import { booking } from './blocks/booking.js';
 import { contactForm } from './blocks/contactForm.js';
 import { newsletter } from './blocks/newsletter.js';
 import { search } from './blocks/search.js';
@@ -47,6 +51,7 @@ import { auth } from './blocks/auth.js';
 import { cta } from './blocks/cta.js';
 import { socialLinks } from './blocks/socialLinks.js';
 import { contactDetails } from './blocks/contactDetails.js';
+import { hours } from './blocks/hours.js';
 import { directions } from './blocks/directions.js';
 import { legal } from './blocks/legal.js';
 import { divider } from './blocks/divider.js';
@@ -104,17 +109,17 @@ const SPECS: readonly BlockSpec[] = [
   profileHeader, experience, skills,
   // content
   features, about, richText, split, steps, stats,
-  services, pricing, logos, team,
+  services, menu, product, pricing, logos, team,
   // media
   gallery, carousel, video, videoGallery, map,
   // structured content
-  timeline, tabs, accordion, testimonials, faq,
+  timeline, tabs, accordion, testimonials, reviews, faq,
   // collections
   blogList, blogPost, feed,
   // dynamic / powered
-  contactForm, newsletter, search, auth,
+  booking, contactForm, newsletter, search, auth,
   // conversion / contact
-  cta, socialLinks, contactDetails, directions, legal,
+  cta, socialLinks, contactDetails, hours, directions, legal,
   // rhythm
   divider, spacer,
   copyright, footer,

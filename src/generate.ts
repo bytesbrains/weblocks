@@ -11,6 +11,8 @@
 import { catalogPrompt } from './catalog.js';
 import { blockTypes } from './registry.js';
 import { presetNames } from './presets.js';
+import { getVertical, type Vertical } from './verticals.js';
+import { getTemplate } from './templates.js';
 import { normalizeTokens, DEFAULT_TOKENS } from './tokens.js';
 import { validateManifest } from './validate.js';
 import { applyOps, type BatchResult, type EditOp } from './ops.js';
@@ -18,9 +20,63 @@ import type { Block, SiteManifest } from './types.js';
 
 export type ModelCall = (args: { system: string; user: string }) => Promise<string>;
 
+/** Optional levers for compose. All advisory — the model may still deviate. */
+export interface GenerateOptions {
+  /**
+   * A business-vertical id (`verticalNames()`). When set, its recommended
+   * section set + fitting preset are injected as defaults ("prefer these unless
+   * the brief says otherwise"). Unknown ids are ignored. See `verticals.ts`.
+   */
+  vertical?: string;
+  /**
+   * A starter **scaffold** to adapt: a template id (`templateNames()`) or a
+   * complete `SiteManifest`. When set, its structure + design are seeded into
+   * the prompt ("start from this, keep the section set unless the brief
+   * conflicts, rewrite the copy for THIS business"). Unknown ids are ignored;
+   * absent = blank-slate compose. See `templates.ts`.
+   */
+  template?: string | SiteManifest;
+}
+
+/** Resolve the `template` option to a manifest (by id, or passed through). */
+function resolveTemplate(t: GenerateOptions['template']): SiteManifest | undefined {
+  if (!t) return undefined;
+  return typeof t === 'string' ? getTemplate(t)?.manifest : t;
+}
+
 // ── Compose: brief → manifest ──────────────────────────────────────────────────
 
-export function buildGenerationPrompt(brief: string): { system: string; user: string } {
+/** Advisory guidance lines seeded from a chosen vertical (empty if none/unknown). */
+function verticalGuidance(v: Vertical | undefined): string[] {
+  if (!v) return [];
+  return [
+    '',
+    `Business vertical: ${v.label} — aim for a ${v.tone} tone.`,
+    `Prefer these sections, in this order, unless the brief clearly calls for a different set: ${v.blocks.join(', ')}.`,
+    `Base the look on the "${v.preset}" preset unless the brief implies another mood.`,
+    ...(v.booking
+      ? ['This is an appointment/booking-driven business — the primary call-to-action should read like "Book" or "Reserve" and lead to a booking or contact section.']
+      : []),
+  ];
+}
+
+/** Advisory scaffold lines seeded from a template manifest (empty if none). */
+function templateGuidance(scaffold: SiteManifest | undefined): string[] {
+  if (!scaffold) return [];
+  const structure = scaffold.blocks
+    .filter((b) => b.visible !== false)
+    .map((b) => ({ type: b.type, config: b.config }));
+  return [
+    '',
+    'Starter scaffold — START FROM THIS structure and adapt it (do NOT keep the placeholder copy):',
+    JSON.stringify({ design: scaffold.design, blocks: structure }),
+    'Keep this section set and order unless the brief clearly calls for a change; REWRITE every headline, label, and body for the business described in the brief so no placeholder text remains; keep the design coherent (retune the palette if the brief implies a different mood).',
+  ];
+}
+
+export function buildGenerationPrompt(brief: string, opts: GenerateOptions = {}): { system: string; user: string } {
+  const vertical = opts.vertical ? getVertical(opts.vertical) : undefined;
+  const scaffold = resolveTemplate(opts.template);
   const system = [
     'You are a web designer that composes a single-page site by ARRANGING pre-built blocks.',
     'You do NOT write HTML, CSS, or JavaScript. You output ONLY a JSON site manifest.',
@@ -34,6 +90,8 @@ export function buildGenerationPrompt(brief: string): { system: string; user: st
     '  mode:auto follows the viewer\'s OS light/dark; supply an optional darkPalette:{...same keys...} for the dark side.',
     '  (Text on primary/accent fills is auto-contrasted — never hand-set button text colours.)',
     `  (For a quick coherent look, base it on a named preset: ${presetNames().join(', ')}.)`,
+    ...verticalGuidance(vertical),
+    ...templateGuidance(scaffold),
     '',
     'Rules:',
     '- Use ONLY the block types listed above; never invent a type or a config key.',
@@ -53,8 +111,8 @@ export interface ComposeResult {
 }
 
 /** Compose a manifest from a brief using the injected model. */
-export async function generateSite(brief: string, callModel: ModelCall): Promise<ComposeResult> {
-  const { system, user } = buildGenerationPrompt(brief);
+export async function generateSite(brief: string, callModel: ModelCall, opts: GenerateOptions = {}): Promise<ComposeResult> {
+  const { system, user } = buildGenerationPrompt(brief, opts);
   const raw = await callModel({ system, user });
   return parseManifestResponse(raw);
 }

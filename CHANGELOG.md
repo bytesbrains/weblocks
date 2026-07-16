@@ -5,6 +5,55 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.7.0 — 2026-07-17
+
+Business verticals land: a vertical taxonomy, named starter templates, and five
+new blocks that cover the booking-driven and shop verticals. Additive and
+**non-breaking** — every `0.6.x` manifest still validates and renders
+identically. Catalog 45 → 50.
+
+### Added
+- **Five new blocks for vertical coverage (#32).** Catalog 45 → 50.
+  - **`booking`** — an appointment/reservation request form (service, date, time,
+    contact) for the booking-driven verticals (salon, clinic, gym, hotel,
+    events). Powered brick: posts to the host `booking.request` capability, inert
+    fallback with no runtime, native form post + optional host island.
+  - **`hours`** — structured weekly opening hours (24h, split shifts) as an
+    accessible table with a live "open now / closed" badge via a shipped `hours`
+    island (static-first: the full week always renders without JS).
+  - **`menu`** — a food/drink menu: sections → items with price, dietary/allergen
+    tags, and a 0–3 spice level.
+  - **`product`** — a shoppable product grid: image, price (+ optional "was" and
+    badge), and a buy/enquire link per item.
+  - **`reviews`** — star-rated (1–5) customer reviews with author, date, and
+    source (Google/Yelp/…), plus an optional aggregate score.
+
+  Additive + non-breaking: every `0.6.x` manifest still validates and renders
+  identically. The booking-driven verticals (#30) now have a home block.
+- **Named starter templates (`templates.ts`, #31).** One complete, realistic,
+  `validateManifest`-clean `SiteManifest` per vertical (17 in all), each with a
+  fitting preset baked in. Exposed as `TEMPLATES` / `templateNames()` /
+  `templatesForVertical()` / `getTemplate()` so a host can render an instant,
+  zero-LLM starter and the AI can scaffold from the same source of truth. A
+  runnable example (`npm run example:templates`) renders them all to
+  `templates-output/`.
+- **Template-aware generation.** `generateSite` / `buildGenerationPrompt` accept
+  `{ template }` (a template id or a raw `SiteManifest`); when present the
+  structure + design are seeded into the prompt ("start from this, keep the
+  section set unless the brief conflicts, rewrite the copy for THIS business").
+  Blank-slate compose is unchanged when omitted.
+- **Business-vertical taxonomy (`verticals.ts`, #30).** A small, stable list that
+  maps each vertical (`restaurant`, `salon`, `healthcare`, … `other`) to its
+  recommended sections (in order), a fitting `preset`, a copy `tone`, and a
+  `booking` flag. Exposed as `VERTICALS` / `verticalNames()` / `getVertical()` so
+  a host renders one source of truth instead of hardcoding a category list. Every
+  recommended block is a real catalog type (unit-tested).
+- **Vertical-aware generation.** `generateSite` / `buildGenerationPrompt` accept
+  an optional `{ vertical }`; when present, the vertical's recommended sections +
+  preset are injected as advisory defaults ("prefer these unless the brief says
+  otherwise"). Blank-slate compose is unchanged when omitted. `GenerateOptions`
+  is exported.
+
 ## 0.6.2 — 2026-07-17
 
 Bug fix: in-page nav links now scroll.

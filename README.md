@@ -139,20 +139,20 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**45 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**50 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
 | Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `footer` |
 | Heroes | `hero` · `hero-app` |
 | Résumé / profile | `profile-header` · `experience` · `skills` (live CV — avatar, dated entries, skills, Download-PDF/Share) |
-| Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` |
+| Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` |
 | Media | `gallery` · `carousel` · `video` · `video-gallery` · `map` |
 | Location | `directions` (deep links to the visitor’s map app) |
-| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `faq` |
+| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` |
 | Collections | `blog-list` · `blog-post` · `feed` |
-| Dynamic (powered) | `contact-form` · `newsletter` · `search` · `auth` |
-| Conversion / rhythm | `cta` · `social-links` · `contact-details` · `divider` · `spacer` · `copyright` |
+| Dynamic (powered) | `booking` · `contact-form` · `newsletter` · `search` · `auth` |
+| Conversion / rhythm | `cta` · `social-links` · `contact-details` · `hours` · `divider` · `spacer` · `copyright` |
 | Legal | `legal` (terms/privacy links → safe-Markdown dialogs) |
 
 `rich-text` and `blog-post` carry **typed** content nodes (headings, paragraphs,
@@ -273,6 +273,8 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Catalog** | `catalog` · `catalogPrompt` |
 | **Registry** | `REGISTRY` · `getSpec` · `blockTypes` · `needsIsland` |
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
+| **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
+| **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `getTemplate` |
 | **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
@@ -283,6 +285,52 @@ Core types: `SiteManifest` · `Block` · `DesignTokens` · `Palette` ·
 
 `ModelCall` is `(args: { system: string; user: string }) => Promise<string>` — the
 one thing you inject, so the engine never depends on a provider.
+
+## Verticals
+
+`verticals.ts` is a small, stable **business-vertical taxonomy** — one source of
+truth for what *kind* of site is being built. Each entry maps a stable `id`
+(persist it host-side as e.g. `businessType`) to a label + icon, a recommended
+section set in order, a fitting `preset`, a copy `tone`, and a `booking` flag.
+
+```ts
+import { verticalNames, getVertical, generateSite } from '@bytesbrains/weblocks';
+
+verticalNames();                 // ['restaurant','retail','salon', … ,'other']
+getVertical('salon');            // { id, label, blocks:[…], preset:'candy', booking:true, … }
+
+// Seed compose with the vertical's recommended sections + preset (advisory):
+await generateSite('a hair salon in Leeds', callModel, { vertical: 'salon' });
+```
+
+Hosts building a category picker should **render `verticalNames()`** rather than
+hardcode their own list — the same way the block editor consumes `catalog.json` —
+so chips, the AI's section defaults, and starter templates all derive from one
+list. Verticals are additive and stable: new ones are safe; existing `id`s are
+never renamed or repurposed.
+
+## Templates
+
+`templates.ts` ships **named starter templates** — one complete, validated
+`SiteManifest` per vertical, with realistic copy and a fitting preset baked in.
+They serve two callers from one source of truth: a host renders one as an
+instant, zero-LLM starter/preview, and generation seeds one as a scaffold to
+personalise.
+
+```ts
+import { templatesForVertical, getTemplate, generateSite, renderSite } from '@bytesbrains/weblocks';
+
+templatesForVertical('salon');            // [{ id:'salon-spa', label, manifest }, …]
+renderSite(getTemplate('salon-spa')!.manifest);   // instant preview, no model call
+
+// Or scaffold generation from a template — keep the structure, rewrite the copy:
+await generateSite('a taco truck in Austin', callModel, { template: 'restaurant-modern' });
+// A raw SiteManifest works too: { template: myManifest }. Omit → blank-slate compose.
+```
+
+Render every template to eyeball them: `npm run example:templates` →
+`templates-output/index.html`. Templates are additive and stable (ids never
+renamed); every manifest is `validateManifest`-clean (unit-tested).
 
 ## Adding a block
 
@@ -300,6 +348,7 @@ npm run build        # tsc → lib/
 npm test             # block definition-of-done + engine invariants
 npm run example         # render a sample landing page → example-output.html
 npm run example:resume  # render a live résumé/CV → resume-output.html (try its Download-PDF)
+npm run example:templates # render every starter template → templates-output/index.html
 npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
 ```
 
