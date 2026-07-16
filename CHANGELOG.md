@@ -5,10 +5,10 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.2.0 — 2026-07-16
 
-Additive, non-breaking. Every 0.1.0 manifest still validates and renders
-identically.
+Rich, app-like PWAs. Additive and **non-breaking**: every `0.1.0` manifest still
+validates and renders identically.
 
 ### Added
 - **27 new blocks** (catalog now 37), all typed + totally-rendered:
