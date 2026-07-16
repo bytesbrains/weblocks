@@ -65,18 +65,19 @@ export function buildAnchors(blocks: Block[]): Anchors {
     if (!slugToId.has(base)) slugToId.set(base, id);
   }
 
+  // A slug → an existing anchor id: exact id (incl. de-duped like `features-2`),
+  // canonical slug, or a common alias. '' when nothing matches.
+  const lookup = (key: string): string =>
+    (ids.has(key) ? key : slugToId.get(key) ?? slugToId.get(ALIAS[key] ?? '') ?? '');
+
   const resolve = (href: unknown, label = ''): string => {
     const raw = String(href ?? '').trim();
-    if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return raw;   // scheme (http/mailto/tel/…) → external, untouched
-    if (raw && !raw.startsWith('#')) return raw;         // relative path/query → untouched
-    const target = raw.startsWith('#') && raw.length > 1 ? raw.slice(1) : label; // hash text, else label
-    const key = slugify(target);
+    if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) return raw; // scheme (http/mailto/tel/…) → external, untouched
+    if (raw && !raw.startsWith('#')) return raw;       // relative path/query → untouched
+    const key = slugify(raw.startsWith('#') && raw.length > 1 ? raw.slice(1) : label); // hash text, else label
     if (!key || key === 'home' || key === 'top' || key === 'start') return '#'; // Home/Top → page top
-    if (ids.has(key)) return `#${key}`;                  // exact id (incl. de-duped like features-2)
-    const direct = slugToId.get(key);
-    if (direct) return `#${direct}`;                     // canonical slug
-    const aliased = ALIAS[key] && slugToId.get(ALIAS[key]);
-    return aliased ? `#${aliased}` : '#';                // alias, else top (never a dead anchor)
+    const id = lookup(key);
+    return id ? `#${id}` : '#'; // resolved anchor, else top (never a dead anchor)
   };
 
   return { idFor, resolve };
