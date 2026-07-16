@@ -14,6 +14,9 @@ import { nav } from './blocks/nav.js';
 import { announcementBar } from './blocks/announcementBar.js';
 import { hero } from './blocks/hero.js';
 import { heroApp } from './blocks/heroApp.js';
+import { profileHeader } from './blocks/profileHeader.js';
+import { experience } from './blocks/experience.js';
+import { skills } from './blocks/skills.js';
 import { features } from './blocks/features.js';
 import { about } from './blocks/about.js';
 import { richText } from './blocks/richText.js';
@@ -91,6 +94,8 @@ const SPECS: readonly BlockSpec[] = [
   appShell, nav, announcementBar, sidebar,
   // heroes
   hero, heroApp,
+  // résumé / profile
+  profileHeader, experience, skills,
   // content
   features, about, richText, split, steps, stats,
   services, pricing, logos, team,
@@ -128,5 +133,7 @@ export function blockTypes(): string[] {
 export function needsIsland(spec: BlockSpec, config: Record<string, unknown>): boolean {
   if (!spec.island) return false;
   if (spec.type === 'gallery') return config.lightbox === true;
+  // profile-header only needs the resume island when an action button is shown.
+  if (spec.type === 'profile-header') return config.showDownload === true || config.showShare === true;
   return true;
 }

@@ -34,6 +34,11 @@ img{max-width:100%}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 `.trim().replace(/\n/g, '');
 
+// Print styles — makes any page (especially a résumé) export cleanly to PDF via
+// the browser's print dialog: keep colours, hide `data-wl-noprint` controls,
+// un-stick fixed chrome, and avoid splitting entries across pages.
+const PRINT_CSS = `@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}[data-wl-noprint]{display:none!important}.blk-nav,.blk-app-shell,.blk-announcement-bar,.blk-sidebar{position:static!important}.blk-profile-header,.blk-experience .entry,.blk-skills .group,.blk-timeline li{break-inside:avoid}a[href]{text-decoration:none}@page{margin:1.4cm}}`;
+
 /** Render one block: normalize its config, then hand markup to the brick. */
 function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapter): string {
   const spec = getSpec(block.type);
@@ -83,7 +88,7 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(meta.title || 'Untitled site')}</title>${meta.description ? `\n<meta name="description" content="${escapeAttr(meta.description)}">` : ''}${headExtras(manifest, tokens.palette.primary)}
-<style>${tokensToCss(tokens)}\n${RESET_CSS}\n${blockCss}</style>
+<style>${tokensToCss(tokens)}\n${RESET_CSS}\n${blockCss}\n${PRINT_CSS}</style>
 </head>
 <body>
 ${body}${islandTags ? '\n' + islandTags : ''}

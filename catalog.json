@@ -10,6 +10,9 @@
     "sidebar",
     "hero",
     "hero-app",
+    "profile-header",
+    "experience",
+    "skills",
     "features",
     "about",
     "rich-text",
@@ -363,6 +366,227 @@
         "required": [
           "headline"
         ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "profile-header",
+      "description": "A résumé/CV header: avatar, name, role, location, a contact + social row, and optional Download-PDF and Share buttons.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 160,
+            "default": ""
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "avatar": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "summary": {
+            "type": "string",
+            "maxLength": 400,
+            "default": ""
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "enum": [
+                    "email",
+                    "phone",
+                    "website",
+                    "location",
+                    "linkedin",
+                    "github",
+                    "twitter",
+                    "x",
+                    "custom"
+                  ],
+                  "default": "custom"
+                },
+                "value": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": ""
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 10
+          },
+          "showDownload": {
+            "type": "boolean",
+            "default": false
+          },
+          "downloadLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Download PDF"
+          },
+          "showShare": {
+            "type": "boolean",
+            "default": false
+          },
+          "shareLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Share"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "experience",
+      "description": "A résumé section of dated entries (role, org, period, location, bullets). Reuse for Experience, Education, Certifications by changing the title.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Experience"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "org": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "period": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "location": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "summary": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "default": ""
+                },
+                "bullets": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 300,
+                    "default": ""
+                  },
+                  "maxItems": 12
+                }
+              },
+              "required": [
+                "role"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "skills",
+      "description": "Grouped skills shown as tags (with optional proficiency dots) or labelled level bars; also for languages and tools.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Skills"
+          },
+          "display": {
+            "enum": [
+              "tags",
+              "bars"
+            ],
+            "default": "tags"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "maxLength": 60,
+                        "default": ""
+                      },
+                      "level": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 5,
+                        "default": 0
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 40
+                }
+              },
+              "additionalProperties": false
+            },
+            "maxItems": 10
+          }
+        },
         "additionalProperties": false
       }
     },
