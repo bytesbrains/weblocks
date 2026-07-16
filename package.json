@@ -37,7 +37,7 @@
     "lib",
     "!lib/**/*.test.js",
     "!lib/**/*.test.d.ts",
-    "!lib/example.*",
+    "!lib/example*",
     "catalog.json",
     "CATALOG.md",
     "AGENT.md",
@@ -61,6 +61,7 @@
     "emit:catalog": "node scripts/emit-catalog.mjs",
     "test": "npm run build && node --test lib/*.test.js test/*.mjs",
     "example": "tsc -p tsconfig.json && node lib/example.js",
+    "example:resume": "tsc -p tsconfig.json && node lib/example-resume.js",
     "ai": "tsc -p tsconfig.json && node scripts/ai-run.mjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build && npm run emit:catalog && npm test"
