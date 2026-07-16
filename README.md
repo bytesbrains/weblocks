@@ -274,6 +274,7 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Registry** | `REGISTRY` · `getSpec` · `blockTypes` · `needsIsland` |
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
 | **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
+| **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `getTemplate` |
 | **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
@@ -308,6 +309,29 @@ so chips, the AI's section defaults, and starter templates all derive from one
 list. Verticals are additive and stable: new ones are safe; existing `id`s are
 never renamed or repurposed.
 
+## Templates
+
+`templates.ts` ships **named starter templates** — one complete, validated
+`SiteManifest` per vertical, with realistic copy and a fitting preset baked in.
+They serve two callers from one source of truth: a host renders one as an
+instant, zero-LLM starter/preview, and generation seeds one as a scaffold to
+personalise.
+
+```ts
+import { templatesForVertical, getTemplate, generateSite, renderSite } from '@bytesbrains/weblocks';
+
+templatesForVertical('salon');            // [{ id:'salon-spa', label, manifest }, …]
+renderSite(getTemplate('salon-spa')!.manifest);   // instant preview, no model call
+
+// Or scaffold generation from a template — keep the structure, rewrite the copy:
+await generateSite('a taco truck in Austin', callModel, { template: 'restaurant-modern' });
+// A raw SiteManifest works too: { template: myManifest }. Omit → blank-slate compose.
+```
+
+Render every template to eyeball them: `npm run example:templates` →
+`templates-output/index.html`. Templates are additive and stable (ids never
+renamed); every manifest is `validateManifest`-clean (unit-tested).
+
 ## Adding a block
 
 Register a `BlockSpec` (`type` + `schema` + `css` + `render`, optionally `island`
@@ -324,6 +348,7 @@ npm run build        # tsc → lib/
 npm test             # block definition-of-done + engine invariants
 npm run example         # render a sample landing page → example-output.html
 npm run example:resume  # render a live résumé/CV → resume-output.html (try its Download-PDF)
+npm run example:templates # render every starter template → templates-output/index.html
 npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
 ```
 

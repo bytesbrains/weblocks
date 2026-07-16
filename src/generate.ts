@@ -12,6 +12,7 @@ import { catalogPrompt } from './catalog.js';
 import { blockTypes } from './registry.js';
 import { presetNames } from './presets.js';
 import { getVertical, type Vertical } from './verticals.js';
+import { getTemplate } from './templates.js';
 import { normalizeTokens, DEFAULT_TOKENS } from './tokens.js';
 import { validateManifest } from './validate.js';
 import { applyOps, type BatchResult, type EditOp } from './ops.js';
@@ -27,6 +28,20 @@ export interface GenerateOptions {
    * the brief says otherwise"). Unknown ids are ignored. See `verticals.ts`.
    */
   vertical?: string;
+  /**
+   * A starter **scaffold** to adapt: a template id (`templateNames()`) or a
+   * complete `SiteManifest`. When set, its structure + design are seeded into
+   * the prompt ("start from this, keep the section set unless the brief
+   * conflicts, rewrite the copy for THIS business"). Unknown ids are ignored;
+   * absent = blank-slate compose. See `templates.ts`.
+   */
+  template?: string | SiteManifest;
+}
+
+/** Resolve the `template` option to a manifest (by id, or passed through). */
+function resolveTemplate(t: GenerateOptions['template']): SiteManifest | undefined {
+  if (!t) return undefined;
+  return typeof t === 'string' ? getTemplate(t)?.manifest : t;
 }
 
 // ── Compose: brief → manifest ──────────────────────────────────────────────────
@@ -45,8 +60,23 @@ function verticalGuidance(v: Vertical | undefined): string[] {
   ];
 }
 
+/** Advisory scaffold lines seeded from a template manifest (empty if none). */
+function templateGuidance(scaffold: SiteManifest | undefined): string[] {
+  if (!scaffold) return [];
+  const structure = scaffold.blocks
+    .filter((b) => b.visible !== false)
+    .map((b) => ({ type: b.type, config: b.config }));
+  return [
+    '',
+    'Starter scaffold — START FROM THIS structure and adapt it (do NOT keep the placeholder copy):',
+    JSON.stringify({ design: scaffold.design, blocks: structure }),
+    'Keep this section set and order unless the brief clearly calls for a change; REWRITE every headline, label, and body for the business described in the brief so no placeholder text remains; keep the design coherent (retune the palette if the brief implies a different mood).',
+  ];
+}
+
 export function buildGenerationPrompt(brief: string, opts: GenerateOptions = {}): { system: string; user: string } {
   const vertical = opts.vertical ? getVertical(opts.vertical) : undefined;
+  const scaffold = resolveTemplate(opts.template);
   const system = [
     'You are a web designer that composes a single-page site by ARRANGING pre-built blocks.',
     'You do NOT write HTML, CSS, or JavaScript. You output ONLY a JSON site manifest.',
@@ -61,6 +91,7 @@ export function buildGenerationPrompt(brief: string, opts: GenerateOptions = {})
     '  (Text on primary/accent fills is auto-contrasted — never hand-set button text colours.)',
     `  (For a quick coherent look, base it on a named preset: ${presetNames().join(', ')}.)`,
     ...verticalGuidance(vertical),
+    ...templateGuidance(scaffold),
     '',
     'Rules:',
     '- Use ONLY the block types listed above; never invent a type or a config key.',

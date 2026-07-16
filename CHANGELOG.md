@@ -8,6 +8,18 @@ are minor, breaking changes to either are major.
 ## Unreleased
 
 ### Added
+- **Named starter templates (`templates.ts`, #31).** One complete, realistic,
+  `validateManifest`-clean `SiteManifest` per vertical (17 in all), each with a
+  fitting preset baked in. Exposed as `TEMPLATES` / `templateNames()` /
+  `templatesForVertical()` / `getTemplate()` so a host can render an instant,
+  zero-LLM starter and the AI can scaffold from the same source of truth. A
+  runnable example (`npm run example:templates`) renders them all to
+  `templates-output/`.
+- **Template-aware generation.** `generateSite` / `buildGenerationPrompt` accept
+  `{ template }` (a template id or a raw `SiteManifest`); when present the
+  structure + design are seeded into the prompt ("start from this, keep the
+  section set unless the brief conflicts, rewrite the copy for THIS business").
+  Blank-slate compose is unchanged when omitted.
 - **Business-vertical taxonomy (`verticals.ts`, #30).** A small, stable list that
   maps each vertical (`restaurant`, `salon`, `healthcare`, … `other`) to its
   recommended sections (in order), a fitting `preset`, a copy `tone`, and a
