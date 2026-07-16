@@ -1,0 +1,38 @@
+name: Publish to npm
+
+# Publishes @bytesbrains/weblocks to npm via OIDC **Trusted Publishing** whenever
+# a `v*` tag is pushed (your dev → main → tag release flow). No npm token is
+# stored anywhere — auth comes from GitHub's OIDC id-token, and npm attaches a
+# verified provenance statement automatically. `prepublishOnly` (build +
+# emit:catalog + test) runs as the final gate before the upload.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {} # allow a manual run from the Actions tab
+
+permissions:
+  contents: read
+  id-token: write # REQUIRED for OIDC trusted publishing + provenance
+
+jobs:
+  publish:
+    if: github.repository == 'bytesbrains/weblocks'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted Publishing requires npm >= 11.5.1; runners ship an older npm.
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - run: npm ci
+
+      # No NODE_AUTH_TOKEN — npm obtains a short-lived credential via OIDC.
+      - name: Publish
+        run: npm publish
