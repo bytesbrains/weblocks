@@ -5,6 +5,18 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+Additive and non-breaking.
+
+### Added
+- **`legal` block** — policy links (Terms, Privacy, Cookies, …) that open as
+  **scrollable, dismissible dialogs** (pure CSS `:target`, no JavaScript). Each
+  document's body is authored in a **safe Markdown subset** (headings, lists,
+  links, emphasis, quotes, rules) — rich formatting, but **never raw HTML** (any
+  literal HTML is escaped, not executed). Exports `renderMarkdown`. Catalog now
+  40 blocks.
+
 ## 0.3.0 — 2026-07-16
 
 Additive and non-breaking — every `0.2.0` manifest still validates and renders

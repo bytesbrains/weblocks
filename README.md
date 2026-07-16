@@ -139,7 +139,7 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**39 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**40 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
@@ -152,6 +152,7 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 | Collections | `blog-list` · `blog-post` · `feed` |
 | Dynamic (powered) | `contact-form` · `newsletter` · `search` · `auth` |
 | Conversion / rhythm | `cta` · `social-links` · `contact-details` · `divider` · `spacer` |
+| Legal | `legal` (terms/privacy links → safe-Markdown dialogs) |
 
 `rich-text` and `blog-post` carry **typed** content nodes (headings, paragraphs,
 quotes, lists) — a safe freeform-content escape hatch that is never raw HTML.

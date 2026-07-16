@@ -7,6 +7,7 @@ import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
 import { DEFAULT_TOKENS, tokensToCss, readableOn, sectionOverrideCss } from './tokens.js';
+import { renderMarkdown } from './markdown.js';
 import type { SiteManifest } from './types.js';
 
 const empty = (): SiteManifest => ({ meta: { title: 't', description: '', lang: 'en' }, design: DEFAULT_TOKENS, blocks: [], version: 1 });
@@ -220,6 +221,25 @@ test('directions builds map-app deep links from coords / address / pasted link',
   const h3 = renderSite(bad.manifest);
   assert.ok(!h3.includes('999'), 'out-of-range coords dropped');
   assert.ok(h3.includes('href="https://maps.example/here"'), 'pasted map link used');
+});
+
+test('legal renders policy links + dismissible dialogs with SAFE markdown', () => {
+  const md = '# Our Terms\n\nUse it **wisely**. Email [us](mailto:hi@x.com).\n\n- one\n- two\n\n<script>alert(1)</script>';
+  const r = applyOp(empty(), { op: 'addBlock', type: 'legal', id: 'legal-1', config: { documents: [{ label: 'Terms', title: 'Terms of Service', content: md }] } });
+  const html = renderSite(r.manifest);
+  // Trigger link + dialog wiring (CSS :target).
+  assert.ok(html.includes('href="#legal-1-0"') && html.includes('id="legal-1-0"') && html.includes('role="dialog"'));
+  assert.ok(html.includes('href="#open-legal-1-0"'), 'close/backdrop return to the trigger');
+  // Safe markdown → real formatting…
+  assert.ok(html.includes('<strong>wisely</strong>') && html.includes('<li>one</li>') && html.includes('href="mailto:hi@x.com"'));
+  // …but raw HTML is escaped, never executed.
+  assert.ok(!html.includes('<script>alert(1)</script>') && html.includes('&lt;script&gt;'), 'HTML in content is neutralised');
+});
+
+test('renderMarkdown is safe: escapes HTML, sanitizes link schemes', () => {
+  assert.ok(renderMarkdown('a <b>c</b>').includes('&lt;b&gt;'), 'tags escaped');
+  assert.ok(renderMarkdown('[x](javascript:alert(1))').includes('href="#"'), 'dangerous scheme neutralised');
+  assert.ok(renderMarkdown('## Hi').includes('<h3>Hi</h3>'), 'heading level offset');
 });
 
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
