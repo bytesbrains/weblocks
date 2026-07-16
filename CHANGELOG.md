@@ -5,9 +5,11 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.6.0 — 2026-07-16
 
-Additive and non-breaking.
+A résumé/CV builder, hero image banners, and favicons. Additive and
+**non-breaking** — every `0.5.0` manifest still validates and renders identically.
+Catalog 42 → 45.
 
 ### Added
 - **Résumé / CV pack** — turn the engine into a live-resume builder:
