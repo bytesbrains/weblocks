@@ -10,6 +10,14 @@ are minor, breaking changes to either are major.
 Additive and non-breaking.
 
 ### Added
+- **`social-links` — built-in brand icons & layouts.** Each link now takes a
+  typed `platform` (x/twitter, instagram, facebook, linkedin, youtube, github,
+  tiktok, whatsapp, telegram, discord, mastodon, rss, email, website, phone) that
+  supplies a monochrome brand icon (simple-icons, CC0; themed via `currentColor`)
+  and a default accessible label — `custom` still takes your own emoji/glyph.
+  New `layout` (row/grid), `variant` (labeled/icon-only), and `align` options.
+  Stays one generic block; unset accounts are simply absent. Non-breaking (the old
+  `{ label, href, icon }` shape still renders).
 - **Shipped interactive islands** — the engine now ships the client scripts for
   its interactive blocks (previously host-provided), as zero-dependency browser
   modules under the `./islands/*.js` subpath export:

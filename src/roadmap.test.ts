@@ -260,6 +260,24 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   await assert.doesNotReject(import('./islands/carousel.js'));
 });
 
+test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
+  const labeled = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { links: [
+    { platform: 'github', href: 'https://github.com/x' },
+    { platform: 'twitter', href: 'https://x.com/x' },        // alias → X
+    { platform: 'custom', href: 'https://ex.com', label: 'Blog', icon: '📝' },
+    { platform: 'x', href: '' },                              // no href → dropped
+  ] } });
+  const html = renderSite(labeled.manifest);
+  assert.ok(html.includes('<svg class="ico"') && html.includes('<span class="lbl">GitHub</span>'), 'brand icon + default label');
+  assert.ok(html.includes('<span class="lbl">X</span>'), 'twitter aliases to X label');
+  assert.ok(html.includes('<span class="ico emoji" aria-hidden="true">📝</span>'), 'custom emoji fallback');
+  assert.equal((html.match(/class="s-item/g) ?? []).length, 3, 'link with no href is dropped');
+
+  const iconOnly = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { variant: 'icon', links: [{ platform: 'linkedin', href: 'https://linkedin.com/x' }] } });
+  const h2 = renderSite(iconOnly.manifest);
+  assert.ok(h2.includes('s-item icon-only') && h2.includes('aria-label="LinkedIn"') && !h2.includes('<span class="lbl">'), 'icon-only uses aria-label, no visible text');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

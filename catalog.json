@@ -1737,7 +1737,7 @@
     },
     {
       "type": "social-links",
-      "description": "A centered row of links to social or external profiles, each an optional icon plus a label.",
+      "description": "A row or grid of links to social/contact profiles; each link picks a built-in brand icon by platform (or a custom emoji), shown labeled or icon-only.",
       "schema": {
         "type": "object",
         "properties": {
@@ -1746,19 +1746,63 @@
             "maxLength": 120,
             "default": ""
           },
+          "layout": {
+            "enum": [
+              "row",
+              "grid"
+            ],
+            "default": "row"
+          },
+          "variant": {
+            "enum": [
+              "labeled",
+              "icon"
+            ],
+            "default": "labeled"
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
+          },
           "links": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "label": {
-                  "type": "string",
-                  "maxLength": 40,
-                  "default": ""
+                "platform": {
+                  "enum": [
+                    "x",
+                    "twitter",
+                    "instagram",
+                    "facebook",
+                    "linkedin",
+                    "youtube",
+                    "github",
+                    "tiktok",
+                    "whatsapp",
+                    "telegram",
+                    "discord",
+                    "mastodon",
+                    "rss",
+                    "email",
+                    "website",
+                    "phone",
+                    "custom"
+                  ],
+                  "default": "custom"
                 },
                 "href": {
                   "type": "string",
                   "maxLength": 500,
+                  "default": ""
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
                   "default": ""
                 },
                 "icon": {
@@ -1768,12 +1812,11 @@
                 }
               },
               "required": [
-                "label",
                 "href"
               ],
               "additionalProperties": false
             },
-            "maxItems": 12
+            "maxItems": 20
           }
         },
         "additionalProperties": false

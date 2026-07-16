@@ -352,11 +352,14 @@ A full-width call-to-action band: a headline, optional subheading, and one butto
 
 ## `social-links`
 
-A centered row of links to social or external profiles, each an optional icon plus a label.
+A row or grid of links to social/contact profiles; each link picks a built-in brand icon by platform (or a custom emoji), shown labeled or icon-only.
 
 | field | type | required | notes |
 |---|---|---|---|
 | `title` | string |  |  |
+| `layout` | undefined (row\|grid) |  |  |
+| `variant` | undefined (labeled\|icon) |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
 | `links` | array |  |  |
 
 ## `contact-details`
