@@ -44,6 +44,7 @@ import { cta } from './blocks/cta.js';
 import { socialLinks } from './blocks/socialLinks.js';
 import { contactDetails } from './blocks/contactDetails.js';
 import { directions } from './blocks/directions.js';
+import { legal } from './blocks/legal.js';
 import { divider } from './blocks/divider.js';
 import { spacer } from './blocks/spacer.js';
 import { appShell } from './blocks/appShell.js';
@@ -100,7 +101,7 @@ const SPECS: readonly BlockSpec[] = [
   // dynamic / powered
   contactForm, newsletter, search, auth,
   // conversion / contact
-  cta, socialLinks, contactDetails, directions,
+  cta, socialLinks, contactDetails, directions, legal,
   // rhythm
   divider, spacer,
   footer,

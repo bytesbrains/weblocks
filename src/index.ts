@@ -23,6 +23,7 @@ export {
 } from './pwa.js';
 export { validateBlock, validateManifest, type Validation } from './validate.js';
 export { parse, escapeHtml, escapeAttr, sanitizeUrl, type Field, type Schema, type ParseResult } from './schema.js';
+export { renderMarkdown } from './markdown.js';
 export { catalog, catalogPrompt, type BlockCatalogEntry, type JsonSchema } from './catalog.js';
 export { applyOp, applyOps, type EditOp, type OpResult, type BatchResult } from './ops.js';
 export {

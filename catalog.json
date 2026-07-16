@@ -40,6 +40,7 @@
     "social-links",
     "contact-details",
     "directions",
+    "legal",
     "divider",
     "spacer",
     "footer"
@@ -1857,6 +1858,62 @@
           "appleMaps": {
             "type": "boolean",
             "default": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "legal",
+      "description": "Policy links (terms, privacy, cookies, …) that open as scrollable, dismissible dialogs; each body is safe Markdown (never raw HTML). No JavaScript.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
+          },
+          "separator": {
+            "type": "string",
+            "maxLength": 4,
+            "default": "·"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "default": ""
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 40000,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8
           }
         },
         "additionalProperties": false
