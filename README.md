@@ -234,6 +234,29 @@ for (const [file, body] of Object.entries(emitPwa(manifest) ?? {})) writeFileSyn
 // → manifest.webmanifest + sw.js
 ```
 
+## Interactivity (islands)
+
+Pages are static-first: JavaScript ships only for the interactive blocks that need
+it, and only when their behaviour is on. `renderSite` emits a marker for each —
+`<script type="module" src="/_island/<name>.js">` — and the engine **ships the
+island scripts** (zero-dependency, ~6 KB each) under a subpath:
+
+| Block | Island | Behaviour |
+|---|---|---|
+| `gallery` (`lightbox: true`) | `lightbox.js` | click-to-zoom, prev/next, keyboard, swipe, Esc |
+| `carousel` | `carousel.js` | arrows, dots, keyboard, optional autoplay |
+
+Serve them at the island URL. Copy from the package's `./islands/*.js` export, e.g.:
+
+```ts
+import lightbox from '@bytesbrains/weblocks/islands/lightbox.js?url'; // bundler
+// or, for a static host, copy node_modules/@bytesbrains/weblocks/lib/islands/*.js
+// to /_island/  (change the base with renderSite(m, { islandBase: '/assets/js' }))
+```
+
+Blocks whose behaviour is off (e.g. `tabs`, `accordion` — CSS-only) ship no JS at
+all.
+
 ## API reference
 
 All exports are named; types are shipped (`lib/index.d.ts`).

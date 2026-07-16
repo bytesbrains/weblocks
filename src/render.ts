@@ -18,6 +18,12 @@ import type { Block, SiteManifest } from './types.js';
 export interface RenderOptions {
   /** Host runtime for powered bricks (§6). Defaults to the inert no-op adapter. */
   runtime?: RuntimeAdapter;
+  /**
+   * URL prefix where the host serves island scripts (from the package's
+   * `./islands/*.js` subpath). Defaults to `/_island`, so a `lightbox` island is
+   * emitted as `<script src="/_island/lightbox.js">`.
+   */
+  islandBase?: string;
 }
 
 const RESET_CSS = `
@@ -66,8 +72,9 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
     const { value } = parse(spec.schema, b.config ?? {});
     if (needsIsland(spec, value)) islands.add(spec.island!);
   }
+  const islandBase = (options.islandBase ?? '/_island').replace(/\/+$/, '');
   const islandTags = [...islands]
-    .map((name) => `<script type="module" src="/_island/${escapeAttr(name)}.js" data-island="${escapeAttr(name)}"></script>`)
+    .map((name) => `<script type="module" src="${escapeAttr(islandBase)}/${escapeAttr(name)}.js" data-island="${escapeAttr(name)}"></script>`)
     .join('\n');
 
   return `<!doctype html>

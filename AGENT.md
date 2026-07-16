@@ -60,6 +60,12 @@ The 40 block types, by group:
 - **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `divider`, `spacer`
 - **Legal:** `legal` (terms/privacy links that open safe-Markdown dialogs; content is Markdown, never raw HTML)
 
+Interactivity is safe to enable: `gallery` with `lightbox: true`, `carousel` with
+`autoplay: true`, `tabs`/`accordion`, etc. work out of the box — CSS-only where
+possible, and the host serves small shipped islands (`gallery` lightbox,
+`carousel` controls) for the rest. You just set the typed config; you never write
+the JavaScript.
+
 ## Composing a manifest
 
 Emit exactly this shape (a block’s `id` is optional — the engine assigns one):

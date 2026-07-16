@@ -30,6 +30,7 @@
       "types": "./lib/index.d.ts",
       "import": "./lib/index.js"
     },
+    "./islands/*.js": "./lib/islands/*.js",
     "./catalog.json": "./catalog.json"
   },
   "files": [
@@ -56,9 +57,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.islands.json",
     "emit:catalog": "node scripts/emit-catalog.mjs",
-    "test": "tsc -p tsconfig.json && node --test lib/*.test.js",
+    "test": "npm run build && node --test lib/*.test.js",
     "example": "tsc -p tsconfig.json && node lib/example.js",
     "ai": "tsc -p tsconfig.json && node scripts/ai-run.mjs",
     "prepare": "npm run build",
