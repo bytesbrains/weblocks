@@ -1,6 +1,6 @@
 {
   "name": "@bytesbrains/weblocks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Block engine for AI-composable web apps — the AI composes a SiteManifest from a fixed block catalog; the engine validates and renders it to static HTML. Snap-together \"Lego\" web building blocks, shareable across repos.",
   "keywords": [
     "ai",
@@ -18,7 +18,9 @@
   "license": "MIT",
   "author": "bytesbrains",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "sideEffects": false,
   "main": "./lib/index.js",
   "module": "./lib/index.js",
@@ -47,8 +49,12 @@
     "url": "git+https://github.com/bytesbrains/weblocks.git"
   },
   "homepage": "https://github.com/bytesbrains/weblocks#readme",
-  "bugs": { "url": "https://github.com/bytesbrains/weblocks/issues" },
-  "publishConfig": { "access": "public" },
+  "bugs": {
+    "url": "https://github.com/bytesbrains/weblocks/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "emit:catalog": "node scripts/emit-catalog.mjs",

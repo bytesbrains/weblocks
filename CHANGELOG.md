@@ -5,6 +5,21 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.3.0 — 2026-07-16
+
+Additive and non-breaking — every `0.2.0` manifest still validates and renders
+identically. Catalog 37 → 39.
+
+### Added
+- **`search` block** — site search rendered as a full **search bar** or a
+  compact **expanding icon button** (CSS-only, no JavaScript). A powered block
+  that queries a host `search.query` runtime; degrades to an inert, valid GET
+  form when unwired.
+- **`directions` block** — a location card with **deep links that open the
+  visitor’s map app for directions** (Google Maps universal URL + optional Apple
+  Maps), built from an address, GPS coordinates, or a pasted map link. Static,
+  no runtime. Catalog now 39 blocks.
+
 ## 0.2.0 — 2026-07-16
 
 Rich, app-like PWAs. Additive and **non-breaking**: every `0.1.0` manifest still

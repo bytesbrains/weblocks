@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.2.0)
+# @bytesbrains/weblocks — Block Catalog (v0.3.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `auth` · `cta` · `social-links` · `contact-details` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `divider` · `spacer` · `footer`
 
 ## `app-shell`
 
@@ -315,6 +315,19 @@ An email-capture form that posts to a host-provided runtime; renders inert until
 | `submitLabel` | string |  |  |
 | `successMessage` | string |  |  |
 
+## `search`
+
+A site search rendered as a full search bar or a compact expanding icon button; queries a host-provided search runtime.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `layout` | undefined (bar\|icon) |  |  |
+| `placeholder` | string |  |  |
+| `label` | string |  |  |
+| `buttonLabel` | string |  |  |
+| `name` | string |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
+
 ## `auth`
 
 A provider-agnostic sign in / sign up panel: social provider buttons and an optional email form that start auth via a host runtime.
@@ -357,6 +370,21 @@ A contact info block: address, phone, email, and opening hours (each optional). 
 | `phone` | string |  |  |
 | `email` | string |  |  |
 | `hours` | string |  |  |
+
+## `directions`
+
+A location card with deep links that open the visitor’s map app (Google/Apple Maps) for directions, from an address, GPS coordinates, or a pasted map link.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `place` | string |  |  |
+| `address` | string |  |  |
+| `lat` | string |  |  |
+| `lng` | string |  |  |
+| `mapUrl` | string |  |  |
+| `directionsLabel` | string |  |  |
+| `appleMaps` | boolean |  |  |
 
 ## `divider`
 

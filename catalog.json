@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "package": "@bytesbrains/weblocks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
     "app-shell",
@@ -34,10 +34,12 @@
     "feed",
     "contact-form",
     "newsletter",
+    "search",
     "auth",
     "cta",
     "social-links",
     "contact-details",
+    "directions",
     "divider",
     "spacer",
     "footer"
@@ -1582,6 +1584,56 @@
       }
     },
     {
+      "type": "search",
+      "description": "A site search rendered as a full search bar or a compact expanding icon button; queries a host-provided search runtime.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "layout": {
+            "enum": [
+              "bar",
+              "icon"
+            ],
+            "default": "bar"
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "Search…"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60,
+            "default": "Search"
+          },
+          "buttonLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Search"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "q"
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "search.query"
+        ]
+      }
+    },
+    {
       "type": "auth",
       "description": "A provider-agnostic sign in / sign up panel: social provider buttons and an optional email form that start auth via a host runtime.",
       "schema": {
@@ -1756,6 +1808,55 @@
             "type": "string",
             "maxLength": 160,
             "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "directions",
+      "description": "A location card with deep links that open the visitor’s map app (Google/Apple Maps) for directions, from an address, GPS coordinates, or a pasted map link.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "lat": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "lng": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "mapUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "directionsLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Get directions"
+          },
+          "appleMaps": {
+            "type": "boolean",
+            "default": true
           }
         },
         "additionalProperties": false

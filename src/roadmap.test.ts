@@ -190,6 +190,38 @@ test('prose renderer (shared by rich-text & blog-post) groups lists and escapes'
   assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
 });
 
+test('search renders both layouts, wires to a runtime, and stays inert without one', () => {
+  const bar = applyOp(empty(), { op: 'addBlock', type: 'search', id: 'search-1', config: { layout: 'bar', label: 'Find posts' } });
+  const inert = renderSite(bar.manifest);
+  assert.ok(inert.includes('role="search"') && inert.includes('layout-bar'));
+  assert.ok(inert.includes('data-wl-capability="search.query"') && inert.includes('data-wl-inert="true"'));
+  assert.ok(inert.includes('aria-label="Find posts"'), 'label escaped into the landmark');
+
+  const wired = renderSite(bar.manifest, { runtime: pathRuntime('/api') });
+  assert.ok(wired.includes('action="/api/search.query/search-1"') && !wired.includes('data-wl-inert'));
+
+  const icon = applyOp(empty(), { op: 'addBlock', type: 'search', config: { layout: 'icon' } });
+  assert.ok(renderSite(icon.manifest).includes('layout-icon'), 'icon variant renders');
+});
+
+test('directions builds map-app deep links from coords / address / pasted link', () => {
+  const gps = applyOp(empty(), { op: 'addBlock', type: 'directions', config: { place: 'Studio', lat: '38.7223', lng: '-9.1393', appleMaps: true } });
+  const html = renderSite(gps.manifest);
+  // `&` is escaped to `&amp;` in the attribute (correct); assert on the stable parts.
+  assert.ok(html.includes('www.google.com/maps/dir/?api=1') && html.includes('destination=38.7223%2C-9.1393'), 'precise GPS destination');
+  assert.ok(html.includes('https://maps.apple.com/?daddr=38.7223%2C-9.1393'), 'apple maps link');
+  assert.ok(html.includes('38.7223, -9.1393'), 'coords shown');
+
+  const addr = applyOp(empty(), { op: 'addBlock', type: 'directions', config: { address: '14 Kiln Lane', appleMaps: false } });
+  const h2 = renderSite(addr.manifest);
+  assert.ok(h2.includes('destination=14%20Kiln%20Lane') && !h2.includes('maps.apple.com'), 'address destination, apple hidden');
+
+  const bad = applyOp(empty(), { op: 'addBlock', type: 'directions', config: { lat: '999', lng: 'x', mapUrl: 'https://maps.example/here' } });
+  const h3 = renderSite(bad.manifest);
+  assert.ok(!h3.includes('999'), 'out-of-range coords dropped');
+  assert.ok(h3.includes('href="https://maps.example/here"'), 'pasted map link used');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

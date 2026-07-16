@@ -46,16 +46,17 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 37 block types, by group:
+The 39 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `footer`
 - **Heroes:** `hero`, `hero-app`
 - **Content:** `features`, `about`, `rich-text`, `split`, `steps`, `stats`,
   `services-catalogue`, `pricing`, `logos`, `team`
 - **Media:** `gallery`, `carousel`, `video`, `map`
+- **Location:** `directions` (deep links to open the visitor’s map app)
 - **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `faq`
 - **Collections:** `blog-list`, `blog-post`, `feed`
-- **Dynamic (powered):** `contact-form`, `newsletter`, `auth`
+- **Dynamic (powered):** `contact-form`, `newsletter`, `search`, `auth`
 - **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `divider`, `spacer`
 
 ## Composing a manifest
@@ -152,8 +153,8 @@ cheap:
 
 ## Powered (dynamic) blocks
 
-`contact-form`, `newsletter`, and `auth` need a backend. You still only fill their
-typed config (fields, labels, providers). The block declares the runtime
+`contact-form`, `newsletter`, `search`, and `auth` need a backend. You still only
+fill their typed config (fields, labels, providers, placeholder). The block declares the runtime
 capability it needs; the **host** wires the endpoint. If no runtime is wired, the
 block renders inert-but-valid — that is expected, not an error. Never put secrets,
 endpoints, captcha keys, or backend logic in the config.
