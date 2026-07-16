@@ -1,6 +1,6 @@
 /** `nav` — header bar: brand, links, optional CTA. Static brick. */
 import { escapeAttr, escapeHtml, sanitizeUrl, type Schema } from '../schema.js';
-import type { BlockSpec } from '../registry.js';
+import type { BlockSpec, RenderContext } from '../registry.js';
 
 const schema: Schema = {
   brand: { kind: 'string', required: true, default: 'Brand', max: 60 },
@@ -25,16 +25,19 @@ const css = `
 
 type Link = { label: string; href: string };
 
-function render(config: Record<string, unknown>): string {
+function render(config: Record<string, unknown>, _tokens?: unknown, ctx?: RenderContext): string {
   const brand = config.brand as string;
   const sticky = config.sticky as boolean;
   const links = (config.links as Link[]) ?? [];
   const cta = config.cta as Link;
-  const linkHtml = links.map((l) => `<a href="${escapeAttr(sanitizeUrl(l.href))}">${escapeHtml(l.label)}</a>`).join('');
+  // Resolve in-page links to real section anchors (falls back to plain sanitize
+  // when rendered without a page context, e.g. a single block in isolation).
+  const href = (l: Link) => escapeAttr(sanitizeUrl(ctx?.resolveLink ? ctx.resolveLink(l.href, l.label) : l.href));
+  const linkHtml = links.map((l) => `<a href="${href(l)}">${escapeHtml(l.label)}</a>`).join('');
   return `<nav class="blk-nav" data-sticky="${sticky ? 'true' : 'false'}" aria-label="Primary">
   <div class="wrap">
     <a class="brand" href="#">${escapeHtml(brand)}</a>
-    <div class="links">${linkHtml}${cta.label ? `<a class="cta" href="${escapeAttr(sanitizeUrl(cta.href))}">${escapeHtml(cta.label)}</a>` : ''}</div>
+    <div class="links">${linkHtml}${cta.label ? `<a class="cta" href="${href(cta)}">${escapeHtml(cta.label)}</a>` : ''}</div>
   </div>
 </nav>`;
 }

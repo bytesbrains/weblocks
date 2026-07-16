@@ -5,6 +5,23 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Fixed
+- **In-page nav links now scroll (#26).** `renderSite` previously emitted sections
+  without ids, so `#about` / `#menu` / `#contact` resolved to nothing on every
+  generated site. It now emits a stable, de-duped anchor `id` on each content
+  section (a canonical slug — e.g. `contact-details` → `#contact`,
+  `services-catalogue` → `#services`, `testimonials` → `#reviews`), and `nav`
+  (plus its CTA) resolves links by `#hash`, label, or a common alias
+  (`Menu` → services, `Get in touch` → contact, …). External/relative links pass
+  through; unresolved links fall back to `#` (top), never a dead anchor. Chrome
+  and rhythm blocks get no anchor. **Render-side, so re-rendering an existing
+  manifest just works** — no manifest change needed.
+
+### Added
+- `slugify` exported (`'About Us!'` → `'about-us'`, folds diacritics).
+
 ## 0.6.1 — 2026-07-16
 
 Docs only — no engine changes.

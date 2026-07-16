@@ -112,3 +112,48 @@ test('validateManifest catches duplicate ids and bad configs', () => {
 test('validateManifest passes a well-formed manifest', () => {
   assert.equal(validateManifest(full).ok, true);
 });
+
+// ── in-page anchors: nav links scroll (issue #26) ───────────────────────────────
+
+const anchored = (): SiteManifest => manifest([
+  { id: 'n1', type: 'nav', visible: true, config: { brand: 'Cafe', links: [
+    { label: 'About', href: '#about' },
+    { label: 'Menu', href: '#' },              // label-only → alias → services
+    { label: 'Reviews', href: '#reviews' },
+    { label: 'GitHub', href: 'https://github.com/x' },
+    { label: 'Nowhere', href: '#does-not-exist' },
+  ], cta: { label: 'Get in touch', href: '#' } } },
+  { id: 'a1', type: 'about', visible: true, config: {} },
+  { id: 's1', type: 'services-catalogue', visible: true, config: {} },
+  { id: 'f1', type: 'features', visible: true, config: {} },
+  { id: 'f2', type: 'features', visible: true, config: {} }, // repeat → features-2
+  { id: 't1', type: 'testimonials', visible: true, config: {} },
+  { id: 'c1', type: 'contact-details', visible: true, config: {} },
+]);
+
+test('sections get stable, de-duped anchor ids (canonical slug, not the CSS class)', () => {
+  const html = renderSite(anchored());
+  for (const id of ['about', 'services', 'features', 'features-2', 'reviews', 'contact']) {
+    assert.ok(html.includes(`<section id="${id}"`), `expected #${id}`);
+  }
+  // chrome blocks get no anchor id
+  assert.ok(!/<nav id=/.test(html), 'nav has no anchor id');
+});
+
+test('nav + CTA in-page links resolve (hash, label, alias); external unchanged; dead → top', () => {
+  const html = renderSite(anchored());
+  assert.ok(html.includes('href="#about">About'), 'exact hash');
+  assert.ok(html.includes('href="#services">Menu'), 'label-only "Menu" → alias → services');
+  assert.ok(html.includes('href="#reviews">Reviews'), 'testimonials canonical slug');
+  assert.ok(html.includes('href="https://github.com/x">GitHub'), 'external link untouched');
+  assert.ok(html.includes('href="#">Nowhere'), 'unresolved falls back to top, not a dead anchor');
+  assert.ok(html.includes('href="#contact"') && html.includes('Get in touch'), 'CTA label → contact');
+});
+
+test('re-rendering an existing manifest (unchanged) produces working nav', () => {
+  const m = anchored();
+  const a = renderSite(m);
+  const b = renderSite(m); // no manifest mutation
+  assert.equal(a, b);
+  assert.ok(a.includes('<section id="about"') && a.includes('href="#about">About'));
+});
