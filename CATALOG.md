@@ -2,7 +2,7 @@
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `divider` · `spacer` · `footer`
 
 ## `app-shell`
 
@@ -370,6 +370,21 @@ A contact info block: address, phone, email, and opening hours (each optional). 
 | `phone` | string |  |  |
 | `email` | string |  |  |
 | `hours` | string |  |  |
+
+## `directions`
+
+A location card with deep links that open the visitor’s map app (Google/Apple Maps) for directions, from an address, GPS coordinates, or a pasted map link.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `place` | string |  |  |
+| `address` | string |  |  |
+| `lat` | string |  |  |
+| `lng` | string |  |  |
+| `mapUrl` | string |  |  |
+| `directionsLabel` | string |  |  |
+| `appleMaps` | boolean |  |  |
 
 ## `divider`
 

@@ -139,7 +139,7 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**38 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**39 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
@@ -147,6 +147,7 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 | Heroes | `hero` · `hero-app` |
 | Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` |
 | Media | `gallery` · `carousel` · `video` · `map` |
+| Location | `directions` (deep links to the visitor’s map app) |
 | Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `faq` |
 | Collections | `blog-list` · `blog-post` · `feed` |
 | Dynamic (powered) | `contact-form` · `newsletter` · `search` · `auth` |
