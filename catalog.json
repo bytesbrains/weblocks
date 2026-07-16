@@ -20,6 +20,8 @@
     "steps",
     "stats",
     "services-catalogue",
+    "menu",
+    "product",
     "pricing",
     "logos",
     "team",
@@ -32,10 +34,12 @@
     "tabs",
     "accordion",
     "testimonials",
+    "reviews",
     "faq",
     "blog-list",
     "blog-post",
     "feed",
+    "booking",
     "contact-form",
     "newsletter",
     "search",
@@ -43,6 +47,7 @@
     "cta",
     "social-links",
     "contact-details",
+    "hours",
     "directions",
     "legal",
     "divider",
@@ -928,6 +933,174 @@
       }
     },
     {
+      "type": "menu",
+      "description": "A food/drink menu: named sections, each with items that have an optional price, dietary/allergen tags (e.g. V, VG, GF), and a 0–3 spice level. Use for restaurants and cafés.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Menu"
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "Section"
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "default": ""
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "default": "Item"
+                      },
+                      "description": {
+                        "type": "string",
+                        "maxLength": 300,
+                        "default": ""
+                      },
+                      "price": {
+                        "type": "string",
+                        "maxLength": 40,
+                        "default": ""
+                      },
+                      "tags": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "maxLength": 12,
+                          "default": ""
+                        },
+                        "maxItems": 8
+                      },
+                      "spice": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 3,
+                        "default": 0
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "maxItems": 40
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 20
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "product",
+      "description": "A shoppable product grid: each item has an image, price (with optional \"was\" price and badge), and a buy/enquire link. Use for retail and e-commerce; the cart/checkout is the host's.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "default": "Product"
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 240,
+                  "default": ""
+                },
+                "price": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "was": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "image": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "badge": {
+                  "type": "string",
+                  "maxLength": 24,
+                  "default": ""
+                },
+                "ctaLabel": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": "Buy"
+                },
+                "ctaHref": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": "#"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 48
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "pricing",
       "description": "A row of pricing/tier cards, each with a name, price, feature list, and a call-to-action button; one plan can be highlighted.",
       "schema": {
@@ -1540,6 +1713,87 @@
       }
     },
     {
+      "type": "reviews",
+      "description": "Star-rated customer reviews (1–5 stars) each with an optional author, date, and source (Google, Yelp, …), plus an optional aggregate score. Richer than plain testimonial quotes.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "average": {
+            "type": "string",
+            "maxLength": 8,
+            "default": ""
+          },
+          "count": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 40,
+            "default": ""
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rating": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5,
+                  "default": 5
+                },
+                "quote": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "author": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "date": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "source": {
+                  "enum": [
+                    "google",
+                    "yelp",
+                    "facebook",
+                    "trustpilot",
+                    "tripadvisor",
+                    "app-store",
+                    "other"
+                  ],
+                  "default": "other"
+                }
+              },
+              "required": [
+                "quote"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "faq",
       "description": "An accordion of question/answer pairs. Expands/collapses natively (no JS).",
       "schema": {
@@ -1771,6 +2025,99 @@
           }
         },
         "additionalProperties": false
+      }
+    },
+    {
+      "type": "booking",
+      "description": "An appointment/reservation request form (service, date, time, contact) that posts to a host-provided runtime. For booking-driven businesses — salons, clinics, gyms, hotels, events. No raw HTML.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Book an appointment"
+          },
+          "intro": {
+            "type": "string",
+            "maxLength": 280,
+            "default": ""
+          },
+          "submitLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Request booking"
+          },
+          "successMessage": {
+            "type": "string",
+            "maxLength": 200,
+            "default": "Thanks — we'll confirm your booking shortly."
+          },
+          "serviceLabel": {
+            "type": "string",
+            "maxLength": 60,
+            "default": "Service"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "Service"
+                },
+                "duration": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "price": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 40
+          },
+          "askDate": {
+            "type": "boolean",
+            "default": true
+          },
+          "askTime": {
+            "type": "boolean",
+            "default": true
+          },
+          "askParty": {
+            "type": "boolean",
+            "default": false
+          },
+          "askPhone": {
+            "type": "boolean",
+            "default": true
+          },
+          "askNotes": {
+            "type": "boolean",
+            "default": true
+          },
+          "notesLabel": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "Anything we should know?"
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "booking.request"
+        ]
       }
     },
     {
@@ -2169,6 +2516,70 @@
             "type": "string",
             "maxLength": 160,
             "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "hours",
+      "description": "Structured weekly opening hours (24h times per day, split shifts allowed) rendered as an accessible table with a live \"open now / closed\" badge. Use for shops, cafés, salons, and clinics.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "Opening hours"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 60,
+            "default": ""
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "enum": [
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                    "sun"
+                  ],
+                  "default": "mon"
+                },
+                "open": {
+                  "type": "string",
+                  "maxLength": 5,
+                  "default": ""
+                },
+                "close": {
+                  "type": "string",
+                  "maxLength": 5,
+                  "default": ""
+                },
+                "closed": {
+                  "type": "boolean",
+                  "default": false
+                }
+              },
+              "required": [
+                "day"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 21
           }
         },
         "additionalProperties": false

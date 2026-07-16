@@ -139,20 +139,20 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**45 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**50 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
 | Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `footer` |
 | Heroes | `hero` · `hero-app` |
 | Résumé / profile | `profile-header` · `experience` · `skills` (live CV — avatar, dated entries, skills, Download-PDF/Share) |
-| Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` |
+| Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` |
 | Media | `gallery` · `carousel` · `video` · `video-gallery` · `map` |
 | Location | `directions` (deep links to the visitor’s map app) |
-| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `faq` |
+| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` |
 | Collections | `blog-list` · `blog-post` · `feed` |
-| Dynamic (powered) | `contact-form` · `newsletter` · `search` · `auth` |
-| Conversion / rhythm | `cta` · `social-links` · `contact-details` · `divider` · `spacer` · `copyright` |
+| Dynamic (powered) | `booking` · `contact-form` · `newsletter` · `search` · `auth` |
+| Conversion / rhythm | `cta` · `social-links` · `contact-details` · `hours` · `divider` · `spacer` · `copyright` |
 | Legal | `legal` (terms/privacy links → safe-Markdown dialogs) |
 
 `rich-text` and `blog-post` carry **typed** content nodes (headings, paragraphs,
