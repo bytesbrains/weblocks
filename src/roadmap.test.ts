@@ -158,6 +158,38 @@ test('powered block renders inert with the no-op runtime, wired with an adapter'
   assert.equal(NOOP_RUNTIME.resolve('x', 'y'), null);
 });
 
+// ── hardening: powered-block form safety ────────────────────────────────────────
+
+test('a hostile runtime method is whitelisted to post; the attribute never breaks out', () => {
+  const evil = { resolve: () => ({ url: '/x', method: 'get"><script>alert(1)</script>' as never }) };
+  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
+  const html = renderSite(r.manifest, { runtime: evil });
+  assert.ok(html.includes('method="post"'), 'coerced to a safe method token');
+  assert.ok(!html.includes('<script>alert(1)</script>'), 'no attribute breakout');
+});
+
+test('contact-form field ids are DOM-safe even when field names have spaces', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1', config: { fields: [{ name: 'full name', label: 'Full name', type: 'text' }] } });
+  const html = renderSite(r.manifest);
+  const id = /id="(f-cf-1-[^"]*)"/.exec(html)?.[1] ?? '';
+  assert.ok(id && !/\s/.test(id), `id must be space-free, got "${id}"`);
+  assert.ok(html.includes(`for="${id}"`), 'label stays associated with the input');
+});
+
+test('carousel takes a title so multiple carousels get unique landmark names', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'carousel', config: { title: 'Client work' } });
+  assert.ok(renderSite(r.manifest).includes('aria-label="Client work"'));
+});
+
+test('prose renderer (shared by rich-text & blog-post) groups lists and escapes', () => {
+  const rt = applyOp(empty(), { op: 'addBlock', type: 'rich-text', config: { blocks: [
+    { kind: 'heading', text: 'H' }, { kind: 'bullet', text: 'a' }, { kind: 'bullet', text: 'b' }, { kind: 'numbered', text: '1' },
+  ] } });
+  const html = renderSite(rt.manifest);
+  assert.ok(html.includes('<ul><li>a</li><li>b</li></ul>'), 'adjacent bullets grouped');
+  assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

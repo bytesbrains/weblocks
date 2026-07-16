@@ -23,8 +23,8 @@ const css = `
 
 function render(config: Record<string, unknown>): string {
   const query = String(config.query ?? '');
-  const zoom = config.zoom as number;
-  const height = config.height as number;
+  const zoom = Number.isInteger(config.zoom) ? (config.zoom as number) : 14;
+  const height = Number.isInteger(config.height) ? (config.height as number) : 360;
   const label = (config.label as string) || query;
   const enc = encodeURIComponent(query);
   const embed = query ? `https://maps.google.com/maps?q=${enc}&z=${zoom}&output=embed` : '';

@@ -7,7 +7,7 @@
  */
 import { escapeAttr, escapeHtml, type Schema } from '../schema.js';
 import type { BlockSpec, RenderContext } from '../registry.js';
-import { NOOP_RUNTIME } from '../runtime.js';
+import { NOOP_RUNTIME, safeMethod } from '../runtime.js';
 
 const CAPABILITY = 'auth.start';
 
@@ -56,16 +56,18 @@ function render(config: Record<string, unknown>, _tokens?: unknown, ctx?: Render
   const action = runtime.resolve(CAPABILITY, id);
   const inert = action ? '' : ' data-wl-inert="true"';
 
+  // `action.url` comes from the host adapter; it is escaped here, but the host
+  // is responsible for returning a legitimate endpoint (it is trusted config).
   const buttons = providers.filter((p) => p && p.label).map((p) => {
     const prov = escapeAttr(p.provider || p.label);
     return action
-      ? `<form method="${action.method.toLowerCase()}" action="${escapeAttr(action.url)}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}" data-wl-provider="${prov}"><input type="hidden" name="provider" value="${prov}"><button class="provider" type="submit">${escapeHtml(p.label)}</button></form>`
+      ? `<form method="${safeMethod(action.method)}" action="${escapeAttr(action.url)}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}" data-wl-provider="${prov}"><input type="hidden" name="provider" value="${prov}"><button class="provider" type="submit">${escapeHtml(p.label)}</button></form>`
       : `<button class="provider" type="button" data-wl-capability="${CAPABILITY}" data-wl-provider="${prov}" disabled>${escapeHtml(p.label)}</button>`;
   }).join('\n      ');
 
   const email = showEmail ? `
     ${buttons ? '<div class="sep">or</div>' : ''}
-    <form method="${action ? action.method.toLowerCase() : 'post'}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}" data-wl-provider="email"${inert}>
+    <form method="${safeMethod(action?.method)}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}" data-wl-provider="email"${inert}>
       <input type="email" name="email" placeholder="you@example.com" aria-label="Email address" required>
       <button type="submit"${action ? '' : ' disabled'}>Continue with email</button>
     </form>` : '';

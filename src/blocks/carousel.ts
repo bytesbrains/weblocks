@@ -7,6 +7,7 @@ import { escapeAttr, escapeHtml, sanitizeUrl, type Schema } from '../schema.js';
 import type { BlockSpec } from '../registry.js';
 
 const schema: Schema = {
+  title: { kind: 'string', default: '', max: 120 },
   items: {
     kind: 'array', max: 20,
     of: {
@@ -42,9 +43,10 @@ function slide(it: Item): string {
 }
 
 function render(config: Record<string, unknown>): string {
+  const title = config.title as string;
   const items = ((config.items as Item[]) ?? []).map(slide).filter(Boolean);
   const autoplay = config.autoplay === true;
-  return `<section class="blk-carousel" aria-label="Carousel"${autoplay ? ' data-wl-autoplay="true"' : ''}>
+  return `<section class="blk-carousel" aria-label="${escapeAttr(title || 'Carousel')}"${autoplay ? ' data-wl-autoplay="true"' : ''}>
   <div class="track">
     ${items.join('\n    ')}
   </div>

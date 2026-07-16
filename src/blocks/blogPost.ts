@@ -5,6 +5,7 @@
  */
 import { escapeAttr, escapeHtml, sanitizeUrl, type Schema } from '../schema.js';
 import type { BlockSpec } from '../registry.js';
+import { renderProse, type ProseNode } from './prose.js';
 
 const schema: Schema = {
   title: { kind: 'string', required: true, default: '', max: 200 },
@@ -37,32 +38,13 @@ const css = `
 .blk-blog-post li{margin:.3em 0;font-size:var(--fs-lg);line-height:1.6}
 `.trim();
 
-type Node = { kind: string; text: string };
-
-function body(nodes: Node[]): string {
-  const out: string[] = [];
-  let bullets: string[] = [];
-  const flush = () => { if (bullets.length) { out.push(`<ul>${bullets.join('')}</ul>`); bullets = []; } };
-  for (const n of nodes) {
-    if (!n || !n.text) continue;
-    const t = escapeHtml(n.text);
-    if (n.kind === 'bullet') { bullets.push(`<li>${t}</li>`); continue; }
-    flush();
-    if (n.kind === 'heading') out.push(`<h2>${t}</h2>`);
-    else if (n.kind === 'quote') out.push(`<blockquote>${t}</blockquote>`);
-    else out.push(`<p>${t}</p>`);
-  }
-  flush();
-  return out.join('\n      ');
-}
-
 function render(config: Record<string, unknown>): string {
   const title = config.title as string;
   const date = config.date as string;
   const author = config.author as string;
   const cover = sanitizeUrl(config.cover);
   const hasCover = cover !== '#' && !!(config.cover as string);
-  const nodes = (config.body as Node[]) ?? [];
+  const body = renderProse(config.body as ProseNode[]);
   const meta = [author && `By ${escapeHtml(author)}`, date && escapeHtml(date)].filter(Boolean).join(' · ');
 
   return `<section class="blk-blog-post" aria-label="${escapeAttr(title || 'Article')}">
@@ -70,7 +52,7 @@ function render(config: Record<string, unknown>): string {
     ${hasCover ? `<img class="cover" src="${escapeAttr(cover)}" alt="${escapeAttr(config.coverAlt)}" loading="lazy">` : ''}
     ${title ? `<h1>${escapeHtml(title)}</h1>` : ''}
     ${meta ? `<p class="meta">${meta}</p>` : ''}
-    ${body(nodes)}
+    ${body}
   </article>
 </section>`;
 }

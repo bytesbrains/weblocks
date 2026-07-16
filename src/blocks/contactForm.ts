@@ -10,7 +10,7 @@
  */
 import { escapeAttr, escapeHtml, type Schema } from '../schema.js';
 import type { BlockSpec, RenderContext } from '../registry.js';
-import { NOOP_RUNTIME } from '../runtime.js';
+import { NOOP_RUNTIME, safeMethod } from '../runtime.js';
 
 const CAPABILITY = 'contact-form.submit';
 
@@ -52,8 +52,14 @@ const css = `
 
 interface FieldCfg { name: string; label: string; type: string; placeholder: string; required: boolean; options: string[] }
 
-function control(f: FieldCfg): string {
-  const id = `f-${escapeAttr(f.name)}`;
+/** A DOM-safe id fragment from a field name (label/input association can't break). */
+function fieldId(base: string, name: string, i: number): string {
+  const slug = String(name).replace(/[^A-Za-z0-9_-]/g, '') || `f${i}`;
+  return `${base}-${slug}`;
+}
+
+function control(f: FieldCfg, base: string, i: number): string {
+  const id = escapeAttr(fieldId(base, f.name, i));
   const req = f.required ? ' required' : '';
   const ph = f.placeholder ? ` placeholder="${escapeAttr(f.placeholder)}"` : '';
   const nm = escapeAttr(f.name);
@@ -79,13 +85,13 @@ function render(config: Record<string, unknown>, _tokens: unknown, ctx?: RenderC
   const submitLabel = (config.submitLabel as string) || 'Send';
   const fields = (config.fields as FieldCfg[]) ?? [];
   const action = runtime.resolve(CAPABILITY, id);
-  const controls = fields.map(control).join('\n      ');
+  const controls = fields.map((f, i) => control(f, `f-${id}`, i)).join('\n      ');
 
   return `<section class="blk-contact-form" aria-label="${escapeAttr(title || 'Contact form')}">
   <div class="wrap">
     ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
     ${intro ? `<p class="intro">${escapeHtml(intro)}</p>` : ''}
-    <form method="${action ? action.method.toLowerCase() : 'post'}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}"${action ? '' : ' data-wl-inert="true"'}>
+    <form method="${safeMethod(action?.method)}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}"${action ? '' : ' data-wl-inert="true"'}>
       ${controls}
       <button type="submit"${action ? '' : ' disabled'}>${escapeHtml(submitLabel)}</button>
       ${action ? '' : '<p class="note">This form needs a runtime to be wired before it can send.</p>'}

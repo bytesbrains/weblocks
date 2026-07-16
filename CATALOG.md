@@ -187,6 +187,7 @@ A horizontal, swipeable carousel of image slides with optional captions; scrolls
 
 | field | type | required | notes |
 |---|---|---|---|
+| `title` | string |  |  |
 | `items` | array |  |  |
 | `autoplay` | boolean |  |  |
 

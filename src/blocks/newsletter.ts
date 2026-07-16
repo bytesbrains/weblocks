@@ -6,7 +6,7 @@
  */
 import { escapeAttr, escapeHtml, type Schema } from '../schema.js';
 import type { BlockSpec, RenderContext } from '../registry.js';
-import { NOOP_RUNTIME } from '../runtime.js';
+import { NOOP_RUNTIME, safeMethod } from '../runtime.js';
 
 const CAPABILITY = 'newsletter.subscribe';
 
@@ -43,7 +43,7 @@ function render(config: Record<string, unknown>, _tokens?: unknown, ctx?: Render
   <div class="wrap">
     ${title ? `<h2>${escapeHtml(title)}</h2>` : ''}
     ${intro ? `<p class="intro">${escapeHtml(intro)}</p>` : ''}
-    <form method="${action ? action.method.toLowerCase() : 'post'}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}"${action ? '' : ' data-wl-inert="true"'}>
+    <form method="${safeMethod(action?.method)}" action="${action ? escapeAttr(action.url) : '#'}" data-wl-capability="${CAPABILITY}" data-wl-block="${escapeAttr(id)}"${action ? '' : ' data-wl-inert="true"'}>
       <input type="email" name="email" placeholder="${escapeAttr(placeholder)}" aria-label="Email address" required>
       <button type="submit"${action ? '' : ' disabled'}>${escapeHtml(submitLabel)}</button>
     </form>

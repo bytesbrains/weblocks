@@ -57,6 +57,17 @@ export function pathRuntime(base = '/api', method: 'GET' | 'POST' = 'POST'): Run
   };
 }
 
+/**
+ * Whitelist a form method to a safe lowercase token. A `RuntimeAdapter` is typed
+ * to return `'GET' | 'POST'`, but a host implements it at runtime — so a powered
+ * brick coerces the value before writing it into a `method` attribute (anything
+ * that isn't a clear GET falls back to POST). Defence-in-depth: no host string
+ * can break out of the attribute.
+ */
+export function safeMethod(method: unknown): 'get' | 'post' {
+  return String(method ?? '').toLowerCase() === 'get' ? 'get' : 'post';
+}
+
 /** One block's declared runtime needs. */
 export interface BlockRuntimeNeeds {
   blockId: string;

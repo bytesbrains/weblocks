@@ -48,7 +48,7 @@ function render(config: Record<string, unknown>): string {
 
   const cards = items
     .map((it, i) => `<li>
-        <div class="num" aria-hidden="true">${escapeAttr(i + 1)}</div>
+        <div class="num" aria-hidden="true">${i + 1}</div>
         <h3>${escapeHtml(it.title)}</h3>
         ${it.text ? `<p>${escapeHtml(it.text)}</p>` : ''}
       </li>`)

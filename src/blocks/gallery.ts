@@ -49,7 +49,7 @@ function figure(it: Item): string {
 }
 
 function render(config: Record<string, unknown>): string {
-  const columns = config.columns as number;
+  const columns = Number.isInteger(config.columns) ? (config.columns as number) : 3;
   const gap = GAP_REM[config.gap as string] ?? GAP_REM.md;
   const items = ((config.items as Item[]) ?? []).map(figure).filter(Boolean);
 

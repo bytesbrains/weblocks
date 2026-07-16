@@ -42,7 +42,7 @@ type Item = { value: string; label: string; prefix: string; suffix: string };
 
 function render(config: Record<string, unknown>): string {
   const title = config.title as string;
-  const columns = config.columns as number;
+  const columns = Number.isInteger(config.columns) ? (config.columns as number) : 4;
   const items = ((config.items as Item[]) ?? []).filter((it) => it && it.value && it.label);
 
   const cards = items

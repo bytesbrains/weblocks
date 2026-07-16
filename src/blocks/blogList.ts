@@ -67,7 +67,7 @@ function card(p: Post): string {
 
 function render(config: Record<string, unknown>): string {
   const title = config.title as string;
-  const columns = config.columns as number;
+  const columns = Number.isInteger(config.columns) ? (config.columns as number) : 3;
   const posts = ((config.posts as Post[]) ?? []).map(card).filter(Boolean);
 
   return `<section class="blk-blog-list" aria-label="${escapeAttr(title || 'Posts')}">

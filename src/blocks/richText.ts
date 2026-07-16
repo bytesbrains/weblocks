@@ -3,8 +3,9 @@
  * that is NOT raw HTML: authors compose ordered blocks (headings, paragraphs,
  * quotes, lists) whose text is always escaped. Static brick.
  */
-import { escapeHtml, type Schema } from '../schema.js';
+import { type Schema } from '../schema.js';
 import type { BlockSpec } from '../registry.js';
+import { renderProse, type ProseNode } from './prose.js';
 
 const schema: Schema = {
   blocks: {
@@ -38,44 +39,11 @@ const css = `
 @media(max-width:560px){.blk-rich-text p,.blk-rich-text li,.blk-rich-text blockquote{font-size:var(--fs-base)}}
 `.trim();
 
-type Block = { kind: string; text: string };
-
 function render(config: Record<string, unknown>): string {
-  const blocks = ((config.blocks as Block[]) ?? []).filter((b) => b && typeof b.text === 'string' && b.text);
-
-  const out: string[] = [];
-  let listKind: 'bullet' | 'numbered' | null = null;
-  let listItems: string[] = [];
-
-  const flush = () => {
-    if (listKind && listItems.length) {
-      const tag = listKind === 'bullet' ? 'ul' : 'ol';
-      out.push(`<${tag}>${listItems.join('')}</${tag}>`);
-    }
-    listKind = null;
-    listItems = [];
-  };
-
-  for (const b of blocks) {
-    const kind = b.kind;
-    if (kind === 'bullet' || kind === 'numbered') {
-      if (listKind && listKind !== kind) flush();
-      listKind = kind;
-      listItems.push(`<li>${escapeHtml(b.text)}</li>`);
-      continue;
-    }
-    flush();
-    const t = escapeHtml(b.text);
-    if (kind === 'heading') out.push(`<h2>${t}</h2>`);
-    else if (kind === 'subheading') out.push(`<h3>${t}</h3>`);
-    else if (kind === 'quote') out.push(`<blockquote>${t}</blockquote>`);
-    else out.push(`<p>${t}</p>`);
-  }
-  flush();
-
+  const body = renderProse(config.blocks as ProseNode[], '\n    ');
   return `<section class="blk-rich-text" aria-label="Content">
   <div class="wrap">
-    ${out.join('\n    ')}
+    ${body}
   </div>
 </section>`;
 }
