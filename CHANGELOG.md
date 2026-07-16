@@ -5,6 +5,21 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Added
+- **Business-vertical taxonomy (`verticals.ts`, #30).** A small, stable list that
+  maps each vertical (`restaurant`, `salon`, `healthcare`, … `other`) to its
+  recommended sections (in order), a fitting `preset`, a copy `tone`, and a
+  `booking` flag. Exposed as `VERTICALS` / `verticalNames()` / `getVertical()` so
+  a host renders one source of truth instead of hardcoding a category list. Every
+  recommended block is a real catalog type (unit-tested).
+- **Vertical-aware generation.** `generateSite` / `buildGenerationPrompt` accept
+  an optional `{ vertical }`; when present, the vertical's recommended sections +
+  preset are injected as advisory defaults ("prefer these unless the brief says
+  otherwise"). Blank-slate compose is unchanged when omitted. `GenerateOptions`
+  is exported.
+
 ## 0.6.2 — 2026-07-17
 
 Bug fix: in-page nav links now scroll.

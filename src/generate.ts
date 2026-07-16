@@ -11,6 +11,7 @@
 import { catalogPrompt } from './catalog.js';
 import { blockTypes } from './registry.js';
 import { presetNames } from './presets.js';
+import { getVertical, type Vertical } from './verticals.js';
 import { normalizeTokens, DEFAULT_TOKENS } from './tokens.js';
 import { validateManifest } from './validate.js';
 import { applyOps, type BatchResult, type EditOp } from './ops.js';
@@ -18,9 +19,34 @@ import type { Block, SiteManifest } from './types.js';
 
 export type ModelCall = (args: { system: string; user: string }) => Promise<string>;
 
+/** Optional levers for compose. All advisory — the model may still deviate. */
+export interface GenerateOptions {
+  /**
+   * A business-vertical id (`verticalNames()`). When set, its recommended
+   * section set + fitting preset are injected as defaults ("prefer these unless
+   * the brief says otherwise"). Unknown ids are ignored. See `verticals.ts`.
+   */
+  vertical?: string;
+}
+
 // ── Compose: brief → manifest ──────────────────────────────────────────────────
 
-export function buildGenerationPrompt(brief: string): { system: string; user: string } {
+/** Advisory guidance lines seeded from a chosen vertical (empty if none/unknown). */
+function verticalGuidance(v: Vertical | undefined): string[] {
+  if (!v) return [];
+  return [
+    '',
+    `Business vertical: ${v.label} — aim for a ${v.tone} tone.`,
+    `Prefer these sections, in this order, unless the brief clearly calls for a different set: ${v.blocks.join(', ')}.`,
+    `Base the look on the "${v.preset}" preset unless the brief implies another mood.`,
+    ...(v.booking
+      ? ['This is an appointment/booking-driven business — the primary call-to-action should read like "Book" or "Reserve" and lead to a booking or contact section.']
+      : []),
+  ];
+}
+
+export function buildGenerationPrompt(brief: string, opts: GenerateOptions = {}): { system: string; user: string } {
+  const vertical = opts.vertical ? getVertical(opts.vertical) : undefined;
   const system = [
     'You are a web designer that composes a single-page site by ARRANGING pre-built blocks.',
     'You do NOT write HTML, CSS, or JavaScript. You output ONLY a JSON site manifest.',
@@ -34,6 +60,7 @@ export function buildGenerationPrompt(brief: string): { system: string; user: st
     '  mode:auto follows the viewer\'s OS light/dark; supply an optional darkPalette:{...same keys...} for the dark side.',
     '  (Text on primary/accent fills is auto-contrasted — never hand-set button text colours.)',
     `  (For a quick coherent look, base it on a named preset: ${presetNames().join(', ')}.)`,
+    ...verticalGuidance(vertical),
     '',
     'Rules:',
     '- Use ONLY the block types listed above; never invent a type or a config key.',
@@ -53,8 +80,8 @@ export interface ComposeResult {
 }
 
 /** Compose a manifest from a brief using the injected model. */
-export async function generateSite(brief: string, callModel: ModelCall): Promise<ComposeResult> {
-  const { system, user } = buildGenerationPrompt(brief);
+export async function generateSite(brief: string, callModel: ModelCall, opts: GenerateOptions = {}): Promise<ComposeResult> {
+  const { system, user } = buildGenerationPrompt(brief, opts);
   const raw = await callModel({ system, user });
   return parseManifestResponse(raw);
 }

@@ -273,6 +273,7 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Catalog** | `catalog` · `catalogPrompt` |
 | **Registry** | `REGISTRY` · `getSpec` · `blockTypes` · `needsIsland` |
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
+| **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
 | **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
@@ -283,6 +284,29 @@ Core types: `SiteManifest` · `Block` · `DesignTokens` · `Palette` ·
 
 `ModelCall` is `(args: { system: string; user: string }) => Promise<string>` — the
 one thing you inject, so the engine never depends on a provider.
+
+## Verticals
+
+`verticals.ts` is a small, stable **business-vertical taxonomy** — one source of
+truth for what *kind* of site is being built. Each entry maps a stable `id`
+(persist it host-side as e.g. `businessType`) to a label + icon, a recommended
+section set in order, a fitting `preset`, a copy `tone`, and a `booking` flag.
+
+```ts
+import { verticalNames, getVertical, generateSite } from '@bytesbrains/weblocks';
+
+verticalNames();                 // ['restaurant','retail','salon', … ,'other']
+getVertical('salon');            // { id, label, blocks:[…], preset:'candy', booking:true, … }
+
+// Seed compose with the vertical's recommended sections + preset (advisory):
+await generateSite('a hair salon in Leeds', callModel, { vertical: 'salon' });
+```
+
+Hosts building a category picker should **render `verticalNames()`** rather than
+hardcode their own list — the same way the block editor consumes `catalog.json` —
+so chips, the AI's section defaults, and starter templates all derive from one
+list. Verticals are additive and stable: new ones are safe; existing `id`s are
+never renamed or repurposed.
 
 ## Adding a block
 
