@@ -1,4 +1,4 @@
-# @bytesbrains/weblocks — Block Catalog (v0.6.2)
+# @bytesbrains/weblocks — Block Catalog (v0.7.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
