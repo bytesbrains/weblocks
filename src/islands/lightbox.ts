@@ -39,22 +39,31 @@ if (typeof document !== 'undefined') {
       document.head.appendChild(s);
     }
 
+    // Built with createElement (no innerHTML) — the overlay chrome is static, but
+    // constructing nodes keeps the "no HTML strings into the DOM" rule absolute.
+    const mkBtn = (cls: string, glyph: string, label: string): HTMLButtonElement => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = cls;
+      b.textContent = glyph;
+      b.setAttribute('aria-label', label);
+      return b;
+    };
     const ov = document.createElement('div');
     ov.className = 'wl-lb';
     ov.setAttribute('role', 'dialog');
     ov.setAttribute('aria-modal', 'true');
     ov.setAttribute('aria-label', 'Image viewer');
-    ov.innerHTML =
-      '<button class="wl-close" type="button" aria-label="Close">×</button>' +
-      '<button class="wl-prev" type="button" aria-label="Previous image">‹</button>' +
-      '<button class="wl-next" type="button" aria-label="Next image">›</button>' +
-      '<figure><img alt=""><figcaption></figcaption></figure>';
+    const btnClose = mkBtn('wl-close', '×', 'Close');
+    const btnPrev = mkBtn('wl-prev', '‹', 'Previous image');
+    const btnNext = mkBtn('wl-next', '›', 'Next image');
+    const fig = document.createElement('figure');
+    const bigImg = document.createElement('img');
+    bigImg.alt = '';
+    const cap = document.createElement('figcaption');
+    fig.append(bigImg, cap);
+    ov.append(btnClose, btnPrev, btnNext, fig);
     document.body.appendChild(ov);
-
-    const bigImg = ov.querySelector('img')!;
-    const cap = ov.querySelector('figcaption')!;
-    const btnPrev = ov.querySelector<HTMLElement>('.wl-prev')!;
-    const btnNext = ov.querySelector<HTMLElement>('.wl-next')!;
 
     let items: HTMLImageElement[] = [];
     let idx = 0;
@@ -77,7 +86,7 @@ if (typeof document !== 'undefined') {
       show();
       ov.setAttribute('data-open', '');
       document.documentElement.classList.add('wl-lb-lock');
-      (ov.querySelector('.wl-close') as HTMLElement).focus();
+      btnClose.focus();
     };
     const close = () => {
       ov.removeAttribute('data-open');
@@ -87,7 +96,7 @@ if (typeof document !== 'undefined') {
     };
     const nav = (d: number) => { if (items.length) { idx = (idx + d + items.length) % items.length; show(); } };
 
-    ov.querySelector('.wl-close')!.addEventListener('click', close);
+    btnClose.addEventListener('click', close);
     btnPrev.addEventListener('click', () => nav(-1));
     btnNext.addEventListener('click', () => nav(1));
     ov.addEventListener('click', (e) => { if (e.target === ov) close(); });

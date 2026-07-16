@@ -59,7 +59,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.islands.json",
     "emit:catalog": "node scripts/emit-catalog.mjs",
-    "test": "npm run build && node --test lib/*.test.js",
+    "test": "npm run build && node --test lib/*.test.js test/*.mjs",
     "example": "tsc -p tsconfig.json && node lib/example.js",
     "ai": "tsc -p tsconfig.json && node scripts/ai-run.mjs",
     "prepare": "npm run build",
@@ -67,6 +67,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "jsdom": "^29.1.1",
     "typescript": "^5.6.0"
   }
 }
