@@ -5,7 +5,12 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.7.0 — 2026-07-17
+
+Business verticals land: a vertical taxonomy, named starter templates, and five
+new blocks that cover the booking-driven and shop verticals. Additive and
+**non-breaking** — every `0.6.x` manifest still validates and renders
+identically. Catalog 45 → 50.
 
 ### Added
 - **Five new blocks for vertical coverage (#32).** Catalog 45 → 50.
