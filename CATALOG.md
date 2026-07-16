@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.3.0)
+# @bytesbrains/weblocks — Block Catalog (v0.4.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `footer`
 
 ## `app-shell`
 
@@ -385,6 +385,17 @@ A location card with deep links that open the visitor’s map app (Google/Apple 
 | `mapUrl` | string |  |  |
 | `directionsLabel` | string |  |  |
 | `appleMaps` | boolean |  |  |
+
+## `legal`
+
+Policy links (terms, privacy, cookies, …) that open as scrollable, dismissible dialogs; each body is safe Markdown (never raw HTML). No JavaScript.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
+| `separator` | string |  |  |
+| `documents` | array |  |  |
 
 ## `divider`
 

@@ -46,7 +46,7 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 39 block types, by group:
+The 40 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `footer`
 - **Heroes:** `hero`, `hero-app`
@@ -58,6 +58,7 @@ The 39 block types, by group:
 - **Collections:** `blog-list`, `blog-post`, `feed`
 - **Dynamic (powered):** `contact-form`, `newsletter`, `search`, `auth`
 - **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `divider`, `spacer`
+- **Legal:** `legal` (terms/privacy links that open safe-Markdown dialogs; content is Markdown, never raw HTML)
 
 ## Composing a manifest
 
