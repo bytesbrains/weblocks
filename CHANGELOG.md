@@ -5,9 +5,10 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.3.0 — 2026-07-16
 
-Additive and non-breaking.
+Additive and non-breaking — every `0.2.0` manifest still validates and renders
+identically. Catalog 37 → 39.
 
 ### Added
 - **`search` block** — site search rendered as a full **search bar** or a
