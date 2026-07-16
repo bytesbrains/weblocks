@@ -43,6 +43,7 @@
     "legal",
     "divider",
     "spacer",
+    "copyright",
     "footer"
   ],
   "blocks": [
@@ -1951,6 +1952,43 @@
               "xl"
             ],
             "default": "md"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "copyright",
+      "description": "A small copyright bar (© year holder + rights text) for the bottom of a page; the year auto-fills to the current year when left blank.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "holder": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "year": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "All rights reserved."
+          },
+          "showSymbol": {
+            "type": "boolean",
+            "default": true
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
           }
         },
         "additionalProperties": false

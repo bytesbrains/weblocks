@@ -260,6 +260,22 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   await assert.doesNotReject(import('./islands/carousel.js'));
 });
 
+test('copyright: composes the line, auto-fills the current year, escapes', () => {
+  const explicit = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme <Inc>', year: '2026', text: 'All rights reserved.' } });
+  const h = renderSite(explicit.manifest);
+  assert.ok(h.includes('© 2026 Acme &lt;Inc&gt;. All rights reserved.'), 'line composed + holder escaped');
+
+  const auto = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme', text: '' } });
+  const h2 = renderSite(auto.manifest);
+  assert.ok(/© \d{4} Acme<\/p>/.test(h2.replace(/\s+/g, ' ')) || /© \d{4} Acme/.test(h2), 'blank year auto-fills 4-digit year, no trailing text');
+
+  const noSym = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme', year: '2026', showSymbol: false } });
+  assert.ok(!renderSite(noSym.manifest).includes('© '), 'symbol can be turned off');
+
+  const dot = applyOp(empty(), { op: 'addBlock', type: 'copyright', config: { holder: 'Acme Inc.', year: '2026', text: 'All rights reserved.' } });
+  assert.ok(renderSite(dot.manifest).includes('Acme Inc. All rights reserved.'), 'no double period after a holder ending in "."');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

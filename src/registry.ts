@@ -47,6 +47,7 @@ import { directions } from './blocks/directions.js';
 import { legal } from './blocks/legal.js';
 import { divider } from './blocks/divider.js';
 import { spacer } from './blocks/spacer.js';
+import { copyright } from './blocks/copyright.js';
 import { appShell } from './blocks/appShell.js';
 import { sidebar } from './blocks/sidebar.js';
 import { footer } from './blocks/footer.js';
@@ -104,7 +105,7 @@ const SPECS: readonly BlockSpec[] = [
   cta, socialLinks, contactDetails, directions, legal,
   // rhythm
   divider, spacer,
-  footer,
+  copyright, footer,
 ];
 
 export const REGISTRY: ReadonlyMap<string, BlockSpec> = new Map(SPECS.map((s) => [s.type, s]));

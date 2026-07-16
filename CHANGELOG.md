@@ -10,6 +10,10 @@ are minor, breaking changes to either are major.
 Additive and non-breaking.
 
 ### Added
+- **`copyright` block** — a small "© year holder · rights" bar for the bottom of
+  a page (a standalone alternative to the `footer` copyright line). The year
+  auto-fills to the current year when blank; configurable holder, note, symbol,
+  and alignment. Catalog now 41 blocks.
 - **Shipped interactive islands** — the engine now ships the client scripts for
   its interactive blocks (previously host-provided), as zero-dependency browser
   modules under the `./islands/*.js` subpath export:

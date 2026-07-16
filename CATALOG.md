@@ -2,7 +2,7 @@
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -412,6 +412,18 @@ Deliberate vertical whitespace between sections, in one of four sizes (sm, md, l
 | field | type | required | notes |
 |---|---|---|---|
 | `size` | undefined (sm\|md\|lg\|xl) |  |  |
+
+## `copyright`
+
+A small copyright bar (© year holder + rights text) for the bottom of a page; the year auto-fills to the current year when left blank.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `holder` | string |  |  |
+| `year` | string |  |  |
+| `text` | string |  |  |
+| `showSymbol` | boolean |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
 
 ## `footer`
 
