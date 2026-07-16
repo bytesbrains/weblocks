@@ -34,6 +34,7 @@
     "feed",
     "contact-form",
     "newsletter",
+    "search",
     "auth",
     "cta",
     "social-links",
@@ -1578,6 +1579,56 @@
       "runtime": {
         "capabilities": [
           "newsletter.subscribe"
+        ]
+      }
+    },
+    {
+      "type": "search",
+      "description": "A site search rendered as a full search bar or a compact expanding icon button; queries a host-provided search runtime.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "layout": {
+            "enum": [
+              "bar",
+              "icon"
+            ],
+            "default": "bar"
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "Search…"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60,
+            "default": "Search"
+          },
+          "buttonLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Search"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "q"
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
+          }
+        },
+        "additionalProperties": false
+      },
+      "runtime": {
+        "capabilities": [
+          "search.query"
         ]
       }
     },

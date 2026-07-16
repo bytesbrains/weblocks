@@ -57,9 +57,9 @@ test('catalog is the closed vocabulary — the full named brick set', () => {
       'about', 'accordion', 'announcement-bar', 'app-shell', 'auth', 'blog-list',
       'blog-post', 'carousel', 'contact-details', 'contact-form', 'cta', 'divider',
       'faq', 'features', 'feed', 'footer', 'gallery', 'hero', 'hero-app', 'logos',
-      'map', 'nav', 'newsletter', 'pricing', 'rich-text', 'services-catalogue',
-      'sidebar', 'social-links', 'spacer', 'split', 'stats', 'steps', 'tabs',
-      'team', 'testimonials', 'timeline', 'video',
+      'map', 'nav', 'newsletter', 'pricing', 'rich-text', 'search',
+      'services-catalogue', 'sidebar', 'social-links', 'spacer', 'split', 'stats',
+      'steps', 'tabs', 'team', 'testimonials', 'timeline', 'video',
     ],
   );
 });

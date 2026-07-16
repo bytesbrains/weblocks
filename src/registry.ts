@@ -38,6 +38,7 @@ import { blogPost } from './blocks/blogPost.js';
 import { feed } from './blocks/feed.js';
 import { contactForm } from './blocks/contactForm.js';
 import { newsletter } from './blocks/newsletter.js';
+import { search } from './blocks/search.js';
 import { auth } from './blocks/auth.js';
 import { cta } from './blocks/cta.js';
 import { socialLinks } from './blocks/socialLinks.js';
@@ -96,7 +97,7 @@ const SPECS: readonly BlockSpec[] = [
   // collections
   blogList, blogPost, feed,
   // dynamic / powered
-  contactForm, newsletter, auth,
+  contactForm, newsletter, search, auth,
   // conversion / contact
   cta, socialLinks, contactDetails,
   // rhythm

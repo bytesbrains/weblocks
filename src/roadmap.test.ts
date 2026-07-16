@@ -190,6 +190,20 @@ test('prose renderer (shared by rich-text & blog-post) groups lists and escapes'
   assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
 });
 
+test('search renders both layouts, wires to a runtime, and stays inert without one', () => {
+  const bar = applyOp(empty(), { op: 'addBlock', type: 'search', id: 'search-1', config: { layout: 'bar', label: 'Find posts' } });
+  const inert = renderSite(bar.manifest);
+  assert.ok(inert.includes('role="search"') && inert.includes('layout-bar'));
+  assert.ok(inert.includes('data-wl-capability="search.query"') && inert.includes('data-wl-inert="true"'));
+  assert.ok(inert.includes('aria-label="Find posts"'), 'label escaped into the landmark');
+
+  const wired = renderSite(bar.manifest, { runtime: pathRuntime('/api') });
+  assert.ok(wired.includes('action="/api/search.query/search-1"') && !wired.includes('data-wl-inert'));
+
+  const icon = applyOp(empty(), { op: 'addBlock', type: 'search', config: { layout: 'icon' } });
+  assert.ok(renderSite(icon.manifest).includes('layout-icon'), 'icon variant renders');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {
