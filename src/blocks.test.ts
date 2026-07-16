@@ -60,7 +60,7 @@ test('catalog is the closed vocabulary — the full named brick set', () => {
       'faq', 'features', 'feed', 'footer', 'gallery', 'hero', 'hero-app', 'legal',
       'logos', 'map', 'nav', 'newsletter', 'pricing', 'rich-text', 'search',
       'services-catalogue', 'sidebar', 'social-links', 'spacer', 'split', 'stats',
-      'steps', 'tabs', 'team', 'testimonials', 'timeline', 'video',
+      'steps', 'tabs', 'team', 'testimonials', 'timeline', 'video', 'video-gallery',
     ],
   );
 });

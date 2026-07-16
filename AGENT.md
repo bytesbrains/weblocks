@@ -46,13 +46,13 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 40 block types, by group:
+The 41 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `footer`
 - **Heroes:** `hero`, `hero-app`
 - **Content:** `features`, `about`, `rich-text`, `split`, `steps`, `stats`,
   `services-catalogue`, `pricing`, `logos`, `team`
-- **Media:** `gallery`, `carousel`, `video`, `map`
+- **Media:** `gallery`, `carousel`, `video`, `video-gallery`, `map`
 - **Location:** `directions` (deep links to open the visitor’s map app)
 - **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `faq`
 - **Collections:** `blog-list`, `blog-post`, `feed`

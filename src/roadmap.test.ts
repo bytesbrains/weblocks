@@ -260,6 +260,20 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   await assert.doesNotReject(import('./islands/carousel.js'));
 });
 
+test('video-gallery: facade cards — auto YT thumb, autoplay embed, no-JS fallback, island', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'video-gallery', config: { title: 'Watch', items: [
+    { provider: 'youtube', src: 'https://youtu.be/dQw4w9WgXcQ', title: 'Clip' },
+    { provider: 'file', src: 'https://cdn.example/v.mp4' },
+    { provider: 'youtube', src: '' }, // no id → dropped
+  ] } });
+  const html = renderSite(r.manifest);
+  assert.ok(html.includes('i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'), 'auto youtube thumbnail');
+  assert.ok(html.includes('data-wl-embed="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1"'), 'autoplay embed for the island');
+  assert.ok(html.includes('href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"'), 'no-JS fallback links to the platform');
+  assert.ok(html.includes('data-wl-provider="file"') && html.includes('src="/_island/video.js"'), 'file card + island wired');
+  assert.equal((html.match(/class="v-card"/g) ?? []).length, 2, 'card with no id is dropped');
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {

@@ -27,6 +27,7 @@ import { team } from './blocks/team.js';
 import { gallery } from './blocks/gallery.js';
 import { carousel } from './blocks/carousel.js';
 import { video } from './blocks/video.js';
+import { videoGallery } from './blocks/videoGallery.js';
 import { map } from './blocks/map.js';
 import { timeline } from './blocks/timeline.js';
 import { tabs } from './blocks/tabs.js';
@@ -93,7 +94,7 @@ const SPECS: readonly BlockSpec[] = [
   features, about, richText, split, steps, stats,
   services, pricing, logos, team,
   // media
-  gallery, carousel, video, map,
+  gallery, carousel, video, videoGallery, map,
   // structured content
   timeline, tabs, accordion, testimonials, faq,
   // collections

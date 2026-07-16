@@ -23,6 +23,7 @@
     "gallery",
     "carousel",
     "video",
+    "video-gallery",
     "map",
     "timeline",
     "tabs",
@@ -1027,6 +1028,73 @@
         "required": [
           "src"
         ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "video-gallery",
+      "description": "A grid or carousel of click-to-play video cards (YouTube/Vimeo/file); each loads its player inline on click (a lightweight facade — no heavy iframes up front).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "layout": {
+            "enum": [
+              "grid",
+              "carousel"
+            ],
+            "default": "grid"
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "enum": [
+                    "youtube",
+                    "vimeo",
+                    "file"
+                  ],
+                  "default": "youtube"
+                },
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 160,
+                  "default": ""
+                },
+                "poster": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                }
+              },
+              "required": [
+                "src"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
         "additionalProperties": false
       }
     },

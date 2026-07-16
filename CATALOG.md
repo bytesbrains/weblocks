@@ -2,7 +2,7 @@
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `footer`
 
 ## `app-shell`
 
@@ -202,6 +202,17 @@ A responsive embedded video from YouTube or Vimeo (by id or URL) or a self-hoste
 | `title` | string |  |  |
 | `poster` | string |  |  |
 | `caption` | string |  |  |
+
+## `video-gallery`
+
+A grid or carousel of click-to-play video cards (YouTube/Vimeo/file); each loads its player inline on click (a lightweight facade — no heavy iframes up front).
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `layout` | undefined (grid\|carousel) |  |  |
+| `columns` | integer (2\|3\|4) |  |  |
+| `items` | array |  |  |
 
 ## `map`
 

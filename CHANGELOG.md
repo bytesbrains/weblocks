@@ -10,6 +10,11 @@ are minor, breaking changes to either are major.
 Additive and non-breaking.
 
 ### Added
+- **`video-gallery` block** — a grid or carousel of **click-to-play video cards**
+  (YouTube / Vimeo / self-hosted). Each card is a lightweight *facade* (thumbnail
+  + play button); the new **`video.js` island** loads the real player inline on
+  click, so no heavy iframes load up front. YouTube thumbnails auto-derive from
+  the id; no-JS clicks open the platform. Catalog now 41 blocks.
 - **Shipped interactive islands** — the engine now ships the client scripts for
   its interactive blocks (previously host-provided), as zero-dependency browser
   modules under the `./islands/*.js` subpath export:
