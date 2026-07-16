@@ -13,7 +13,11 @@ Additive and non-breaking.
 - **`search` block** — site search rendered as a full **search bar** or a
   compact **expanding icon button** (CSS-only, no JavaScript). A powered block
   that queries a host `search.query` runtime; degrades to an inert, valid GET
-  form when unwired. Catalog now 38 blocks.
+  form when unwired.
+- **`directions` block** — a location card with **deep links that open the
+  visitor’s map app for directions** (Google Maps universal URL + optional Apple
+  Maps), built from an address, GPS coordinates, or a pasted map link. Static,
+  no runtime. Catalog now 39 blocks.
 
 ## 0.2.0 — 2026-07-16
 

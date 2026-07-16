@@ -39,6 +39,7 @@
     "cta",
     "social-links",
     "contact-details",
+    "directions",
     "divider",
     "spacer",
     "footer"
@@ -1807,6 +1808,55 @@
             "type": "string",
             "maxLength": 160,
             "default": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "directions",
+      "description": "A location card with deep links that open the visitor’s map app (Google/Apple Maps) for directions, from an address, GPS coordinates, or a pasted map link.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "place": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "lat": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "lng": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "mapUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "directionsLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "Get directions"
+          },
+          "appleMaps": {
+            "type": "boolean",
+            "default": true
           }
         },
         "additionalProperties": false
