@@ -62,6 +62,11 @@ export interface SiteMeta {
   title: string;
   description: string;
   lang: string;
+  /**
+   * Optional browser-tab favicon: a URL to an icon (svg/png/ico), OR a single
+   * emoji/glyph (rendered as an inline SVG data URI). Absent = no icon link.
+   */
+  favicon?: string;
 }
 
 /**

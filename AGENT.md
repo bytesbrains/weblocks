@@ -166,6 +166,15 @@ capability it needs; the **host** wires the endpoint. If no runtime is wired, th
 block renders inert-but-valid — that is expected, not an error. Never put secrets,
 endpoints, captcha keys, or backend logic in the config.
 
+## Favicon & hero banner
+
+- **Favicon:** set `meta.favicon` to an icon **URL** or a single **emoji** (e.g.
+  `"🍞"`) — the engine emits the browser-tab `<link rel="icon">`.
+- **Hero image banner:** give the `hero` block an `image` for a full-bleed
+  background banner; add `overlay` (`scrim`/`dark`/`light`/`none`) for text
+  legibility and `minHeight` (`sm`/`md`/`lg`/`full`). Text colour auto-flips over
+  dark overlays.
+
 ## PWA & SEO (optional, additive)
 
 Add top-level fields to make the app installable / discoverable:

@@ -5,6 +5,20 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+Additive and non-breaking.
+
+### Added
+- **`hero` image banner** — the `hero` block gains optional `image`, `overlay`
+  (scrim / dark / light / none), and `minHeight` (sm / md / lg / full). With an
+  image, the photo sits behind the content (an `<img>` + scrim) with a legibility
+  overlay and the text flips to a readable colour; with no image it renders
+  exactly as before.
+- **`meta.favicon`** — a browser-tab favicon: a URL (svg/png/ico) **or a single
+  emoji** (rendered as an inline SVG data URI). `renderSite` emits a scheme-
+  sanitized `<link rel="icon">` in `<head>` when set.
+
 ## 0.5.0 — 2026-07-16
 
 More media & footer blocks, brand icons, and shipped interactivity. Additive and
