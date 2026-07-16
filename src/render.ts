@@ -13,6 +13,7 @@ import { escapeAttr, escapeHtml, parse, sanitizeUrl } from './schema.js';
 import { getSpec, needsIsland, REGISTRY, type RenderContext } from './registry.js';
 import { normalizeTokens, sectionOverrideCss, tokensToCss } from './tokens.js';
 import { NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
+import { buildAnchors, injectAnchorId, type Anchors } from './anchors.js';
 import type { Block, SiteManifest } from './types.js';
 
 export interface RenderOptions {
@@ -40,13 +41,16 @@ img{max-width:100%}
 const PRINT_CSS = `@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}[data-wl-noprint]{display:none!important}.blk-nav,.blk-app-shell,.blk-announcement-bar,.blk-sidebar{position:static!important}.blk-profile-header,.blk-experience .entry,.blk-skills .group,.blk-timeline li{break-inside:avoid}a[href]{text-decoration:none}@page{margin:1.4cm}}`;
 
 /** Render one block: normalize its config, then hand markup to the brick. */
-function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapter): string {
+function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapter, anchors: Anchors): string {
   const spec = getSpec(block.type);
   if (!spec) return ''; // unknown type → skip (closed vocabulary; total)
   const { value } = parse(spec.schema, block.config ?? {});
   const tokens = normalizeTokens(manifest.design);
-  const ctx: RenderContext = { id: block.id, runtime };
+  const ctx: RenderContext = { id: block.id, runtime, resolveLink: anchors.resolve };
   let html = spec.render(value, tokens, ctx);
+  // In-page anchor: emit a stable id on the section so nav links can scroll to it.
+  const anchorId = anchors.idFor.get(block.id);
+  if (anchorId) html = injectAnchorId(html, anchorId);
   // Opt-in per-section overrides: scope palette/radius/spacing as inherited CSS
   // vars on a wrapper (escaped for the style attribute).
   const style = sectionOverrideCss(block.overrides);
@@ -68,7 +72,8 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
     .map((s) => s.css)
     .join('\n');
 
-  const body = blocks.map((b) => renderBlock(b, manifest, runtime)).filter(Boolean).join('\n');
+  const anchors = buildAnchors(blocks);
+  const body = blocks.map((b) => renderBlock(b, manifest, runtime, anchors)).filter(Boolean).join('\n');
 
   // Islands to hydrate. Static-only pages emit none.
   const islands = new Set<string>();

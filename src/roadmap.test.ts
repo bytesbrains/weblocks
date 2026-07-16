@@ -311,7 +311,7 @@ test('hero: background image banner adds img + scrim + overlay; plain hero uncha
   const h = renderSite(banner.manifest);
   assert.ok(h.includes('class="blk-hero has-image overlay-dark mh-lg"'), 'banner classes');
   assert.ok(h.includes('<img class="bg" src="/b.jpg" alt="" aria-hidden="true">') && h.includes('<div class="scrim">'), 'image + scrim layers');
-  assert.ok(renderSite(applyOp(empty(), { op: 'addBlock', type: 'hero', config: { headline: 'Hi' } }).manifest).includes('<section class="blk-hero" data-align'), 'no image → plain text hero (no banner classes on the element)');
+  assert.ok(renderSite(applyOp(empty(), { op: 'addBlock', type: 'hero', config: { headline: 'Hi' } }).manifest).includes('class="blk-hero"'), 'no image → plain text hero (class is exactly blk-hero, no banner modifiers)');
 });
 
 test('favicon: meta.favicon emits <link rel="icon"> (url or emoji), sanitized', () => {

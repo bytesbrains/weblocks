@@ -156,3 +156,19 @@ export function sanitizeUrl(url: unknown): string {
   if (hasScheme && !SAFE_URL_SCHEME.test(s)) return '#';
   return s;
 }
+
+/**
+ * A URL-fragment slug from arbitrary text: `'About Us!'` → `'about-us'`.
+ * Diacritics are folded (`résumé` → `resume`). Used for section anchor ids and
+ * nav in-page link resolution.
+ */
+export function slugify(s: unknown): string {
+  return String(s ?? '')
+    .normalize('NFKD').replace(/[̀-ͯ]/g, '') // fold accents
+    .toLowerCase()
+    .replace(/[^a-z0-9\s_-]/g, '')                      // drop other punctuation
+    .trim()
+    .replace(/[\s_]+/g, '-')                            // spaces/underscores → hyphen
+    .replace(/-+/g, '-')                               // collapse
+    .replace(/^-+|-+$/g, '');                          // trim hyphens
+}
