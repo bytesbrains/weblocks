@@ -51,9 +51,10 @@ function figure(it: Item): string {
 function render(config: Record<string, unknown>): string {
   const columns = Number.isInteger(config.columns) ? (config.columns as number) : 3;
   const gap = GAP_REM[config.gap as string] ?? GAP_REM.md;
+  const lightbox = config.lightbox === true; // flag for the `lightbox` island
   const items = ((config.items as Item[]) ?? []).map(figure).filter(Boolean);
 
-  return `<section class="blk-gallery" aria-label="Gallery">
+  return `<section class="blk-gallery" aria-label="Gallery"${lightbox ? ' data-wl-lightbox="true"' : ''}>
   <div class="wrap">
     <div class="grid" style="--cols:${columns};--gap:${gap}">
       ${items.join('\n      ')}

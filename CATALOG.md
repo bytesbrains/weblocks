@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.4.0)
+# @bytesbrains/weblocks — Block Catalog (v0.5.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `faq` · `blog-list` · `blog-post` · `feed` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -203,6 +203,17 @@ A responsive embedded video from YouTube or Vimeo (by id or URL) or a self-hoste
 | `poster` | string |  |  |
 | `caption` | string |  |  |
 
+## `video-gallery`
+
+A grid or carousel of click-to-play video cards (YouTube/Vimeo/file); each loads its player inline on click (a lightweight facade — no heavy iframes up front).
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `layout` | undefined (grid\|carousel) |  |  |
+| `columns` | integer (2\|3\|4) |  |  |
+| `items` | array |  |  |
+
 ## `map`
 
 An embedded location map for a place or address query, with configurable zoom and height and a link to the full map.
@@ -352,11 +363,14 @@ A full-width call-to-action band: a headline, optional subheading, and one butto
 
 ## `social-links`
 
-A centered row of links to social or external profiles, each an optional icon plus a label.
+A row or grid of links to social/contact profiles; each link picks a built-in brand icon by platform (or a custom emoji), shown labeled or icon-only.
 
 | field | type | required | notes |
 |---|---|---|---|
 | `title` | string |  |  |
+| `layout` | undefined (row\|grid) |  |  |
+| `variant` | undefined (labeled\|icon) |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
 | `links` | array |  |  |
 
 ## `contact-details`
@@ -412,6 +426,18 @@ Deliberate vertical whitespace between sections, in one of four sizes (sm, md, l
 | field | type | required | notes |
 |---|---|---|---|
 | `size` | undefined (sm\|md\|lg\|xl) |  |  |
+
+## `copyright`
+
+A small copyright bar (© year holder + rights text) for the bottom of a page; the year auto-fills to the current year when left blank.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `holder` | string |  |  |
+| `year` | string |  |  |
+| `text` | string |  |  |
+| `showSymbol` | boolean |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
 
 ## `footer`
 

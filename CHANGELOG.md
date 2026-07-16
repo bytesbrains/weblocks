@@ -5,6 +5,41 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.5.0 — 2026-07-16
+
+More media & footer blocks, brand icons, and shipped interactivity. Additive and
+**non-breaking** — every `0.4.0` manifest still validates and renders identically.
+Catalog 40 → 42.
+
+### Added
+- **`video-gallery` block** — a grid or carousel of **click-to-play video cards**
+  (YouTube / Vimeo / self-hosted). Each card is a lightweight *facade* (thumbnail
+  + play button); the new **`video.js` island** loads the real player inline on
+  click, so no heavy iframes load up front. YouTube thumbnails auto-derive from
+  the id; no-JS clicks open the platform.
+- **`copyright` block** — a small "© year holder · rights" bar for the bottom of
+  a page (a standalone alternative to the `footer` copyright line). The year
+  auto-fills to the current year when blank; configurable holder, note, symbol,
+  and alignment.
+- **`social-links` — built-in brand icons & layouts.** Each link takes a typed
+  `platform` (x/twitter, instagram, facebook, linkedin, youtube, github, tiktok,
+  whatsapp, telegram, discord, mastodon, rss, email, website, phone) that supplies
+  a monochrome brand icon (simple-icons, CC0; themed via `currentColor`) and a
+  default label — `custom` still takes your own emoji/glyph. New `layout`
+  (row/grid), `variant` (labeled/icon-only), and `align` options. Non-breaking.
+- **Shipped interactive islands** — the engine now ships the client scripts for
+  its interactive blocks (previously host-provided), as zero-dependency browser
+  modules under the `./islands/*.js` subpath export:
+  - `lightbox.js` — `gallery` click-to-zoom: prev/next, keyboard, swipe, Esc,
+    caption, scroll-lock, focus restore.
+  - `carousel.js` — `carousel` arrows, dot indicators, keyboard nav, and optional
+    autoplay (honours `prefers-reduced-motion`, pauses on hover/focus).
+- `renderSite(manifest, { islandBase })` to configure where island scripts are
+  served (default `/_island`).
+- Islands are built by a separate `tsconfig.islands.json` (DOM lib); the engine's
+  Node code stays DOM-free. `gallery` now marks `data-wl-lightbox` when its
+  lightbox is enabled.
+
 ## 0.4.0 — 2026-07-16
 
 Additive and non-breaking — every `0.3.0` manifest still validates and renders

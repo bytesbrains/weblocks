@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "package": "@bytesbrains/weblocks",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
     "app-shell",
@@ -23,6 +23,7 @@
     "gallery",
     "carousel",
     "video",
+    "video-gallery",
     "map",
     "timeline",
     "tabs",
@@ -43,6 +44,7 @@
     "legal",
     "divider",
     "spacer",
+    "copyright",
     "footer"
   ],
   "blocks": [
@@ -1031,6 +1033,73 @@
       }
     },
     {
+      "type": "video-gallery",
+      "description": "A grid or carousel of click-to-play video cards (YouTube/Vimeo/file); each loads its player inline on click (a lightweight facade — no heavy iframes up front).",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "layout": {
+            "enum": [
+              "grid",
+              "carousel"
+            ],
+            "default": "grid"
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "enum": [
+                    "youtube",
+                    "vimeo",
+                    "file"
+                  ],
+                  "default": "youtube"
+                },
+                "src": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 160,
+                  "default": ""
+                },
+                "poster": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                }
+              },
+              "required": [
+                "src"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 24
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "type": "map",
       "description": "An embedded location map for a place or address query, with configurable zoom and height and a link to the full map.",
       "schema": {
@@ -1737,7 +1806,7 @@
     },
     {
       "type": "social-links",
-      "description": "A centered row of links to social or external profiles, each an optional icon plus a label.",
+      "description": "A row or grid of links to social/contact profiles; each link picks a built-in brand icon by platform (or a custom emoji), shown labeled or icon-only.",
       "schema": {
         "type": "object",
         "properties": {
@@ -1746,19 +1815,63 @@
             "maxLength": 120,
             "default": ""
           },
+          "layout": {
+            "enum": [
+              "row",
+              "grid"
+            ],
+            "default": "row"
+          },
+          "variant": {
+            "enum": [
+              "labeled",
+              "icon"
+            ],
+            "default": "labeled"
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
+          },
           "links": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "label": {
-                  "type": "string",
-                  "maxLength": 40,
-                  "default": ""
+                "platform": {
+                  "enum": [
+                    "x",
+                    "twitter",
+                    "instagram",
+                    "facebook",
+                    "linkedin",
+                    "youtube",
+                    "github",
+                    "tiktok",
+                    "whatsapp",
+                    "telegram",
+                    "discord",
+                    "mastodon",
+                    "rss",
+                    "email",
+                    "website",
+                    "phone",
+                    "custom"
+                  ],
+                  "default": "custom"
                 },
                 "href": {
                   "type": "string",
                   "maxLength": 500,
+                  "default": ""
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 60,
                   "default": ""
                 },
                 "icon": {
@@ -1768,12 +1881,11 @@
                 }
               },
               "required": [
-                "label",
                 "href"
               ],
               "additionalProperties": false
             },
-            "maxItems": 12
+            "maxItems": 20
           }
         },
         "additionalProperties": false
@@ -1951,6 +2063,43 @@
               "xl"
             ],
             "default": "md"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "copyright",
+      "description": "A small copyright bar (© year holder + rights text) for the bottom of a page; the year auto-fills to the current year when left blank.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "holder": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "year": {
+            "type": "string",
+            "maxLength": 24,
+            "default": ""
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "All rights reserved."
+          },
+          "showSymbol": {
+            "type": "boolean",
+            "default": true
+          },
+          "align": {
+            "enum": [
+              "start",
+              "center",
+              "end"
+            ],
+            "default": "center"
           }
         },
         "additionalProperties": false
