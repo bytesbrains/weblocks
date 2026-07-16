@@ -47,7 +47,7 @@ A vertical section/drawer navigation for multi-view apps: an optional title over
 
 ## `hero`
 
-Top-of-page banner: a big headline with an optional eyebrow, subheading, and one call-to-action button.
+Top-of-page hero: a big headline with optional eyebrow, subheading, and CTA — optionally over a full-bleed background image banner with a legibility overlay.
 
 | field | type | required | notes |
 |---|---|---|---|
@@ -55,6 +55,9 @@ Top-of-page banner: a big headline with an optional eyebrow, subheading, and one
 | `headline` | string | yes |  |
 | `subhead` | string |  |  |
 | `align` | undefined (center\|left) |  |  |
+| `image` | string |  |  |
+| `overlay` | undefined (scrim\|dark\|light\|none) |  |  |
+| `minHeight` | undefined (auto\|sm\|md\|lg\|full) |  |  |
 | `cta` | object |  |  |
 
 ## `hero-app`

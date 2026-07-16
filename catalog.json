@@ -237,7 +237,7 @@
     },
     {
       "type": "hero",
-      "description": "Top-of-page banner: a big headline with an optional eyebrow, subheading, and one call-to-action button.",
+      "description": "Top-of-page hero: a big headline with optional eyebrow, subheading, and CTA — optionally over a full-bleed background image banner with a legibility overlay.",
       "schema": {
         "type": "object",
         "properties": {
@@ -262,6 +262,30 @@
               "left"
             ],
             "default": "center"
+          },
+          "image": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "overlay": {
+            "enum": [
+              "scrim",
+              "dark",
+              "light",
+              "none"
+            ],
+            "default": "scrim"
+          },
+          "minHeight": {
+            "enum": [
+              "auto",
+              "sm",
+              "md",
+              "lg",
+              "full"
+            ],
+            "default": "auto"
           },
           "cta": {
             "type": "object",

@@ -9,7 +9,7 @@
  * options and speak the §6 contract; with the default no-op runtime they render
  * inert-but-valid. PWA/SEO head tags are emitted only when the manifest opts in.
  */
-import { escapeAttr, escapeHtml, parse } from './schema.js';
+import { escapeAttr, escapeHtml, parse, sanitizeUrl } from './schema.js';
 import { getSpec, needsIsland, REGISTRY, type RenderContext } from './registry.js';
 import { normalizeTokens, sectionOverrideCss, tokensToCss } from './tokens.js';
 import { NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
@@ -91,6 +91,19 @@ ${body}${islandTags ? '\n' + islandTags : ''}
 </html>`;
 }
 
+/** A browser-tab favicon link from meta.favicon (emoji → data URI, else a URL). */
+function faviconTag(fav: string | undefined): string {
+  const s = String(fav ?? '').trim();
+  if (!s) return '';
+  // A short glyph with no scheme/slash/dot → treat as an emoji favicon.
+  if ([...s].length <= 2 && !/[/:.]/.test(s)) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">${escapeHtml(s)}</text></svg>`;
+    return `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(svg)}">`;
+  }
+  const url = sanitizeUrl(s);
+  return url === '#' ? '' : `<link rel="icon" href="${escapeAttr(url)}">`;
+}
+
 /** SEO + PWA <head> tags, emitted only when the manifest opts in. */
 function headExtras(manifest: SiteManifest | undefined, primary: string): string {
   const out: string[] = [];
@@ -98,6 +111,9 @@ function headExtras(manifest: SiteManifest | undefined, primary: string): string
   const pwa = manifest?.pwa;
   const title = manifest?.meta?.title ?? '';
   const desc = manifest?.meta?.description ?? '';
+
+  const favicon = faviconTag(manifest?.meta?.favicon);
+  if (favicon) out.push(favicon);
 
   if (seo) {
     if (seo.canonical) out.push(`<link rel="canonical" href="${escapeAttr(seo.canonical)}">`);

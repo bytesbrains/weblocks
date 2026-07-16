@@ -101,7 +101,7 @@ is never raw HTML:
 
 ```ts
 type SiteManifest = {
-  meta:    { title: string; description: string; lang: string };
+  meta:    { title: string; description: string; lang: string; favicon?: string };
   design:  DesignTokens;   // the shared baseplate (CSS custom properties)
   blocks:  Block[];        // ordered, typed page sections
   version: number;         // bumped per accepted edit → undo / history / diff
