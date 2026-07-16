@@ -106,11 +106,25 @@ order bricks appear in the AI's menu.
 - wraps a block in a scoped `<div>` carrying its opt-in `overrides` as inherited
   CSS variables — so one section can be tinted without touching the rest;
 - emits island `<script>` markers only for interactive bricks whose behaviour is
-  on (`needsIsland`);
+  on (`needsIsland`), at `options.islandBase` (default `/_island`);
 - emits PWA/SEO `<head>` tags only when the manifest opts in.
 
 `options.runtime` supplies a `RuntimeAdapter` for powered bricks; it defaults to
 the inert no-op adapter, so `renderSite(manifest)` needs no host wiring.
+
+### Islands (`src/islands/`)
+
+Static-first: JS ships only for interactive bricks, only when their behaviour is
+on. The engine **ships the island scripts** — hand-written, zero-dependency
+browser modules — built by a separate `tsconfig.islands.json` (DOM lib) into
+`lib/islands/` and exposed via the `./islands/*.js` subpath export. Each is
+self-executing, idempotent, guarded by `typeof document` (safe to import in
+Node/SSR), and injects its own scoped CSS (themed from the design tokens). Today:
+`lightbox.js` (gallery zoom) and `carousel.js` (arrows/dots/keyboard/autoplay).
+The host serves them at the island URL; the block markup carries the hooks the
+island reads (e.g. `gallery` sets `data-wl-lightbox`, `carousel` sets
+`data-wl-autoplay`). Node engine code stays DOM-free (`tsconfig.json` excludes
+`src/islands`).
 
 ## Edit ops (`ops.ts`) — the verbs
 

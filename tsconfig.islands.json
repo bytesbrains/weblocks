@@ -1,0 +1,11 @@
+{
+  "//": "Client-side islands only — browser DOM code, compiled with the DOM lib. Kept separate so the engine's Node code stays DOM-free.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "rootDir": "src/islands",
+    "outDir": "lib/islands"
+  },
+  "include": ["src/islands/**/*.ts"],
+  "exclude": []
+}

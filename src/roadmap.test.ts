@@ -242,6 +242,24 @@ test('renderMarkdown is safe: escapes HTML, sanitizes link schemes', () => {
   assert.ok(renderMarkdown('## Hi').includes('<h3>Hi</h3>'), 'heading level offset');
 });
 
+// ── shipped islands (gallery lightbox / carousel) ───────────────────────────────
+
+test('gallery flags lightbox for its island, and islandBase is configurable', () => {
+  const on = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: true, items: [{ src: '/a.jpg', alt: 'a' }] } });
+  const off = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: false, items: [{ src: '/a.jpg', alt: 'a' }] } });
+  const html = renderSite(on.manifest);
+  assert.ok(html.includes('data-wl-lightbox="true"'), 'flagged for the island');
+  assert.ok(html.includes('src="/_island/lightbox.js"'), 'island script emitted');
+  assert.ok(!renderSite(off.manifest).includes('data-wl-lightbox'), 'no flag when lightbox off');
+  assert.ok(renderSite(on.manifest, { islandBase: '/assets/js' }).includes('src="/assets/js/lightbox.js"'), 'islandBase override');
+});
+
+test('shipped island modules import safely in a non-DOM environment', async () => {
+  // Guarded by `typeof document`, so importing in Node is a clean no-op.
+  await assert.doesNotReject(import('./islands/lightbox.js'));
+  await assert.doesNotReject(import('./islands/carousel.js'));
+});
+
 // ── §7 PWA layer ────────────────────────────────────────────────────────────────
 
 test('buildWebManifest defaults name/colors from meta + tokens', () => {
