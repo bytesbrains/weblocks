@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
-import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
+import { REGISTRY } from './registry.js';
+import { runtimeNeeds, pathRuntime, NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
 import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
@@ -258,6 +259,39 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   // Guarded by `typeof document`, so importing in Node is a clean no-op.
   await assert.doesNotReject(import('./islands/lightbox.js'));
   await assert.doesNotReject(import('./islands/carousel.js'));
+  await assert.doesNotReject(import('./islands/announcement-bar.js'));
+});
+
+test('every static brick\'s declared island is a shipped module (no 404 island script)', async () => {
+  // The renderer emits <script src="/_island/<name>.js"> for a used block's
+  // declared island, so a static brick's `island` name MUST resolve to a real
+  // shipped module — otherwise every page using it loads a 404.
+  // Powered bricks are the exception: the host wires their runtime, so it also
+  // serves their island (they render inert-but-valid without one).
+  for (const spec of REGISTRY.values()) {
+    if (!spec.island || spec.runtime) continue;
+    await assert.doesNotReject(
+      import(`./islands/${spec.island}.js`),
+      `${spec.type} declares island "${spec.island}" but no such module ships`,
+    );
+  }
+});
+
+test('a powered brick emits its host island only once a runtime is wired', () => {
+  // The engine ships no module for a powered brick's island — the host serves it
+  // alongside the runtime. Unwired, the tag would be a guaranteed 404.
+  const m = applyOp(empty(), { op: 'addBlock', type: 'contact-form' }).manifest;
+  assert.ok(!renderSite(m).includes('/_island/contact-form.js'), 'no runtime → no island tag');
+  assert.ok(renderSite(m).includes('data-wl-inert="true"'), 'and the brick still renders inert-but-valid');
+  assert.ok(renderSite(m, { runtime: pathRuntime() }).includes('/_island/contact-form.js'), 'wired → host island tag');
+
+  // A host that provides other capabilities but not this one stays unwired.
+  const otherCaps: RuntimeAdapter = { resolve: (cap) => (cap === 'search.query' ? { url: '/s', method: 'GET' } : null) };
+  assert.ok(!renderSite(m, { runtime: otherCaps }).includes('/_island/contact-form.js'), 'unrelated capability → still no tag');
+
+  // Static bricks are unaffected — their island ships with the engine.
+  const bar = applyOp(empty(), { op: 'addBlock', type: 'announcement-bar' }).manifest;
+  assert.ok(renderSite(bar).includes('/_island/announcement-bar.js'), 'a static brick needs no runtime');
 });
 
 test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {

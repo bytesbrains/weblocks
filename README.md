@@ -254,6 +254,8 @@ island scripts** (zero-dependency, ~6 KB each) under a subpath:
 | `carousel` | `carousel.js` | arrows, dots, keyboard, optional autoplay |
 | `video-gallery` | `video.js` | click-to-play cards (load the real player inline on press) |
 | `profile-header` (Download/Share on) | `resume.js` | print-to-PDF (`window.print()`) + Web Share / copy-link |
+| `announcement-bar` | `announcement-bar.js` | dismiss the strip |
+| `stats` | `stats.js` | count figures up when they scroll into view |
 | `install-prompt` | `install-prompt.js` | native install prompt, platform-matched steps, sticky dismiss |
 
 Serve them at the island URL. Copy from the package's `./islands/*.js` export, e.g.:
@@ -266,6 +268,14 @@ import lightbox from '@bytesbrains/weblocks/islands/lightbox.js?url'; // bundler
 
 Blocks whose behaviour is off (e.g. `tabs`, `accordion` — CSS-only) ship no JS at
 all.
+
+**Powered blocks are the exception.** `contact-form`, `newsletter`, `booking` and
+`auth` declare an island the *host* serves alongside the runtime it wires — the
+engine ships no module for them, because what that script does (live slots,
+inline validation, an auth SDK) is the host's call. Their `<script>` tag is
+therefore emitted **only when the runtime you pass resolves that block's
+capability**; with no runtime they render inert-but-valid and ship no JS, so an
+unwired page never requests a file you don't serve.
 
 ## API reference
 
