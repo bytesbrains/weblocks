@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/bytesbrains/weblocks/main/assets/weblocks-logo.png" alt="weblocks — bricks for AI-composable web apps" width="260">
+
 # @bytesbrains/weblocks
 
 **The block engine for AI-composable web apps.**
