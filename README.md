@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/bytesbrains/weblocks/main/assets/weblocks-logo.png" alt="weblocks — bricks for AI-composable web apps" width="260">
+
 # @bytesbrains/weblocks
 
 **The block engine for AI-composable web apps.**
@@ -14,6 +16,11 @@ provider- and host-neutral, zero runtime dependencies.
 [![node](https://img.shields.io/node/v/@bytesbrains/weblocks.svg)](https://nodejs.org)
 [![types](https://img.shields.io/npm/types/@bytesbrains/weblocks.svg)](./lib/index.d.ts)
 [![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)](./package.json)
+[![live gallery](https://img.shields.io/badge/live-gallery-3a5a40.svg)](https://bytesbrains.github.io/weblocks/)
+
+**[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
+[all 51 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+[17 starter templates](https://bytesbrains.github.io/weblocks/templates/)
 
 </div>
 
@@ -50,7 +57,7 @@ Zero runtime dependencies · pure TypeScript · ESM · Node ≥ 20.
 
 ## Table of contents
 
-- [Install](#install) · [Quickstart](#quickstart) · [Core concepts](#core-concepts)
+- [Live gallery](https://bytesbrains.github.io/weblocks/) · [Install](#install) · [Quickstart](#quickstart) · [Core concepts](#core-concepts)
 - [The AI contract](#the-ai-contract) · [Block catalog](#block-catalog)
 - [Editing](#editing) · [Theming](#theming) · [Powered blocks & runtime](#powered-blocks--runtime) · [PWA](#pwa)
 - [API reference](#api-reference) · [Adding a block](#adding-a-block) · [Local development](#local-development)
@@ -139,7 +146,9 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**51 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**51 typed blocks.** See every one of them rendered live on the
+**[block wall](https://bytesbrains.github.io/weblocks/blocks/)**; full field
+reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
@@ -350,9 +359,11 @@ await generateSite('a taco truck in Austin', callModel, { template: 'restaurant-
 // A raw SiteManifest works too: { template: myManifest }. Omit → blank-slate compose.
 ```
 
-Render every template to eyeball them: `npm run example:templates` →
-`templates-output/index.html`. Templates are additive and stable (ids never
-renamed); every manifest is `validateManifest`-clean (unit-tested).
+Browse them rendered at
+**[the starter gallery](https://bytesbrains.github.io/weblocks/templates/)**, or
+build them locally: `npm run example:templates` → `templates-output/index.html`.
+Templates are additive and stable (ids never renamed); every manifest is
+`validateManifest`-clean (unit-tested).
 
 ## Adding a block
 
@@ -361,6 +372,11 @@ Register a `BlockSpec` (`type` + `schema` + `css` + `render`, optionally `island
 typed schema (no raw-HTML field), consumes shared tokens, renders totally
 (defaults + escaping, never throws), valid regardless of neighbours. See
 [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md#adding-a-block-concretely).
+
+Also give it demo config so it appears on the
+[block wall](https://bytesbrains.github.io/weblocks/blocks/) — either place it in
+a starter template, or add an entry to `SUPPLEMENT` in `src/showcase.ts`.
+`showcase.test.ts` fails on any registered type without one.
 
 ## Local development
 
@@ -371,6 +387,7 @@ npm test             # block definition-of-done + engine invariants
 npm run example         # render a sample landing page → example-output.html
 npm run example:resume  # render a live résumé/CV → resume-output.html (try its Download-PDF)
 npm run example:templates # render every starter template → templates-output/index.html
+npm run site            # build the published gallery (wall + templates) → site/index.html
 npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
 ```
 
@@ -382,6 +399,23 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 ```
 
 ## Documentation
+
+- **[Live gallery](https://bytesbrains.github.io/weblocks/)** — the engine's real
+  output: [every block rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+  [every starter template](https://bytesbrains.github.io/weblocks/templates/).
+  Rebuilt from source on every push; run it locally with `npm run site`.
+- **[Package on npm](https://www.npmjs.com/package/@bytesbrains/weblocks)** —
+  `npm i @bytesbrains/weblocks`.
+
+**For agents — the contract, fetchable without installing anything:**
+
+| URL | |
+|---|---|
+| [`/llms.txt`](https://bytesbrains.github.io/weblocks/llms.txt) | Index of everything below, in the convention models look for. |
+| [`/AGENT.md`](https://bytesbrains.github.io/weblocks/AGENT.md) | Prime directives, composing a manifest, editing with ops, guarantees. |
+| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 51 block types with full JSON Schema for their config. |
+| [`/catalog.txt`](https://bytesbrains.github.io/weblocks/catalog.txt) | The same vocabulary, one line per block — cheap to drop in a system prompt. |
+| [`/tools.json`](https://bytesbrains.github.io/weblocks/tools.json) | A ready-to-use `compose_site` function-calling definition. |
 
 - **[`AGENT.md`](./AGENT.md)** — how to use this package from an AI / agent.
 - **[`VISION.md`](./VISION.md)** — principles and direction.

@@ -1,6 +1,6 @@
 {
   "name": "@bytesbrains/weblocks",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Block engine for AI-composable web apps — the AI composes a SiteManifest from a fixed block catalog; the engine validates and renders it to static HTML. Snap-together \"Lego\" web building blocks, shareable across repos.",
   "keywords": [
     "ai",
@@ -38,6 +38,7 @@
     "!lib/**/*.test.js",
     "!lib/**/*.test.d.ts",
     "!lib/example*",
+    "!lib/showcase*",
     "catalog.json",
     "CATALOG.md",
     "AGENT.md",
@@ -65,7 +66,8 @@
     "example:templates": "tsc -p tsconfig.json && node lib/example-templates.js",
     "ai": "tsc -p tsconfig.json && node scripts/ai-run.mjs",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run build && npm run emit:catalog && npm test"
+    "prepublishOnly": "npm run build && npm run emit:catalog && npm test",
+    "site": "npm run build && node lib/example-site.js"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

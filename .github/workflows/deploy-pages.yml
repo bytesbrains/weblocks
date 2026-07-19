@@ -1,0 +1,50 @@
+name: Deploy demo site
+
+# Publishes the live block gallery to GitHub Pages: the block wall (every brick
+# in the registry, rendered) plus the starter templates. Built from source on
+# every push to main — nothing generated is committed, same as `lib/`.
+#
+# Requires Pages to be enabled with source = "GitHub Actions"
+# (Settings → Pages → Build and deployment → Source).
+on:
+  push:
+    branches: [main]
+  pull_request: # build only, to catch breakage before merge
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel an in-flight deploy; queue behind it instead.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run site
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    # PRs build above but must not publish.
+    if: github.ref == 'refs/heads/main' && github.repository == 'bytesbrains/weblocks'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
