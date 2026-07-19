@@ -148,26 +148,84 @@ ${cards}`,
 );
 
 // ── the starter gallery ──────────────────────────────────────────────────────
+// Each card shows what the starter actually *is*: a live preview over the
+// ordered block vocabulary that composes it. The spine is the point — it's the
+// manifest made visible, and it's the one thing a screenshot gallery can't show.
+const SPINE_SHOWN = 7;
 let templateFailures = 0;
-const rows = Object.values(TEMPLATES).map((t) => {
+
+const cardsHtml = Object.values(TEMPLATES).map((t) => {
   const v = validateManifest(t.manifest);
   if (!v.ok) { templateFailures++; console.error(`✗ ${t.id}: ${JSON.stringify(v.errors)}`); }
   const file = `${t.id}.html`;
   writeFileSync(join(out, 'templates', file), renderSite(t.manifest, { islandBase: '../_island' }), 'utf8');
-  return `<li><a href="./${escapeAttr(file)}">${escapeHtml(t.label)}</a>
-    <small>${escapeHtml(t.id)} · ${escapeHtml(t.vertical)}${v.ok ? '' : ' · INVALID'}</small></li>`;
+
+  const types = t.manifest.blocks.map((b) => b.type);
+  const shown = types.slice(0, SPINE_SHOWN).map((ty) => `<span class="chip">${escapeHtml(ty)}</span>`).join('');
+  const rest = types.length - SPINE_SHOWN;
+  const spine = shown + (rest > 0 ? `<span class="chip more">+${rest}</span>` : '');
+
+  return `<a class="tpl" href="./${escapeAttr(file)}">
+  <span class="shot"><iframe src="./${escapeAttr(file)}" title="" aria-hidden="true" tabindex="-1" loading="lazy" scrolling="no"></iframe></span>
+  <span class="body">
+    <span class="eyebrow">${escapeHtml(t.vertical)}</span>
+    <span class="name">${escapeHtml(t.label)}${v.ok ? '' : ' <b class="bad">INVALID</b>'}</span>
+    <span class="spine">${spine}</span>
+    <span class="foot"><code>${escapeHtml(t.id)}</code><em>${types.length} blocks</em></span>
+  </span>
+</a>`;
 }).join('\n');
+
+// No vertical filter here on purpose: the set is currently one starter per
+// vertical, so every filter option would match exactly one card. Add one when a
+// vertical grows a second variant.
+const galleryCss = `
+:root{--accent:#0e7c86;--shot:#f4f5f3;--chipbg:#f1f2ef}
+@media(prefers-color-scheme:dark){:root{--accent:#35b9c4;--shot:#1a1a1a;--chipbg:#1e1f1e}}
+.grid{display:grid;gap:1.6rem;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.tpl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  text-decoration:none;color:var(--fg);background:var(--bg);transition:border-color .18s,transform .18s,box-shadow .18s}
+.tpl:hover,.tpl:focus-visible{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.10)}
+.tpl:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.shot{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--shot);border-bottom:1px solid var(--line)}
+.shot iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;pointer-events:none;
+  transform:scale(var(--s,.24));transform-origin:0 0}
+.body{display:flex;flex-direction:column;gap:.5rem;padding:.95rem 1rem 1.05rem}
+.eyebrow{font:.7rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.name{font-size:1.02rem;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.bad{color:#c0392b;font-size:.75rem;font-weight:700}
+.spine{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.1rem}
+.chip{font:.68rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
+  background:var(--chipbg);border-radius:4px;padding:.1em .42em}
+.chip.more{color:var(--accent)}
+.foot{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;margin-top:.35rem;
+  padding-top:.6rem;border-top:1px solid var(--line);font-size:.76rem;color:var(--muted)}
+.foot code{background:none;padding:0}
+.foot em{font-style:normal}
+@media(prefers-reduced-motion:reduce){.tpl{transition:none}.tpl:hover,.tpl:focus-visible{transform:none}}
+`;
+
+// Thumbnails are real pages scaled down, so the scale factor has to track the
+// card's rendered width rather than be guessed at build time.
+const galleryScript = `<script>
+(function(){
+  var shots=document.querySelectorAll('.shot');
+  var fit=function(){shots.forEach(function(s){var w=s.clientWidth;if(w)s.style.setProperty('--s',w/1280);});};
+  fit();addEventListener('resize',fit);addEventListener('load',fit);
+})();
+</script>`;
 
 writeFileSync(
   join(out, 'templates', 'index.html'),
   shell(
     'weblocks — starter templates',
     `<h1>Starter templates</h1>
-<p class="lede">One complete starter per business vertical. Each is a validated <code>SiteManifest</code>
-rendered to a self-contained document — the same output a host gets with zero LLM calls.</p>
-<ul class="list">${rows}</ul>`,
-    '.list{list-style:none;padding:0}.list li{padding:.7rem 0;border-bottom:1px solid var(--line)}.list small{color:var(--muted);margin-left:.5rem}',
-  ),
+<p class="lede">One complete starter per vertical, each a validated <code>SiteManifest</code> rendered to a
+self-contained document — the same output a host gets with zero LLM calls. Every preview below is the real
+page; the chips under it are the blocks it is composed from.</p>
+<div class="grid">${cardsHtml}</div>`,
+    galleryCss,
+  ).replace('</body>', `${galleryScript}</body>`),
   'utf8',
 );
 
