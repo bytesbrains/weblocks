@@ -12,6 +12,7 @@ import type { DesignTokens } from './types.js';
 import type { RuntimeAdapter } from './runtime.js';
 import { nav } from './blocks/nav.js';
 import { announcementBar } from './blocks/announcementBar.js';
+import { installPrompt } from './blocks/installPrompt.js';
 import { hero } from './blocks/hero.js';
 import { heroApp } from './blocks/heroApp.js';
 import { profileHeader } from './blocks/profileHeader.js';
@@ -102,7 +103,7 @@ export interface BlockSpec {
 // order bricks appear in the AI's menu. Roughly top-to-bottom on a page.
 const SPECS: readonly BlockSpec[] = [
   // chrome / app shell
-  appShell, nav, announcementBar, sidebar,
+  appShell, nav, announcementBar, installPrompt, sidebar,
   // heroes
   hero, heroApp,
   // résumé / profile

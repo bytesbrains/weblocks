@@ -447,3 +447,38 @@ test('a rich app manifest (dynamic + pwa + overrides) renders one valid document
   assert.ok(html.startsWith('<!doctype html>') && html.includes('</html>'));
   assert.ok(validateManifest(batch.manifest).ok);
 });
+
+// ── install-prompt (add-to-home-screen toast) ───────────────────────────────────
+
+test('install-prompt: toast + every platform guide, no-JS <details>, island wired', () => {
+  const r = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: {
+    title: 'Install <Acme>', body: 'One tap away.', actionLabel: 'Show me how', position: 'top', delayMs: 3000,
+  } });
+  const html = renderSite(r.manifest);
+  assert.ok(html.includes('class="blk-install-prompt pos-top tone-info"'), 'position + tone classes');
+  assert.ok(html.includes('Install &lt;Acme&gt;'), 'title escaped');
+  assert.ok(html.includes('data-delay="3000"') && html.includes('data-remember="1"'), 'island reads delay + sticky dismiss');
+  assert.ok(html.includes('data-wl-noprint'), 'excluded from print/PDF export');
+  // Static-first: the guide is a <details>, so with no JS every platform expands.
+  assert.ok(html.includes('<details class="guide">') && html.includes('<summary data-wl-install-action>'), 'no-JS disclosure');
+  for (const id of ['ios-safari', 'ios-other', 'android', 'desktop-chrome', 'macos-safari', 'firefox']) {
+    assert.ok(html.includes(`data-platform="${id}"`), `guide for ${id}`);
+  }
+  assert.ok(html.includes('src="/_island/install-prompt.js"'), 'island script emitted');
+  assert.ok(validateManifest(r.manifest).ok);
+});
+
+test('install-prompt: platforms narrows the guides; dismiss can be turned off', () => {
+  const two = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: { platforms: ['ios-safari', 'android'], dismissible: false, rememberDismiss: false } });
+  const html = renderSite(two.manifest);
+  assert.equal((html.match(/<div data-platform="/g) ?? []).length, 2, 'only the two picked guides render');
+  assert.ok(!html.includes('data-wl-dismiss'), 'no close button when dismissible is off');
+  assert.ok(html.includes('data-remember="0"'), 'sticky dismiss opt-out reaches the island');
+
+  const none = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: { platforms: [] } });
+  assert.equal((renderSite(none.manifest).match(/<div data-platform="/g) ?? []).length, 6, 'empty selection falls back to all platforms');
+});
+
+test('install-prompt island imports safely in a non-DOM environment', async () => {
+  await assert.doesNotReject(import('./islands/install-prompt.js'));
+});
