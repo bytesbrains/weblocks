@@ -14,6 +14,7 @@ provider- and host-neutral, zero runtime dependencies.
 [![node](https://img.shields.io/node/v/@bytesbrains/weblocks.svg)](https://nodejs.org)
 [![types](https://img.shields.io/npm/types/@bytesbrains/weblocks.svg)](./lib/index.d.ts)
 [![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)](./package.json)
+[![live gallery](https://img.shields.io/badge/live-gallery-3a5a40.svg)](https://bytesbrains.github.io/weblocks/)
 
 **[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
 [all 51 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
@@ -397,6 +398,12 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 
 ## Documentation
 
+- **[Live gallery](https://bytesbrains.github.io/weblocks/)** — the engine's real
+  output: [every block rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+  [every starter template](https://bytesbrains.github.io/weblocks/templates/).
+  Rebuilt from source on every push; run it locally with `npm run site`.
+- **[Package on npm](https://www.npmjs.com/package/@bytesbrains/weblocks)** —
+  `npm i @bytesbrains/weblocks`.
 - **[`AGENT.md`](./AGENT.md)** — how to use this package from an AI / agent.
 - **[`VISION.md`](./VISION.md)** — principles and direction.
 - **[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)** — internals.
