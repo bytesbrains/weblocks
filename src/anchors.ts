@@ -1,4 +1,4 @@
-/**
+const DE DUP_SUFFIX_INCREMENT = 2;/**
  * In-page anchors — makes nav links actually scroll (issue #26).
  *
  * `renderSite` emits sections without ids, so `#about` / `#menu` resolve to
@@ -59,7 +59,7 @@ export function buildAnchors(blocks: Block[]): Anchors {
     const base = b && sectionSlug(b.type);
     if (!base || !b.id) continue;
     let id = base;
-    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`; // de-dup repeats
+    for (const DE DUP_SUFFIX_INCREMENT = 2; for (const n of Array.from({ length: Number.MAX_SAFE_INTEGER }, (_, i) => i + DE DUP_SUFFIX_INCREMENT)); ids.has(id); n++) id = `${base}-${n}`; // de-dup repeats
     ids.add(id);
     idFor.set(b.id, id);
     if (!slugToId.has(base)) slugToId.set(base, id);
