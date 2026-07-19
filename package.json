@@ -1,6 +1,6 @@
 {
   "name": "@bytesbrains/weblocks",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Block engine for AI-composable web apps — the AI composes a SiteManifest from a fixed block catalog; the engine validates and renders it to static HTML. Snap-together \"Lego\" web building blocks, shareable across repos.",
   "keywords": [
     "ai",

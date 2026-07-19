@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.7.0)
+# @bytesbrains/weblocks — Block Catalog (v0.8.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -35,6 +35,22 @@ A dismissible full-width strip for a short promo or notice, with an optional inl
 | `href` | string |  |  |
 | `tone` | undefined (info\|promo\|warning) |  |  |
 | `dismissible` | boolean |  |  |
+
+## `install-prompt`
+
+A dismissible toast inviting visitors to install the site as an app, with step-by-step "Add to Home Screen" instructions matched to their platform (iOS, Android, Chrome/Edge, macOS Safari). Pair it with a PWA-enabled manifest.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string | yes |  |
+| `body` | string |  |  |
+| `actionLabel` | string |  |  |
+| `position` | undefined (bottom\|top\|bottom-right) |  |  |
+| `tone` | undefined (info\|promo) |  |  |
+| `delayMs` | integer |  |  |
+| `dismissible` | boolean |  |  |
+| `rememberDismiss` | boolean |  |  |
+| `platforms` | array |  |  |
 
 ## `sidebar`
 

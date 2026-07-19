@@ -46,9 +46,9 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 50 block types, by group:
+The 51 block types, by group:
 
-- **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `footer`
+- **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `install-prompt` (add-to-home-screen toast with per-platform steps — use it on PWA-enabled sites), `footer`
 - **Heroes:** `hero`, `hero-app`
 - **Résumé / profile:** `profile-header` (avatar, name, contacts, Download-PDF/Share buttons), `experience` (dated entries — reuse for Education/Certifications by changing its title), `skills` (tags or level bars)
 - **Content:** `features`, `about`, `rich-text`, `split`, `steps`, `stats`,

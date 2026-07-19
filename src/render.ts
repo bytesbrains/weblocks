@@ -12,7 +12,7 @@
 import { escapeAttr, escapeHtml, parse, sanitizeUrl } from './schema.js';
 import { getSpec, needsIsland, REGISTRY, type RenderContext } from './registry.js';
 import { normalizeTokens, sectionOverrideCss, tokensToCss } from './tokens.js';
-import { NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
+import { NOOP_RUNTIME, safeRuntime, type RuntimeAdapter } from './runtime.js';
 import { buildAnchors, injectAnchorId, type Anchors } from './anchors.js';
 import type { Block, SiteManifest } from './types.js';
 
@@ -60,7 +60,8 @@ function renderBlock(block: Block, manifest: SiteManifest, runtime: RuntimeAdapt
 
 /** The full document. */
 export function renderSite(manifest: SiteManifest, options: RenderOptions = {}): string {
-  const runtime = options.runtime ?? NOOP_RUNTIME;
+  // Host code, guarded once here: a throwing adapter must not break the render.
+  const runtime = safeRuntime(options.runtime ?? NOOP_RUNTIME);
   const tokens = normalizeTokens(manifest?.design);
   const meta = manifest?.meta ?? { title: '', description: '', lang: '' };
   const blocks = (manifest?.blocks ?? []).filter((b) => b && b.visible !== false && getSpec(b.type));
@@ -80,7 +81,7 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
   for (const b of blocks) {
     const spec = getSpec(b.type)!;
     const { value } = parse(spec.schema, b.config ?? {});
-    if (needsIsland(spec, value)) islands.add(spec.island!);
+    if (needsIsland(spec, value, runtime, b.id)) islands.add(spec.island!);
   }
   const islandBase = (options.islandBase ?? '/_island').replace(/\/+$/, '');
   const islandTags = [...islands]

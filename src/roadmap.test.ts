@@ -2,8 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
-import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
-import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
+import { pathRuntime } from './runtime.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
 import { DEFAULT_TOKENS, tokensToCss, readableOn, sectionOverrideCss } from './tokens.js';
@@ -134,49 +133,6 @@ test("mode:'auto' adds a prefers-color-scheme dark palette; light/dark do not", 
   assert.ok(darkBlock.includes('--bg:#010203'), 'supplied darkPalette drives the dark block');
 });
 
-// ── §6 runtime contract ─────────────────────────────────────────────────────────
-
-test('runtimeNeeds reports powered blocks and their capabilities', () => {
-  let m = empty();
-  m = applyOp(m, { op: 'addBlock', type: 'contact-form' }).manifest;
-  m = applyOp(m, { op: 'addBlock', type: 'hero' }).manifest;
-  const needs = runtimeNeeds(m);
-  assert.equal(needs.length, 1);
-  assert.equal(needs[0]!.type, 'contact-form');
-  assert.deepEqual(needs[0]!.capabilities, ['contact-form.submit']);
-});
-
-test('powered block renders inert with the no-op runtime, wired with an adapter', () => {
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
-  const inert = renderSite(r.manifest); // default NOOP runtime
-  assert.ok(inert.includes('data-wl-inert="true"'));
-  assert.ok(inert.includes('data-wl-capability="contact-form.submit"'));
-  assert.ok(inert.includes('disabled'));
-
-  const wired = renderSite(r.manifest, { runtime: pathRuntime('/api') });
-  assert.ok(wired.includes('action="/api/contact-form.submit/cf-1"'));
-  assert.ok(!wired.includes('data-wl-inert'));
-  assert.equal(NOOP_RUNTIME.resolve('x', 'y'), null);
-});
-
-// ── hardening: powered-block form safety ────────────────────────────────────────
-
-test('a hostile runtime method is whitelisted to post; the attribute never breaks out', () => {
-  const evil = { resolve: () => ({ url: '/x', method: 'get"><script>alert(1)</script>' as never }) };
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
-  const html = renderSite(r.manifest, { runtime: evil });
-  assert.ok(html.includes('method="post"'), 'coerced to a safe method token');
-  assert.ok(!html.includes('<script>alert(1)</script>'), 'no attribute breakout');
-});
-
-test('contact-form field ids are DOM-safe even when field names have spaces', () => {
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1', config: { fields: [{ name: 'full name', label: 'Full name', type: 'text' }] } });
-  const html = renderSite(r.manifest);
-  const id = /id="(f-cf-1-[^"]*)"/.exec(html)?.[1] ?? '';
-  assert.ok(id && !/\s/.test(id), `id must be space-free, got "${id}"`);
-  assert.ok(html.includes(`for="${id}"`), 'label stays associated with the input');
-});
-
 test('carousel takes a title so multiple carousels get unique landmark names', () => {
   const r = applyOp(empty(), { op: 'addBlock', type: 'carousel', config: { title: 'Client work' } });
   assert.ok(renderSite(r.manifest).includes('aria-label="Client work"'));
@@ -189,20 +145,6 @@ test('prose renderer (shared by rich-text & blog-post) groups lists and escapes'
   const html = renderSite(rt.manifest);
   assert.ok(html.includes('<ul><li>a</li><li>b</li></ul>'), 'adjacent bullets grouped');
   assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
-});
-
-test('search renders both layouts, wires to a runtime, and stays inert without one', () => {
-  const bar = applyOp(empty(), { op: 'addBlock', type: 'search', id: 'search-1', config: { layout: 'bar', label: 'Find posts' } });
-  const inert = renderSite(bar.manifest);
-  assert.ok(inert.includes('role="search"') && inert.includes('layout-bar'));
-  assert.ok(inert.includes('data-wl-capability="search.query"') && inert.includes('data-wl-inert="true"'));
-  assert.ok(inert.includes('aria-label="Find posts"'), 'label escaped into the landmark');
-
-  const wired = renderSite(bar.manifest, { runtime: pathRuntime('/api') });
-  assert.ok(wired.includes('action="/api/search.query/search-1"') && !wired.includes('data-wl-inert'));
-
-  const icon = applyOp(empty(), { op: 'addBlock', type: 'search', config: { layout: 'icon' } });
-  assert.ok(renderSite(icon.manifest).includes('layout-icon'), 'icon variant renders');
 });
 
 test('directions builds map-app deep links from coords / address / pasted link', () => {
@@ -242,23 +184,6 @@ test('renderMarkdown is safe: escapes HTML, sanitizes link schemes', () => {
   assert.ok(renderMarkdown('## Hi').includes('<h3>Hi</h3>'), 'heading level offset');
 });
 
-// ── shipped islands (gallery lightbox / carousel) ───────────────────────────────
-
-test('gallery flags lightbox for its island, and islandBase is configurable', () => {
-  const on = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: true, items: [{ src: '/a.jpg', alt: 'a' }] } });
-  const off = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: false, items: [{ src: '/a.jpg', alt: 'a' }] } });
-  const html = renderSite(on.manifest);
-  assert.ok(html.includes('data-wl-lightbox="true"'), 'flagged for the island');
-  assert.ok(html.includes('src="/_island/lightbox.js"'), 'island script emitted');
-  assert.ok(!renderSite(off.manifest).includes('data-wl-lightbox'), 'no flag when lightbox off');
-  assert.ok(renderSite(on.manifest, { islandBase: '/assets/js' }).includes('src="/assets/js/lightbox.js"'), 'islandBase override');
-});
-
-test('shipped island modules import safely in a non-DOM environment', async () => {
-  // Guarded by `typeof document`, so importing in Node is a clean no-op.
-  await assert.doesNotReject(import('./islands/lightbox.js'));
-  await assert.doesNotReject(import('./islands/carousel.js'));
-});
 
 test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
   const labeled = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { links: [
@@ -361,43 +286,6 @@ test('profile-header: avatar/initials, contacts, and action buttons + island gat
 
 test('renderSite includes print styles for PDF export', () => {
   assert.ok(renderSite(empty()).includes('@media print') && renderSite(empty()).includes('[data-wl-noprint]{display:none'), 'print stylesheet present');
-});
-
-// ── §7 PWA layer ────────────────────────────────────────────────────────────────
-
-test('buildWebManifest defaults name/colors from meta + tokens', () => {
-  const m = empty();
-  m.meta.title = 'Studio';
-  m.pwa = {};
-  const wm = buildWebManifest(m);
-  assert.equal(wm.name, 'Studio');
-  assert.equal(wm.display, 'standalone');
-  assert.equal(wm.theme_color, DEFAULT_TOKENS.palette.primary);
-  assert.ok(wm.icons.length >= 1);
-});
-
-test('emitPwa is null without opt-in, and emits manifest + sw when enabled', () => {
-  assert.equal(emitPwa(empty()), null);
-  const m = empty();
-  m.pwa = { name: 'App', offline: true };
-  const files = emitPwa(m)!;
-  assert.ok(files['manifest.webmanifest']);
-  assert.ok(files['sw.js']);
-  assert.ok(buildServiceWorker(m).includes('weblocks-v'));
-});
-
-test('renderSite emits PWA/SEO head only when opted in', () => {
-  const plain = renderSite(empty());
-  assert.ok(!plain.includes('rel="manifest"'));
-  const m = empty();
-  m.pwa = { themeColor: '#123456' };
-  m.seo = { canonical: 'https://ex.com', ogImage: 'https://ex.com/o.png' };
-  const html = renderSite(m);
-  assert.ok(html.includes('<link rel="manifest" href="/manifest.webmanifest">'));
-  assert.ok(html.includes('content="#123456"'));
-  assert.ok(html.includes('rel="canonical"'));
-  assert.ok(html.includes('og:image'));
-  assert.ok(validateManifest(m).ok);
 });
 
 // ── a full app-shaped manifest still renders valid ──────────────────────────────

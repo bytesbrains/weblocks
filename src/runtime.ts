@@ -58,6 +58,33 @@ export function pathRuntime(base = '/api', method: 'GET' | 'POST' = 'POST'): Run
 }
 
 /**
+ * Wrap a host adapter so the renderer stays **total**.
+ *
+ * `resolve` is the one place arbitrary host code runs inside a render, and the
+ * powered bricks call it directly. An adapter that throws — a bad URL parse, an
+ * undefined lookup, a typo on one capability — would otherwise take the whole
+ * document down, losing the dozens of static bricks that never needed a runtime.
+ *
+ * A throw (or a malformed action) is treated exactly like "the host does not
+ * provide that capability": the brick renders its documented inert-but-valid
+ * fallback with the `data-wl-*` hooks intact. Failures degrade to one inert
+ * form, never a dead page.
+ */
+export function safeRuntime(adapter: RuntimeAdapter): RuntimeAdapter {
+  return {
+    resolve(capability, blockId) {
+      try {
+        const action = adapter?.resolve(capability, blockId);
+        // A host can return anything at runtime; only a usable action counts.
+        return action && typeof action.url === 'string' ? action : null;
+      } catch {
+        return null;
+      }
+    },
+  };
+}
+
+/**
  * Whitelist a form method to a safe lowercase token. A `RuntimeAdapter` is typed
  * to return `'GET' | 'POST'`, but a host implements it at runtime — so a powered
  * brick coerces the value before writing it into a `method` attribute (anything

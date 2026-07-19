@@ -6,9 +6,14 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 
 /** Install a fresh jsdom document as the globals the islands read. */
-function installDom(bodyHtml) {
-  const dom = new JSDOM(`<!doctype html><html><body>${bodyHtml}</body></html>`, { pretendToBeVisual: true });
+function installDom(bodyHtml, options = {}) {
+  const { userAgent, ...jsdomOptions } = options;
+  const dom = new JSDOM(`<!doctype html><html><body>${bodyHtml}</body></html>`, { pretendToBeVisual: true, ...jsdomOptions });
   const w = dom.window;
+  // jsdom no longer takes a `userAgent` option; stub the navigator the islands read.
+  if (userAgent) {
+    Object.defineProperty(w, 'navigator', { value: { userAgent, maxTouchPoints: 5 }, configurable: true });
+  }
   if (!w.IntersectionObserver) {
     w.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
   }
@@ -77,4 +82,91 @@ test('carousel island: a single-slide carousel gets no controls', async () => {
   await import('../lib/islands/carousel.js?case=single');
   const root = document.querySelector('.blk-carousel');
   assert.equal(root.querySelectorAll('.wl-car-btn').length, 0, 'no arrows for <2 slides');
+});
+
+test('announcement-bar island: the close button dismisses the strip', async () => {
+  const w = installDom(
+    '<section class="blk-announcement-bar tone-info"><div class="wrap"><p class="msg">Hi</p>' +
+    '<button class="close" data-wl-dismiss aria-label="Dismiss">x</button></div></section>' +
+    '<section class="blk-other"><button data-wl-dismiss>not mine</button></section>',
+  );
+  await import('../lib/islands/announcement-bar.js?case=dismiss');
+
+  const bar = document.querySelector('.blk-announcement-bar');
+  assert.equal(bar.dataset.wlReady, '1', 'setup ran once');
+  assert.equal(bar.hidden, false, 'visible until dismissed');
+
+  // A [data-wl-dismiss] outside the strip belongs to another block — left alone.
+  document.querySelector('.blk-other [data-wl-dismiss]').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal(bar.hidden, false, 'another block\'s dismiss does not hide the strip');
+
+  bar.querySelector('[data-wl-dismiss]').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal(bar.hidden, true, 'own close button hides the strip');
+});
+
+test('stats island: counts a numeric figure up to its real value, leaves odd ones alone', async () => {
+  const w = installDom(
+    '<section class="blk-stats"><div class="item"><div class="value" data-wl-count="1,200">' +
+    '<span class="affix">+</span>1,200</div></div>' +
+    '<div class="item"><div class="value" data-wl-count="24/7">24/7</div></div></section>',
+  );
+  // Drive the observer by hand: fire the callback for everything observed.
+  const observed = [];
+  w.IntersectionObserver = class {
+    constructor(cb) { this.cb = cb; }
+    observe(el) { observed.push(el); this.cb([{ isIntersecting: true, target: el }], this); }
+    unobserve() {}
+    disconnect() {}
+  };
+  global.IntersectionObserver = w.IntersectionObserver;
+  await import('../lib/islands/stats.js?case=countup');
+
+  const [numeric, odd] = document.querySelectorAll('.value');
+  assert.equal(observed.length, 2, 'both figures observed');
+  assert.equal(odd.textContent, '24/7', 'a non-numeric value is never touched');
+
+  // rAF runs the animation; after the final frame it lands on the real figure.
+  await new Promise((r) => setTimeout(r, 1200));
+  assert.equal(numeric.textContent, '+1,200', 'lands exactly on the rendered figure, affix intact');
+});
+
+/** The static markup the `install-prompt` block renders (trimmed to what the island reads). */
+const INSTALL_TOAST = (attrs = 'data-remember="1"') =>
+  `<section class="blk-install-prompt" data-wl-install data-delay="0" ${attrs}>` +
+  '<div class="toast"><div class="head"><div class="copy"><p class="title">Install</p></div>' +
+  '<button data-wl-dismiss aria-label="Dismiss">x</button></div>' +
+  '<details class="guide"><summary data-wl-install-action>How?</summary><div class="steps">' +
+  '<div data-platform="ios-safari"></div><div data-platform="android"></div>' +
+  '</div></details></div></section>';
+
+const IPHONE_UA =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+
+// jsdom only grants localStorage to a real origin (about:blank is opaque).
+const ORIGIN = { url: 'https://example.test/' };
+
+test('install-prompt island: narrows the steps to the visitor platform and dismisses stickily', async () => {
+  const w = installDom(INSTALL_TOAST(), { ...ORIGIN, userAgent: IPHONE_UA });
+  await import('../lib/islands/install-prompt.js?case=ios');
+
+  const root = document.querySelector('[data-wl-install]');
+  assert.equal(root.dataset.wlReady, '1', 'setup ran once');
+  assert.equal(root.hidden, false, 'visible — not installed, not dismissed');
+  assert.equal(root.querySelector('.steps').getAttribute('data-platform'), 'ios-safari', 'iPhone Safari detected');
+
+  root.querySelector('[data-wl-dismiss]').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal(root.hidden, true, 'dismiss hides the toast');
+  assert.equal(w.localStorage.getItem('wl:install-dismissed'), '1', 'dismiss remembered for the next visit');
+});
+
+test('install-prompt island: stays hidden once dismissed, and only when rememberDismiss is on', async () => {
+  const w = installDom(INSTALL_TOAST(), ORIGIN);
+  w.localStorage.setItem('wl:install-dismissed', '1');
+  await import('../lib/islands/install-prompt.js?case=remembered');
+  assert.equal(document.querySelector('[data-wl-install]').hidden, true, 'a remembered dismiss hides it on load');
+
+  const w2 = installDom(INSTALL_TOAST('data-remember="0"'), ORIGIN);
+  w2.localStorage.setItem('wl:install-dismissed', '1');
+  await import('../lib/islands/install-prompt.js?case=notsticky');
+  assert.equal(document.querySelector('[data-wl-install]').hidden, false, 'rememberDismiss off → shown again');
 });

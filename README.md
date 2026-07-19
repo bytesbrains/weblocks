@@ -139,11 +139,11 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**50 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**51 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
-| Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `footer` |
+| Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `install-prompt` · `footer` |
 | Heroes | `hero` · `hero-app` |
 | Résumé / profile | `profile-header` · `experience` · `skills` (live CV — avatar, dated entries, skills, Download-PDF/Share) |
 | Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` |
@@ -222,6 +222,11 @@ With no runtime, powered blocks render **inert-but-valid** (a disabled control +
 note), keeping `data-wl-*` hooks so a host can enhance them client-side. Captcha,
 server-side validation, delivery, abuse limits, and identity are the host’s job.
 
+Your adapter is the one piece of host code that runs *inside* a render, so
+`renderSite` wraps it (`safeRuntime`): if `resolve` throws, or hands back an
+action without a usable `url`, that capability simply reads as unprovided and the
+brick falls back to inert. One bad capability costs you one form, never the page.
+
 ## PWA
 
 Add a `pwa` field and the engine derives an installable app shell:
@@ -234,6 +239,12 @@ writeFileSync('index.html', renderSite(manifest));  // adds manifest + SW meta t
 for (const [file, body] of Object.entries(emitPwa(manifest) ?? {})) writeFileSync(file, body);
 // → manifest.webmanifest + sw.js
 ```
+
+Add the `install-prompt` block to tell visitors they *can* install it: a
+dismissible toast that expands into "Add to Home Screen" steps for the visitor's
+own platform (iOS Safari, Android Chrome, desktop Chrome/Edge, macOS Safari). Its
+island fires the browser's native install prompt where one is offered — and on
+iOS, where no such prompt exists, the written steps are the only way in.
 
 ## Interactivity (islands)
 
@@ -248,6 +259,9 @@ island scripts** (zero-dependency, ~6 KB each) under a subpath:
 | `carousel` | `carousel.js` | arrows, dots, keyboard, optional autoplay |
 | `video-gallery` | `video.js` | click-to-play cards (load the real player inline on press) |
 | `profile-header` (Download/Share on) | `resume.js` | print-to-PDF (`window.print()`) + Web Share / copy-link |
+| `announcement-bar` | `announcement-bar.js` | dismiss the strip |
+| `stats` | `stats.js` | count figures up when they scroll into view |
+| `install-prompt` | `install-prompt.js` | native install prompt, platform-matched steps, sticky dismiss |
 
 Serve them at the island URL. Copy from the package's `./islands/*.js` export, e.g.:
 
@@ -259,6 +273,14 @@ import lightbox from '@bytesbrains/weblocks/islands/lightbox.js?url'; // bundler
 
 Blocks whose behaviour is off (e.g. `tabs`, `accordion` — CSS-only) ship no JS at
 all.
+
+**Powered blocks are the exception.** `contact-form`, `newsletter`, `booking` and
+`auth` declare an island the *host* serves alongside the runtime it wires — the
+engine ships no module for them, because what that script does (live slots,
+inline validation, an auth SDK) is the host's call. Their `<script>` tag is
+therefore emitted **only when the runtime you pass resolves that block's
+capability**; with no runtime they render inert-but-valid and ship no JS, so an
+unwired page never requests a file you don't serve.
 
 ## API reference
 
@@ -275,7 +297,7 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
 | **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
 | **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `getTemplate` |
-| **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` |
+| **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` · `safeRuntime` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
 

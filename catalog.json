@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "package": "@bytesbrains/weblocks",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
     "app-shell",
     "nav",
     "announcement-bar",
+    "install-prompt",
     "sidebar",
     "hero",
     "hero-app",
@@ -196,6 +197,77 @@
         },
         "required": [
           "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "install-prompt",
+      "description": "A dismissible toast inviting visitors to install the site as an app, with step-by-step \"Add to Home Screen\" instructions matched to their platform (iOS, Android, Chrome/Edge, macOS Safari). Pair it with a PWA-enabled manifest.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 60,
+            "default": "Install this app"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "Add it to your home screen for one-tap access, even offline."
+          },
+          "actionLabel": {
+            "type": "string",
+            "maxLength": 30,
+            "default": "How?"
+          },
+          "position": {
+            "enum": [
+              "bottom",
+              "top",
+              "bottom-right"
+            ],
+            "default": "bottom"
+          },
+          "tone": {
+            "enum": [
+              "info",
+              "promo"
+            ],
+            "default": "info"
+          },
+          "delayMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60000,
+            "default": 0
+          },
+          "dismissible": {
+            "type": "boolean",
+            "default": true
+          },
+          "rememberDismiss": {
+            "type": "boolean",
+            "default": true
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "ios-safari",
+                "ios-other",
+                "android",
+                "desktop-chrome",
+                "macos-safari",
+                "firefox"
+              ]
+            },
+            "maxItems": 6
+          }
+        },
+        "required": [
+          "title"
         ],
         "additionalProperties": false
       }

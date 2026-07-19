@@ -5,6 +5,60 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.8.0 — 2026-07-19
+
+Installability, end to end: a block that tells visitors they can install the
+site, the island modules that were declared but never shipped, and a renderer
+that survives a misbehaving host adapter. Additive and **non-breaking** — every
+`0.7.x` manifest still validates and renders identically. Catalog 50 → 51.
+
+### Added
+- **`install-prompt` block (#39).** Catalog 50 → 51. A dismissible toast that
+  invites visitors to install the site as an app and expands into "Add to Home
+  Screen" steps matched to their platform (iOS Safari, iOS third-party browsers,
+  Android Chrome, desktop Chrome/Edge, macOS Safari 17+, Firefox). Static-first:
+  the guide is a `<details>`, so with no JS every platform's steps still expand.
+  The shipped `install-prompt` island fires the browser's native install prompt
+  where one is offered (`beforeinstallprompt`), narrows the steps to the detected
+  platform otherwise, remembers a dismiss in `localStorage`, and hides the toast
+  once the app is installed. Closes the gap left by the `pwa` layer, which made
+  sites installable but never told anyone.
+
+  Additive + non-breaking: every `0.7.x` manifest still validates and renders
+  identically.
+
+### Fixed
+- **Shipped the two missing island modules.** `announcement-bar` and `stats` both
+  declared an island, so `renderSite` emitted
+  `<script src="/_island/announcement-bar.js">` / `.../stats.js` on every page
+  that used them — but neither module existed, so the script 404'd and the
+  announcement strip's close button did nothing. Both now ship:
+  `announcement-bar.js` dismisses the strip (scoped to its own block), and
+  `stats.js` counts plainly numeric figures up when they scroll into view
+  (skipped under `prefers-reduced-motion`, and non-numeric values like `24/7` are
+  left untouched). Pure progressive enhancement — no markup or schema change.
+- **A powered brick no longer emits an island `<script>` the host can't serve.**
+  `contact-form`, `newsletter`, `booking` and `auth` declare an island the host
+  serves alongside the runtime it wires — so with no runtime configured, that tag
+  was a guaranteed 404 on a page whose bricks are inert anyway. `renderSite` now
+  emits it only once the adapter actually resolves one of the brick's
+  capabilities. Unwired pages ship strictly less JS; wired pages are unchanged.
+  `needsIsland` takes the adapter (and block id) as optional trailing arguments —
+  additive, and the default is the previous "unwired" answer.
+- **`renderSite` is total again: a throwing host runtime can no longer kill the
+  page (#42).** `RuntimeAdapter.resolve` is the one place arbitrary host code runs
+  inside a render, and the powered bricks call it directly — so a throw (a bad URL
+  parse, an undefined lookup, a typo on one capability) escaped `renderSite` and
+  lost the whole document, including every static brick that never needed a
+  runtime. The adapter is now wrapped once per render by the new exported
+  `safeRuntime`: a throw — or an action with no usable `url` — reads exactly like
+  "the host does not provide that capability", so the brick renders its documented
+  inert-but-valid fallback. One bad capability costs one form, never the page. No
+  API change; a working adapter passes straight through.
+- **A regression guard for the whole class:** a test now asserts that every
+  *static* brick's declared island resolves to a real shipped module. Powered
+  bricks are the documented exception, now enforced by the rule above.
+
 ## 0.7.0 — 2026-07-17
 
 Business verticals land: a vertical taxonomy, named starter templates, and five
