@@ -78,3 +78,49 @@ test('carousel island: a single-slide carousel gets no controls', async () => {
   const root = document.querySelector('.blk-carousel');
   assert.equal(root.querySelectorAll('.wl-car-btn').length, 0, 'no arrows for <2 slides');
 });
+
+test('announcement-bar island: the close button dismisses the strip', async () => {
+  const w = installDom(
+    '<section class="blk-announcement-bar tone-info"><div class="wrap"><p class="msg">Hi</p>' +
+    '<button class="close" data-wl-dismiss aria-label="Dismiss">x</button></div></section>' +
+    '<section class="blk-other"><button data-wl-dismiss>not mine</button></section>',
+  );
+  await import('../lib/islands/announcement-bar.js?case=dismiss');
+
+  const bar = document.querySelector('.blk-announcement-bar');
+  assert.equal(bar.dataset.wlReady, '1', 'setup ran once');
+  assert.equal(bar.hidden, false, 'visible until dismissed');
+
+  // A [data-wl-dismiss] outside the strip belongs to another block — left alone.
+  document.querySelector('.blk-other [data-wl-dismiss]').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal(bar.hidden, false, 'another block\'s dismiss does not hide the strip');
+
+  bar.querySelector('[data-wl-dismiss]').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal(bar.hidden, true, 'own close button hides the strip');
+});
+
+test('stats island: counts a numeric figure up to its real value, leaves odd ones alone', async () => {
+  const w = installDom(
+    '<section class="blk-stats"><div class="item"><div class="value" data-wl-count="1,200">' +
+    '<span class="affix">+</span>1,200</div></div>' +
+    '<div class="item"><div class="value" data-wl-count="24/7">24/7</div></div></section>',
+  );
+  // Drive the observer by hand: fire the callback for everything observed.
+  const observed = [];
+  w.IntersectionObserver = class {
+    constructor(cb) { this.cb = cb; }
+    observe(el) { observed.push(el); this.cb([{ isIntersecting: true, target: el }], this); }
+    unobserve() {}
+    disconnect() {}
+  };
+  global.IntersectionObserver = w.IntersectionObserver;
+  await import('../lib/islands/stats.js?case=countup');
+
+  const [numeric, odd] = document.querySelectorAll('.value');
+  assert.equal(observed.length, 2, 'both figures observed');
+  assert.equal(odd.textContent, '24/7', 'a non-numeric value is never touched');
+
+  // rAF runs the animation; after the final frame it lands on the real figure.
+  await new Promise((r) => setTimeout(r, 1200));
+  assert.equal(numeric.textContent, '+1,200', 'lands exactly on the rendered figure, affix intact');
+});

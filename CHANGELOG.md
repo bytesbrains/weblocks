@@ -5,6 +5,23 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Fixed
+- **Shipped the two missing island modules.** `announcement-bar` and `stats` both
+  declared an island, so `renderSite` emitted
+  `<script src="/_island/announcement-bar.js">` / `.../stats.js` on every page
+  that used them — but neither module existed, so the script 404'd and the
+  announcement strip's close button did nothing. Both now ship:
+  `announcement-bar.js` dismisses the strip (scoped to its own block), and
+  `stats.js` counts plainly numeric figures up when they scroll into view
+  (skipped under `prefers-reduced-motion`, and non-numeric values like `24/7` are
+  left untouched). Pure progressive enhancement — no markup or schema change.
+- **A regression guard for the whole class:** a test now asserts that every
+  *static* brick's declared island resolves to a real shipped module. Powered
+  bricks (`contact-form`, `newsletter`, `booking`, `auth`) are the documented
+  exception — the host serves their island along with the runtime it wires.
+
 ## 0.7.0 — 2026-07-17
 
 Business verticals land: a vertical taxonomy, named starter templates, and five

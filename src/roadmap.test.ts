@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
+import { REGISTRY } from './registry.js';
 import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
 import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
@@ -258,6 +259,22 @@ test('shipped island modules import safely in a non-DOM environment', async () =
   // Guarded by `typeof document`, so importing in Node is a clean no-op.
   await assert.doesNotReject(import('./islands/lightbox.js'));
   await assert.doesNotReject(import('./islands/carousel.js'));
+  await assert.doesNotReject(import('./islands/announcement-bar.js'));
+});
+
+test('every static brick\'s declared island is a shipped module (no 404 island script)', async () => {
+  // The renderer emits <script src="/_island/<name>.js"> for a used block's
+  // declared island, so a static brick's `island` name MUST resolve to a real
+  // shipped module — otherwise every page using it loads a 404.
+  // Powered bricks are the exception: the host wires their runtime, so it also
+  // serves their island (they render inert-but-valid without one).
+  for (const spec of REGISTRY.values()) {
+    if (!spec.island || spec.runtime) continue;
+    await assert.doesNotReject(
+      import(`./islands/${spec.island}.js`),
+      `${spec.type} declares island "${spec.island}" but no such module ships`,
+    );
+  }
 });
 
 test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
