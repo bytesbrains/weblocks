@@ -31,6 +31,10 @@ import { catalog, catalogPrompt } from './catalog.js';
 import { DEFAULT_TOKENS } from './tokens.js';
 import type { SiteManifest } from './types.js';
 
+const SITE_URL = 'https://bytesbrains.github.io/weblocks';
+const NPM_URL = 'https://www.npmjs.com/package/@bytesbrains/weblocks';
+const REPO_URL = 'https://github.com/bytesbrains/weblocks';
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'site');
 mkdirSync(join(out, 'blocks'), { recursive: true });
@@ -51,12 +55,31 @@ cpSync(join(root, 'lib', 'islands'), join(out, '_island'), {
  * subject. `home` is relative because the landing page sits one level above the
  * two galleries.
  */
-const shell = (title: string, body: string, extraCss = '', home = '../index.html'): string => {
+const shell = (
+  title: string,
+  body: string,
+  extraCss = '',
+  home = '../index.html',
+  path = '/',
+  description = 'A block engine for AI-composable web apps: a model composes a typed SiteManifest from a fixed catalog, and the engine renders one self-contained static HTML document.',
+): string => {
   const up = home.startsWith('./') ? '.' : '..';
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeAttr(description)}">
+<link rel="canonical" href="${escapeAttr(SITE_URL + path)}">
 <link rel="icon" type="image/png" href="${up}/assets/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="weblocks">
+<meta property="og:title" content="${escapeAttr(title)}">
+<meta property="og:description" content="${escapeAttr(description)}">
+<meta property="og:url" content="${escapeAttr(SITE_URL + path)}">
+<meta property="og:image" content="${escapeAttr(SITE_URL)}/assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="weblocks — bricks for AI-composable web apps">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 /* Themed with the engine's own DEFAULT_TOKENS (and its dark fallback) — the
    showcase runs on the same palette it ships. See src/tokens.ts. */
@@ -157,6 +180,9 @@ that brick's own page — open any of them to see the complete, self-contained d
 <ul class="toc">${toc}</ul>
 ${cards}`,
     wallCss,
+    '../index.html',
+    '/blocks/',
+    `Every one of the ${entries.length} weblocks blocks rendered live, each on its own page, labelled with the island it hydrates with.`,
   ).replace('</body>', `${resizer}</body>`),
   'utf8',
 );
@@ -240,6 +266,9 @@ self-contained document — the same output a host gets with zero LLM calls. Eve
 page; the chips under it are the blocks it is composed from.</p>
 <div class="grid">${cardsHtml}</div>`,
     galleryCss,
+    '../index.html',
+    '/templates/',
+    `${Object.keys(TEMPLATES).length} complete starter sites for weblocks, one per vertical — each a validated SiteManifest rendered to a self-contained document.`,
   ).replace('</body>', `${galleryScript}</body>`),
   'utf8',
 );
@@ -249,8 +278,6 @@ page; the chips under it are the blocks it is composed from.</p>
 // described: an English brief, the actual manifest that expresses it, and the
 // live page it renders to. Nothing here is a mock — the JSON is sliced straight
 // out of the template that the third panel embeds.
-const NPM_URL = 'https://www.npmjs.com/package/@bytesbrains/weblocks';
-const REPO_URL = 'https://github.com/bytesbrains/weblocks';
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string; engines: { node: string } };
 
 const heroTpl = TEMPLATES['restaurant-modern'] ?? Object.values(TEMPLATES)[0]!;
@@ -408,6 +435,7 @@ anything. One request each — no npm, no build step.</p>
 </div>`,
     landingCss,
     './index.html',
+    '/',
   ).replace('</body>', `${landingScript}</body>`),
   'utf8',
 );
@@ -416,8 +444,6 @@ anything. One request each — no npm, no build step.</p>
 // This package is composed BY models, so the contract has to be reachable
 // without installing anything. These five files let an agent fetch the entire
 // closed vocabulary — and the rules for using it — in one request each.
-const SITE_URL = 'https://bytesbrains.github.io/weblocks';
-
 writeFileSync(join(out, 'catalog.json'), readFileSync(join(root, 'catalog.json'), 'utf8'), 'utf8');
 writeFileSync(join(out, 'AGENT.md'), readFileSync(join(root, 'AGENT.md'), 'utf8'), 'utf8');
 
