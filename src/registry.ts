@@ -39,6 +39,7 @@ import { timeline } from './blocks/timeline.js';
 import { tabs } from './blocks/tabs.js';
 import { accordion } from './blocks/accordion.js';
 import { testimonials } from './blocks/testimonials.js';
+import { chatThread } from './blocks/chatThread.js';
 import { reviews } from './blocks/reviews.js';
 import { faq } from './blocks/faq.js';
 import { blogList } from './blocks/blogList.js';
@@ -114,7 +115,7 @@ const SPECS: readonly BlockSpec[] = [
   // media
   gallery, carousel, video, videoGallery, map,
   // structured content
-  timeline, tabs, accordion, testimonials, reviews, faq,
+  timeline, tabs, accordion, testimonials, reviews, faq, chatThread,
   // collections
   blogList, blogPost, feed,
   // dynamic / powered

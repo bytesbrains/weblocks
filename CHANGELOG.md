@@ -5,6 +5,28 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Added
+- **`chat-thread` block (#58).** Catalog 51 → 52. An authored conversation
+  rendered as a thread of rich message bubbles: named participants with avatars
+  or generated initials, optional per-message times, and **typed message
+  bodies** — `text`, `code`, `image`, `list`, `buttons` — that compose in one
+  bubble. Static and JS-free: the transcript is content, for showing how an
+  assistant or a support team answers. A live chatbot is a separate powered
+  brick, deliberately not this one.
+
+  Design decisions are recorded on #58: only `user` sits on the right (`bot` and
+  `agent` are told apart by name and avatar, never by colour alone); quick
+  replies render inert unless they carry an `href`, since a chip that looks
+  clickable but isn't misleads the reader; times are freeform labels rather than
+  `<time>`, which would demand a machine-readable value the brick cannot
+  validate without a parser. The node set is intentionally small — new kinds are
+  additive, removing one is breaking.
+
+  Placed in the `service-local` starter so the schema is exercised by a real
+  composition, not only by the showcase.
+
 ## 0.8.1 — 2026-07-19
 
 Documentation and distribution only — **no change to the engine, the block

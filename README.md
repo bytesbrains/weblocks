@@ -19,7 +19,7 @@ provider- and host-neutral, zero runtime dependencies.
 [![live gallery](https://img.shields.io/badge/live-gallery-3a5a40.svg)](https://bytesbrains.github.io/weblocks/)
 
 **[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
-[all 51 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+[all 52 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
 [17 starter templates](https://bytesbrains.github.io/weblocks/templates/)
 
 </div>
@@ -146,7 +146,7 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**51 typed blocks.** See every one of them rendered live on the
+**52 typed blocks.** See every one of them rendered live on the
 **[block wall](https://bytesbrains.github.io/weblocks/blocks/)**; full field
 reference in [`CATALOG.md`](./CATALOG.md).
 
@@ -158,7 +158,7 @@ reference in [`CATALOG.md`](./CATALOG.md).
 | Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` |
 | Media | `gallery` · `carousel` · `video` · `video-gallery` · `map` |
 | Location | `directions` (deep links to the visitor’s map app) |
-| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` |
+| Structured | `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` (authored conversation, rich typed bubbles) |
 | Collections | `blog-list` · `blog-post` · `feed` |
 | Dynamic (powered) | `booking` · `contact-form` · `newsletter` · `search` · `auth` |
 | Conversion / rhythm | `cta` · `social-links` · `contact-details` · `hours` · `divider` · `spacer` · `copyright` |
@@ -413,7 +413,7 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 |---|---|
 | [`/llms.txt`](https://bytesbrains.github.io/weblocks/llms.txt) | Index of everything below, in the convention models look for. |
 | [`/AGENT.md`](https://bytesbrains.github.io/weblocks/AGENT.md) | Prime directives, composing a manifest, editing with ops, guarantees. |
-| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 51 block types with full JSON Schema for their config. |
+| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 52 block types with full JSON Schema for their config. |
 | [`/catalog.txt`](https://bytesbrains.github.io/weblocks/catalog.txt) | The same vocabulary, one line per block — cheap to drop in a system prompt. |
 | [`/tools.json`](https://bytesbrains.github.io/weblocks/tools.json) | A ready-to-use `compose_site` function-calling definition. |
 
