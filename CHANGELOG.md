@@ -5,7 +5,12 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.8.0 — 2026-07-19
+
+Installability, end to end: a block that tells visitors they can install the
+site, the island modules that were declared but never shipped, and a renderer
+that survives a misbehaving host adapter. Additive and **non-breaking** — every
+`0.7.x` manifest still validates and renders identically. Catalog 50 → 51.
 
 ### Added
 - **`install-prompt` block (#39).** Catalog 50 → 51. A dismissible toast that
