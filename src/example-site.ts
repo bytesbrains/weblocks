@@ -19,7 +19,7 @@
  *
  * Run: `npm run site`, then open `site/index.html`.
  */
-import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { renderSite } from './render.js';
@@ -52,8 +52,12 @@ const shell = (title: string, body: string, extraCss = '', home = '../index.html
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
 <style>
-:root{color-scheme:light dark;--fg:#111;--muted:#666;--line:#e5e5e5;--bg:#fff;--accent:#1668b0}
-@media(prefers-color-scheme:dark){:root{--fg:#e8e8e8;--muted:#9a9a9a;--line:#2a2a2a;--bg:#121212;--accent:#6fb3f0}}
+/* Themed with the engine's own DEFAULT_TOKENS (and its dark fallback) — the
+   showcase runs on the same palette it ships. See src/tokens.ts. */
+:root{color-scheme:light dark;--bg:#f7f4ee;--surface:#fff;--fg:#2a2622;--muted:#6b6459;
+  --accent:#3a5a40;--warm:#c2703d;--line:rgba(42,38,34,.15)}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--surface:#161b22;--fg:#e6edf3;--muted:#8b949e;
+  --accent:#4c8dff;--warm:#f778ba;--line:rgba(230,237,243,.14)}}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;font:16px/1.6 system-ui,-apple-system,sans-serif;color:var(--fg);background:var(--bg)}
 .wrap{max-width:1100px;margin:0 auto;padding:0 1.2rem}
@@ -70,7 +74,9 @@ ${extraCss}
 <main class="wrap">${body}</main>
 <footer class="wrap">Every preview on this page is real <code>renderSite</code> output, generated from
 <code>src/showcase.ts</code> and <code>src/templates.ts</code> on each deploy.
-· <a href="https://github.com/bytesbrains/weblocks">GitHub</a></footer>
+· <a href="https://www.npmjs.com/package/@bytesbrains/weblocks">npm</a>
+· <a href="https://github.com/bytesbrains/weblocks">GitHub</a>
+· MIT</footer>
 </body></html>`;
 
 // ── the wall ─────────────────────────────────────────────────────────────────
@@ -180,8 +186,9 @@ const cardsHtml = Object.values(TEMPLATES).map((t) => {
 // vertical, so every filter option would match exactly one card. Add one when a
 // vertical grows a second variant.
 const galleryCss = `
-:root{--accent:#0e7c86;--shot:#f4f5f3;--chipbg:#f1f2ef}
-@media(prefers-color-scheme:dark){:root{--accent:#35b9c4;--shot:#1a1a1a;--chipbg:#1e1f1e}}
+:root{--shot:#efeae1;--chipbg:rgba(42,38,34,.06)}
+@media(prefers-color-scheme:dark){:root{--shot:#161b22;--chipbg:rgba(230,237,243,.08)}}
+.tpl{background:var(--surface)}
 .grid{display:grid;gap:1.6rem;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
 .tpl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;
   text-decoration:none;color:var(--fg);background:var(--bg);transition:border-color .18s,transform .18s,box-shadow .18s}
@@ -230,25 +237,145 @@ page; the chips under it are the blocks it is composed from.</p>
 );
 
 // ── landing ──────────────────────────────────────────────────────────────────
+// The hero is the pipeline itself, shown with real artefacts rather than
+// described: an English brief, the actual manifest that expresses it, and the
+// live page it renders to. Nothing here is a mock — the JSON is sliced straight
+// out of the template that the third panel embeds.
+const NPM_URL = 'https://www.npmjs.com/package/@bytesbrains/weblocks';
+const REPO_URL = 'https://github.com/bytesbrains/weblocks';
+const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { version: string; engines: { node: string } };
+
+const heroTpl = TEMPLATES['restaurant-modern'] ?? Object.values(TEMPLATES)[0]!;
+const HERO_BLOCKS_SHOWN = 4;
+// Hand-formatted rather than JSON.stringify'd: one block per line reads as a
+// stack of bricks, which is the point being made, and fits the narrow column.
+const heroJson = [
+  `"meta":   { "title": ${JSON.stringify(heroTpl.manifest.meta?.title ?? '')} },`,
+  `"design": { "palette": { "primary": ${JSON.stringify(heroTpl.manifest.design?.palette?.primary ?? '')} } },`,
+  '"blocks": [',
+  ...heroTpl.manifest.blocks.slice(0, HERO_BLOCKS_SHOWN)
+    .map((b) => `  { "id": ${JSON.stringify(b.id)}, "type": ${JSON.stringify(b.type)} },`),
+  `  … ${heroTpl.manifest.blocks.length - HERO_BLOCKS_SHOWN} more`,
+  ']',
+].join('\n');
+
+const facts: Array<[string, string]> = [
+  [String(entries.length), 'typed blocks'],
+  [String(Object.keys(TEMPLATES).length), 'starter templates'],
+  ['0', 'runtime dependencies'],
+  ['1', 'file out — self-contained'],
+];
+
+const landingCss = `
+.hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin:0 0 1.1rem;background:var(--surface)}
+.stage{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
+.stage:last-child{border-right:0}
+.stage>h2{font:.68rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0;padding:.8rem .9rem;border-bottom:1px solid var(--line)}
+.stage>.in{padding:.9rem;flex:1;min-height:150px}
+.brief{font-size:1.06rem;line-height:1.45;color:var(--fg);margin:0}
+.brief b{display:block;font:.72rem ui-monospace,Menlo,monospace;color:var(--warm);font-weight:400;margin-top:.7rem}
+.json{margin:0;font:.7rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
+  white-space:pre;overflow:auto}
+.stage.out>.in{padding:0;position:relative;overflow:hidden}
+.stage.out iframe{position:absolute;top:0;left:0;width:1280px;height:900px;border:0;pointer-events:none;
+  transform:scale(var(--hs,.28));transform-origin:0 0}
+.pipe{font:.72rem ui-monospace,Menlo,monospace;color:var(--muted);margin:0 0 2.6rem;text-align:center}
+.pipe b{color:var(--warm);font-weight:400}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 2.6rem}
+.fact{background:var(--bg);padding:1rem 1.1rem}
+.fact strong{display:block;font-size:1.7rem;font-weight:600;letter-spacing:-.02em;line-height:1}
+.fact span{display:block;font-size:.8rem;color:var(--muted);margin-top:.3rem}
+h2.sec{font-size:.72rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 .9rem;font-weight:400}
+.install{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin:0 0 2.6rem}
+.install pre{margin:0;flex:1;min-width:250px;background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:.75rem .95rem;font:.86rem ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto}
+.install pre span{color:var(--warm)}
+.pill{font-size:.85rem;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:.45em 1em;color:var(--fg)}
+.pill:hover{border-color:var(--accent);color:var(--accent)}
+.cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin:0 0 2.6rem}
+.big{display:block;border:1px solid var(--line);border-radius:10px;padding:1.2rem;text-decoration:none;
+  color:var(--fg);background:var(--surface);transition:border-color .18s,transform .18s}
+.big:hover{border-color:var(--accent);transform:translateY(-2px)}
+.big strong{font-size:1.05rem}
+.big span{display:block;color:var(--muted);font-size:.92rem;margin-top:.35rem}
+.why{display:grid;gap:1.4rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:0 0 1rem}
+.why h3{font-size:.95rem;margin:0 0 .35rem}
+.why p{margin:0;color:var(--muted);font-size:.92rem}
+.why em{font-style:normal;color:var(--warm);font-family:ui-monospace,Menlo,monospace;font-size:.82rem}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.stage{border-right:0;border-bottom:1px solid var(--line)}}
+@media(prefers-reduced-motion:reduce){.big{transition:none}.big:hover{transform:none}}
+`;
+
+const landingScript = `<script>
+(function(){
+  var s=document.querySelector('.stage.out .in');
+  var fit=function(){if(s&&s.clientWidth)s.style.setProperty('--hs',s.clientWidth/1280);};
+  fit();addEventListener('resize',fit);addEventListener('load',fit);
+})();
+</script>`;
+
 writeFileSync(
   join(out, 'index.html'),
   shell(
-    'weblocks — live block gallery',
-    `<h1>weblocks</h1>
-<p class="lede">A block engine for AI-composable web apps. An AI composes a <code>SiteManifest</code> from a
-fixed catalog; the engine validates it and renders static HTML. These pages are that renderer's real
-output, rebuilt from source on every push.</p>
+    'weblocks — the block engine for AI-composable web apps',
+    `<h1>Lego bricks for AI-composable web apps</h1>
+<p class="lede">A model composes a <code>SiteManifest</code> from a fixed catalog of typed blocks — its entire
+API surface. The engine validates it and renders one self-contained static HTML document. No raw HTML from
+the model, no framework runtime, nothing to trust at render time.</p>
+
+<div class="hero">
+  <section class="stage">
+    <h2>1 · the brief</h2>
+    <div class="in"><p class="brief">“a neighbourhood café with a menu, a gallery and opening hours”
+      <b>generateSite(brief, callModel)</b></p></div>
+  </section>
+  <section class="stage">
+    <h2>2 · the manifest</h2>
+    <div class="in"><pre class="json">${escapeHtml(heroJson)}</pre></div>
+  </section>
+  <section class="stage out">
+    <h2>3 · the document</h2>
+    <div class="in"><iframe src="./templates/${escapeAttr(heroTpl.id)}.html" title="" aria-hidden="true" tabindex="-1" loading="lazy" scrolling="no"></iframe></div>
+  </section>
+</div>
+<p class="pipe">typed JSON in <b>→</b> validate <b>→</b> render <b>→</b> one HTML file out</p>
+
+<div class="facts">${facts.map(([n, l]) => `<div class="fact"><strong>${escapeHtml(n)}</strong><span>${escapeHtml(l)}</span></div>`).join('')}</div>
+
+<h2 class="sec">Install</h2>
+<div class="install">
+  <pre><span>npm i</span> @bytesbrains/weblocks</pre>
+  <a class="pill" href="${NPM_URL}">npm ↗</a>
+  <a class="pill" href="${REPO_URL}">GitHub ↗</a>
+  <a class="pill" href="${REPO_URL}#readme">Docs ↗</a>
+</div>
+
+<h2 class="sec">See it rendered</h2>
 <div class="cards">
   <a class="big" href="./blocks/index.html"><strong>The block wall →</strong>
-    <span>All ${entries.length} bricks, rendered live, with the island each one hydrates with.</span></a>
+    <span>All ${entries.length} bricks, rendered live, each labelled with the island it hydrates with.</span></a>
   <a class="big" href="./templates/index.html"><strong>Starter templates →</strong>
-    <span>${Object.keys(TEMPLATES).length} complete starter sites, one per vertical.</span></a>
+    <span>${Object.keys(TEMPLATES).length} complete starter sites, one per vertical, with the blocks that compose them.</span></a>
+</div>
+
+<h2 class="sec">Why it is built this way</h2>
+<div class="why">
+  <div><h3>A closed vocabulary</h3><p>A block exists only if it is registered. An unknown type is skipped, so
+    a confused model produces a plainer page — never a broken one. <em>illegal states unrepresentable</em></p></div>
+  <div><h3>The renderer is total</h3><p>Every block fills defaults, escapes its input and never throws. Validity
+    is independent of how good the model's output was. <em>validity ⟂ AI quality</em></p></div>
+  <div><h3>Static first</h3><p>Pages ship zero JavaScript until a block earns it; interactive blocks hydrate
+    from a small island, and turning the behaviour off ships nothing. <em>${entries.length} blocks, 8 islands</em></p></div>
+  <div><h3>Yours to host</h3><p>Output is one document with inlined CSS and no external dependencies. Node
+    ${escapeHtml(pkg.engines.node)}, MIT, v${escapeHtml(pkg.version)}. <em>0 runtime deps</em></p></div>
 </div>`,
-    '.cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-bottom:2rem}' +
-    '.big{display:block;border:1px solid var(--line);border-radius:10px;padding:1.2rem;text-decoration:none;color:var(--fg)}' +
-    '.big:hover{border-color:var(--accent)}.big span{display:block;color:var(--muted);font-size:.92rem;margin-top:.35rem}',
+    landingCss,
     './index.html',
-  ),
+  ).replace('</body>', `${landingScript}</body>`),
   'utf8',
 );
 
