@@ -55,7 +55,7 @@ test('catalog is the closed vocabulary — the full named brick set', () => {
     blockTypes().sort(),
     [
       'about', 'accordion', 'announcement-bar', 'app-shell', 'auth', 'blog-list',
-      'blog-post', 'booking', 'carousel', 'contact-details', 'contact-form', 'copyright',
+      'blog-post', 'booking', 'carousel', 'chat-thread', 'contact-details', 'contact-form', 'copyright',
       'cta', 'directions', 'divider', 'experience',
       'faq', 'features', 'feed', 'footer', 'gallery', 'hero', 'hero-app', 'hours', 'install-prompt',
       'legal',

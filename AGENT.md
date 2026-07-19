@@ -46,7 +46,7 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 51 block types, by group:
+The 52 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `install-prompt` (add-to-home-screen toast with per-platform steps — use it on PWA-enabled sites), `footer`
 - **Heroes:** `hero`, `hero-app`
@@ -55,7 +55,7 @@ The 51 block types, by group:
   `services-catalogue`, `menu` (food/drink menu — sections, dietary tags, spice), `product` (shoppable grid — price, badge, buy/enquire), `pricing`, `logos`, `team`
 - **Media:** `gallery`, `carousel`, `video`, `video-gallery`, `map`
 - **Location:** `directions` (deep links to open the visitor’s map app)
-- **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `reviews` (star ratings + source), `faq`
+- **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `reviews` (star ratings + source), `faq`, `chat-thread` (an authored conversation as rich bubbles — participants plus messages whose bodies are typed nodes: text, code, image, list, buttons. Static: use it to *show* how an assistant or support team answers, never as a live chatbot)
 - **Collections:** `blog-list`, `blog-post`, `feed`
 - **Dynamic (powered):** `booking` (appointment/reservation request — service, date, time), `contact-form`, `newsletter`, `search`, `auth`
 - **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `hours` (structured weekly opening hours with a live open-now badge), `divider`, `spacer`, `copyright`

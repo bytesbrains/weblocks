@@ -277,6 +277,27 @@ const serviceLocal = manifest('forest',
       { title: 'Fixed quote', text: 'Upfront price before we start.' },
       { title: 'Sorted', text: 'Tidy work, guaranteed for 12 months.' },
     ] }),
+    b('chat', 'chat-thread', {
+      title: 'Booking a job, start to finish',
+      subtitle: 'A real enquiry from last week, lightly trimmed.',
+      participants: [
+        { id: 'c', name: 'Dan Whitfield', role: 'user' },
+        { id: 'r', name: 'Reliant', role: 'agent' },
+      ],
+      messages: [
+        { from: 'c', time: '08:02', body: [{ kind: 'text', text: 'Boiler is making a banging noise and the radiators are cold upstairs. Can someone come today?' }] },
+        { from: 'r', time: '08:09', body: [
+          { kind: 'text', text: 'Sounds like trapped air or a failing pump. We keep two morning slots free for emergencies — both still open:' },
+          { kind: 'list', ordered: false, items: [{ label: '11:00 – 12:00' }, { label: '14:30 – 15:30' }] },
+          { kind: 'buttons', items: [{ label: 'Book 11:00', href: '#contact' }, { label: 'Book 14:30', href: '#contact' }] },
+        ] },
+        { from: 'c', time: '08:11', body: [{ kind: 'text', text: 'Morning one please. What will it cost?' }] },
+        { from: 'r', time: '08:12', body: [
+          { kind: 'text', text: '£85 for the visit and first hour, parts quoted before we fit anything. No call-out fee on top.' },
+          { kind: 'buttons', items: [{ label: 'Confirmed — see you at 11' }] },
+        ] },
+      ],
+    }),
     b('reviews', 'testimonials', { title: 'What neighbours say', items: [
       { quote: 'Fixed our boiler same day and left the kitchen spotless.', author: 'Karen', role: 'Sheffield' },
       { quote: 'Honest, on time, fair price. Booked them for the bathroom next.', author: 'Paul', role: 'Rotherham' },

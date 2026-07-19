@@ -37,6 +37,7 @@
     "testimonials",
     "reviews",
     "faq",
+    "chat-thread",
     "blog-list",
     "blog-post",
     "feed",
@@ -1898,6 +1899,153 @@
               "additionalProperties": false
             },
             "maxItems": 20
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "chat-thread",
+      "description": "A conversation rendered as a thread of rich message bubbles: named participants with avatars or initials, optional per-message times, and typed message bodies that mix text, code, images, lists and quick replies. Static — an authored transcript for showing how an assistant or support team answers, not a live chatbot.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 200,
+            "default": ""
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60,
+                  "default": ""
+                },
+                "role": {
+                  "enum": [
+                    "user",
+                    "bot",
+                    "agent"
+                  ],
+                  "default": "bot"
+                },
+                "avatar": {
+                  "type": "string",
+                  "maxLength": 500,
+                  "default": ""
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 6
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "time": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "default": ""
+                },
+                "body": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "text",
+                          "code",
+                          "image",
+                          "list",
+                          "buttons"
+                        ],
+                        "default": "text"
+                      },
+                      "text": {
+                        "type": "string",
+                        "maxLength": 2000,
+                        "default": ""
+                      },
+                      "lang": {
+                        "type": "string",
+                        "maxLength": 20,
+                        "default": ""
+                      },
+                      "src": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "default": ""
+                      },
+                      "alt": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "ordered": {
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "label": {
+                              "type": "string",
+                              "maxLength": 120,
+                              "default": ""
+                            },
+                            "href": {
+                              "type": "string",
+                              "maxLength": 500,
+                              "default": ""
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "maxItems": 8
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "maxItems": 8
+                }
+              },
+              "required": [
+                "from"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 60
           }
         },
         "additionalProperties": false
