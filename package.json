@@ -38,6 +38,7 @@
     "!lib/**/*.test.js",
     "!lib/**/*.test.d.ts",
     "!lib/example*",
+    "!lib/showcase*",
     "catalog.json",
     "CATALOG.md",
     "AGENT.md",

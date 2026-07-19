@@ -5,6 +5,34 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+Repo/tooling only — **no change to the published package's behaviour or contract**.
+
+### Added
+- **Live gallery on GitHub Pages** —
+  [bytesbrains.github.io/weblocks](https://bytesbrains.github.io/weblocks/). A
+  landing page, the block wall (all 51 bricks rendered live, each labelled with
+  the island it hydrates), and the starter gallery (17 preview cards showing the
+  blocks each one is composed from). Built from source by `npm run site` and
+  deployed on every push to `main`; nothing generated is committed.
+- **`src/showcase.ts`** — demo config for every registered block, harvested from
+  the starter templates where one places it and hand-written for the rest.
+  `showcase.test.ts` asserts it covers the whole registry, so registering a block
+  without demo config now fails CI (see `CONTRIBUTING.md`).
+
+### Fixed
+- **Island scripts resolve under a project path.** `renderSite` defaults
+  `islandBase` to the absolute `/_island`; the site build passes a relative base
+  and ships the modules alongside, so carousel/lightbox/hours/stats hydrate on a
+  static host and from disk.
+- **`lib/showcase.*` no longer ships to npm.** It is demo-site tooling, is not
+  exported from `index.ts`, and was being published as dead weight.
+
+### Changed
+- GitHub Actions moved off the deprecated Node 20 runtime: `checkout` v4→v7,
+  `setup-node` v4→v7, `upload-pages-artifact` v3→v5, `deploy-pages` v4→v5.
+
 ## 0.8.0 — 2026-07-19
 
 Installability, end to end: a block that tells visitors they can install the
