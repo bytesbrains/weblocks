@@ -404,6 +404,17 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
   Rebuilt from source on every push; run it locally with `npm run site`.
 - **[Package on npm](https://www.npmjs.com/package/@bytesbrains/weblocks)** —
   `npm i @bytesbrains/weblocks`.
+
+**For agents — the contract, fetchable without installing anything:**
+
+| URL | |
+|---|---|
+| [`/llms.txt`](https://bytesbrains.github.io/weblocks/llms.txt) | Index of everything below, in the convention models look for. |
+| [`/AGENT.md`](https://bytesbrains.github.io/weblocks/AGENT.md) | Prime directives, composing a manifest, editing with ops, guarantees. |
+| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 51 block types with full JSON Schema for their config. |
+| [`/catalog.txt`](https://bytesbrains.github.io/weblocks/catalog.txt) | The same vocabulary, one line per block — cheap to drop in a system prompt. |
+| [`/tools.json`](https://bytesbrains.github.io/weblocks/tools.json) | A ready-to-use `compose_site` function-calling definition. |
+
 - **[`AGENT.md`](./AGENT.md)** — how to use this package from an AI / agent.
 - **[`VISION.md`](./VISION.md)** — principles and direction.
 - **[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)** — internals.
