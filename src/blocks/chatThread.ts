@@ -30,8 +30,8 @@ const schema: Schema = {
     of: {
       kind: 'object',
       fields: {
-        id: { kind: 'string', required: true, default: '', max: 40 },
-        name: { kind: 'string', required: true, default: '', max: 60 },
+        id: { kind: 'string', required: true, default: '', min: 1, max: 40 },
+        name: { kind: 'string', required: true, default: '', min: 1, max: 60 },
         role: { kind: 'enum', values: ROLES, default: 'bot' },
         avatar: { kind: 'string', default: '', max: 500 },
       },
@@ -42,7 +42,7 @@ const schema: Schema = {
     of: {
       kind: 'object',
       fields: {
-        from: { kind: 'string', required: true, default: '', max: 40 },
+        from: { kind: 'string', required: true, default: '', min: 1, max: 40 },
         time: { kind: 'string', default: '', max: 40 },
         body: {
           kind: 'array', max: 8,

@@ -5,6 +5,9 @@ import { parse } from './schema.js';
 import { DEFAULT_TOKENS } from './tokens.js';
 import { NOOP_RUNTIME } from './runtime.js';
 import { buildAnchors } from './anchors.js';
+import { validateManifest } from './validate.js';
+import { renderSite } from './render.js';
+import type { SiteManifest } from './types.js';
 
 // The decisions recorded on weblocks#58 are load-bearing, not cosmetic: each one
 // is a promise about what the markup does. These pin them so a later tweak has
@@ -164,4 +167,26 @@ test('chat-thread gets a clean anchor slug so nav links read as #chat', () => {
   ]);
   assert.equal(anchors.idFor.get('talk'), 'chat', 'not the raw type name');
   assert.equal(anchors.resolve('#conversation'), '#chat', 'a nav label alias resolves too');
+});
+
+test('an empty participant id is a validation error, not silent data loss', () => {
+  // Reported on PR #59: `required` only means "present", so `id: ''` passed
+  // validation, the participant was skipped, and every message referencing it
+  // vanished from a manifest reporting ok:true with no warnings.
+  const manifest = {
+    meta: { title: 't', description: '', lang: 'en' },
+    blocks: [{ id: 'c', type: 'chat-thread', visible: true, config: {
+      participants: [{ id: '', name: 'Ghost', role: 'bot' }],
+      messages: [{ from: '', body: [{ kind: 'text', text: 'must not vanish silently' }] }],
+    } }],
+    version: 1,
+  } as unknown as SiteManifest;
+
+  const v = validateManifest(manifest);
+  assert.equal(v.ok, false, 'the manifest must not report clean');
+  assert.ok(v.errors.some((e) => /participants\[0\]\.id: must be at least 1 character/.test(e)));
+  assert.ok(v.errors.some((e) => /messages\[0\]\.from: must be at least 1 character/.test(e)));
+
+  // …and the renderer still stays total: an invalid manifest degrades, never throws.
+  assert.doesNotThrow(() => renderSite(manifest));
 });

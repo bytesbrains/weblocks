@@ -31,7 +31,7 @@ export interface JsonSchema {
 
 function fieldToJsonSchema(field: Field): JsonSchema {
   switch (field.kind) {
-    case 'string': return { type: 'string', ...(field.max !== undefined && { maxLength: field.max }), ...(field.default !== undefined && { default: field.default }) };
+    case 'string': return { type: 'string', ...(field.min !== undefined && { minLength: field.min }), ...(field.max !== undefined && { maxLength: field.max }), ...(field.default !== undefined && { default: field.default }) };
     case 'enum': return { enum: field.values, ...(field.default !== undefined && { default: field.default }) };
     case 'boolean': return { type: 'boolean', ...(field.default !== undefined && { default: field.default }) };
     case 'int': return {

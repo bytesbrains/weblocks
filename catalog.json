@@ -1927,11 +1927,13 @@
               "properties": {
                 "id": {
                   "type": "string",
+                  "minLength": 1,
                   "maxLength": 40,
                   "default": ""
                 },
                 "name": {
                   "type": "string",
+                  "minLength": 1,
                   "maxLength": 60,
                   "default": ""
                 },
@@ -1964,6 +1966,7 @@
               "properties": {
                 "from": {
                   "type": "string",
+                  "minLength": 1,
                   "maxLength": 40,
                   "default": ""
                 },
