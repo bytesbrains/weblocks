@@ -38,7 +38,11 @@ npm run emit:catalog # regenerate catalog.json + CATALOG.md from code
    [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md#brick-definition-of-done--admitting-a-new-block).
    The shared suite in `src/blocks.test.ts` runs the DoD against every brick.
 4. Add the new type to the closed-vocabulary list in `blocks.test.ts`.
-5. `npm run emit:catalog` and update docs if needed.
+5. Give it demo config for the published block wall — place it in a starter
+   template, or add an entry to `SUPPLEMENT` in `src/showcase.ts`.
+   `showcase.test.ts` fails on any registered type without one. Check it with
+   `npm run site`.
+6. `npm run emit:catalog` and update docs if needed.
 
 ## Before you open a PR
 

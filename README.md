@@ -15,6 +15,10 @@ provider- and host-neutral, zero runtime dependencies.
 [![types](https://img.shields.io/npm/types/@bytesbrains/weblocks.svg)](./lib/index.d.ts)
 [![deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)](./package.json)
 
+**[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
+[all 51 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+[17 starter templates](https://bytesbrains.github.io/weblocks/templates/)
+
 </div>
 
 ```
@@ -50,7 +54,7 @@ Zero runtime dependencies · pure TypeScript · ESM · Node ≥ 20.
 
 ## Table of contents
 
-- [Install](#install) · [Quickstart](#quickstart) · [Core concepts](#core-concepts)
+- [Live gallery](https://bytesbrains.github.io/weblocks/) · [Install](#install) · [Quickstart](#quickstart) · [Core concepts](#core-concepts)
 - [The AI contract](#the-ai-contract) · [Block catalog](#block-catalog)
 - [Editing](#editing) · [Theming](#theming) · [Powered blocks & runtime](#powered-blocks--runtime) · [PWA](#pwa)
 - [API reference](#api-reference) · [Adding a block](#adding-a-block) · [Local development](#local-development)
@@ -139,7 +143,9 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**51 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**51 typed blocks.** See every one of them rendered live on the
+**[block wall](https://bytesbrains.github.io/weblocks/blocks/)**; full field
+reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
@@ -350,9 +356,11 @@ await generateSite('a taco truck in Austin', callModel, { template: 'restaurant-
 // A raw SiteManifest works too: { template: myManifest }. Omit → blank-slate compose.
 ```
 
-Render every template to eyeball them: `npm run example:templates` →
-`templates-output/index.html`. Templates are additive and stable (ids never
-renamed); every manifest is `validateManifest`-clean (unit-tested).
+Browse them rendered at
+**[the starter gallery](https://bytesbrains.github.io/weblocks/templates/)**, or
+build them locally: `npm run example:templates` → `templates-output/index.html`.
+Templates are additive and stable (ids never renamed); every manifest is
+`validateManifest`-clean (unit-tested).
 
 ## Adding a block
 
@@ -361,6 +369,11 @@ Register a `BlockSpec` (`type` + `schema` + `css` + `render`, optionally `island
 typed schema (no raw-HTML field), consumes shared tokens, renders totally
 (defaults + escaping, never throws), valid regardless of neighbours. See
 [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md#adding-a-block-concretely).
+
+Also give it demo config so it appears on the
+[block wall](https://bytesbrains.github.io/weblocks/blocks/) — either place it in
+a starter template, or add an entry to `SUPPLEMENT` in `src/showcase.ts`.
+`showcase.test.ts` fails on any registered type without one.
 
 ## Local development
 
@@ -371,6 +384,7 @@ npm test             # block definition-of-done + engine invariants
 npm run example         # render a sample landing page → example-output.html
 npm run example:resume  # render a live résumé/CV → resume-output.html (try its Download-PDF)
 npm run example:templates # render every starter template → templates-output/index.html
+npm run site            # build the published gallery (wall + templates) → site/index.html
 npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
 ```
 
