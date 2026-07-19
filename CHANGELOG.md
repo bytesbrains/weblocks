@@ -5,11 +5,24 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.8.1 — 2026-07-19
 
-Repo/tooling only — **no change to the published package's behaviour or contract**.
+Documentation and distribution only — **no change to the engine, the block
+catalog, or the `SiteManifest` shape**. Every `0.8.0` manifest validates and
+renders byte-identically. What reaches an installed copy is a rewritten README
+and one file that should never have shipped.
 
 ### Added
+- **Fetchable agent surface.** The contract is now reachable without installing
+  anything: [`/llms.txt`](https://bytesbrains.github.io/weblocks/llms.txt),
+  [`/AGENT.md`](https://bytesbrains.github.io/weblocks/AGENT.md),
+  [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json),
+  [`/catalog.txt`](https://bytesbrains.github.io/weblocks/catalog.txt) (the
+  compact vocabulary, for a system prompt) and
+  [`/tools.json`](https://bytesbrains.github.io/weblocks/tools.json) (a
+  ready-to-use `compose_site` function-calling definition, with all 51 block
+  types as an enum plus per-type config schemas).
+- **Logo** (`assets/`) — shown on the site, the README and as the favicon.
 - **Live gallery on GitHub Pages** —
   [bytesbrains.github.io/weblocks](https://bytesbrains.github.io/weblocks/). A
   landing page, the block wall (all 51 bricks rendered live, each labelled with
