@@ -5,7 +5,11 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.9.0 — 2026-07-19
+
+A conversation block, and the schema constraint that makes its identifiers
+trustworthy. Additive and **non-breaking** — every `0.8.x` manifest still
+validates and renders identically. Catalog 51 → 52.
 
 ### Added
 - **`chat-thread` block (#58).** Catalog 51 → 52. An authored conversation
@@ -26,6 +30,21 @@ are minor, breaking changes to either are major.
 
   Placed in the `service-local` starter so the schema is exercised by a real
   composition, not only by the showcase.
+
+- **`min` on string fields** (`Schema`). Mirrors the `min` that `int` already
+  had, and surfaces as `minLength` in `catalog.json` so the constraint reaches
+  the model. Unlike `max` (truncate + warn) it is a **hard error**: a too-long
+  value can be repaired, a too-short identifier cannot. Purely additive — no
+  existing field sets it.
+
+### Fixed
+- **An empty required string could silently drop data (#59).** `required` means
+  "present", not "non-empty", so `chat-thread`'s `participants[].id: ''` passed
+  validation, the participant was skipped, and every message referencing that id
+  vanished — from a manifest reporting `ok: true` with no warnings. `id`, `name`
+  and `messages[].from` now set `min: 1`, so the state is reported instead of
+  swallowed. The renderer stays total: an invalid manifest still renders, it
+  just no longer claims to be valid.
 
 ## 0.8.1 — 2026-07-19
 
