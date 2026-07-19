@@ -5,6 +5,23 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Added
+- **`install-prompt` block (#39).** Catalog 50 → 51. A dismissible toast that
+  invites visitors to install the site as an app and expands into "Add to Home
+  Screen" steps matched to their platform (iOS Safari, iOS third-party browsers,
+  Android Chrome, desktop Chrome/Edge, macOS Safari 17+, Firefox). Static-first:
+  the guide is a `<details>`, so with no JS every platform's steps still expand.
+  The shipped `install-prompt` island fires the browser's native install prompt
+  where one is offered (`beforeinstallprompt`), narrows the steps to the detected
+  platform otherwise, remembers a dismiss in `localStorage`, and hides the toast
+  once the app is installed. Closes the gap left by the `pwa` layer, which made
+  sites installable but never told anyone.
+
+  Additive + non-breaking: every `0.7.x` manifest still validates and renders
+  identically.
+
 ## 0.7.0 — 2026-07-17
 
 Business verticals land: a vertical taxonomy, named starter templates, and five

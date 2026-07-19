@@ -1,5 +1,5 @@
 /**
- * Business **verticals** (§ AiToolK.it#154 / weblocks#30) — a small, stable
+ * Business **verticals** (§ weblocks#30) — a small, stable
  * taxonomy that gives generation a sense of what KIND of site it's making.
  *
  * Each vertical maps to its recommended section set (in order), a design-token

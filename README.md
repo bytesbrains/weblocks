@@ -139,11 +139,11 @@ import catalogJson from '@bytesbrains/weblocks/catalog.json' with { type: 'json'
 
 ## Block catalog
 
-**50 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
+**51 typed blocks.** Full field reference in [`CATALOG.md`](./CATALOG.md).
 
 | Group | Blocks |
 |---|---|
-| Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `footer` |
+| Chrome / app-shell | `nav` · `app-shell` · `sidebar` · `announcement-bar` · `install-prompt` · `footer` |
 | Heroes | `hero` · `hero-app` |
 | Résumé / profile | `profile-header` · `experience` · `skills` (live CV — avatar, dated entries, skills, Download-PDF/Share) |
 | Content | `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` |
@@ -235,6 +235,12 @@ for (const [file, body] of Object.entries(emitPwa(manifest) ?? {})) writeFileSyn
 // → manifest.webmanifest + sw.js
 ```
 
+Add the `install-prompt` block to tell visitors they *can* install it: a
+dismissible toast that expands into "Add to Home Screen" steps for the visitor's
+own platform (iOS Safari, Android Chrome, desktop Chrome/Edge, macOS Safari). Its
+island fires the browser's native install prompt where one is offered — and on
+iOS, where no such prompt exists, the written steps are the only way in.
+
 ## Interactivity (islands)
 
 Pages are static-first: JavaScript ships only for the interactive blocks that need
@@ -248,6 +254,7 @@ island scripts** (zero-dependency, ~6 KB each) under a subpath:
 | `carousel` | `carousel.js` | arrows, dots, keyboard, optional autoplay |
 | `video-gallery` | `video.js` | click-to-play cards (load the real player inline on press) |
 | `profile-header` (Download/Share on) | `resume.js` | print-to-PDF (`window.print()`) + Web Share / copy-link |
+| `install-prompt` | `install-prompt.js` | native install prompt, platform-matched steps, sticky dismiss |
 
 Serve them at the island URL. Copy from the package's `./islands/*.js` export, e.g.:
 
