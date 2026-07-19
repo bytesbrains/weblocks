@@ -27,6 +27,7 @@ import { validateManifest } from './validate.js';
 import { TEMPLATES } from './templates.js';
 import { escapeAttr, escapeHtml } from './schema.js';
 import { showcaseBlocks, showcaseManifest } from './showcase.js';
+import { catalog, catalogPrompt } from './catalog.js';
 import { DEFAULT_TOKENS } from './tokens.js';
 import type { SiteManifest } from './types.js';
 
@@ -302,6 +303,14 @@ h2.sec{font-size:.72rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
 .big:hover{border-color:var(--accent);transform:translateY(-2px)}
 .big strong{font-size:1.05rem}
 .big span{display:block;color:var(--muted);font-size:.92rem;margin-top:.35rem}
+.feeds{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;margin:0 0 2.6rem}
+.feed{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .9rem;background:var(--bg);
+  padding:.7rem 1rem;text-decoration:none;color:var(--fg)}
+.feed:hover{background:var(--surface)}
+.feed code{font-size:.86rem;background:none;padding:0;color:var(--accent);min-width:9.5rem}
+.feed span{color:var(--muted);font-size:.88rem;flex:1;min-width:210px}
+.feed span code{color:inherit;min-width:0}
 .why{display:grid;gap:1.4rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin:0 0 1rem}
 .why h3{font-size:.95rem;margin:0 0 .35rem}
 .why p{margin:0;color:var(--muted);font-size:.92rem}
@@ -362,6 +371,17 @@ the model, no framework runtime, nothing to trust at render time.</p>
     <span>${Object.keys(TEMPLATES).length} complete starter sites, one per vertical, with the blocks that compose them.</span></a>
 </div>
 
+<h2 class="sec">For AI agents</h2>
+<p class="lede">The consumer of this package is a model, so the contract is fetchable without installing
+anything. One request each — no npm, no build step.</p>
+<div class="feeds">
+  <a class="feed" href="./llms.txt"><code>/llms.txt</code><span>Index of everything below, in the convention models look for.</span></a>
+  <a class="feed" href="./AGENT.md"><code>/AGENT.md</code><span>Prime directives, composing a manifest, editing with ops, guarantees.</span></a>
+  <a class="feed" href="./catalog.json"><code>/catalog.json</code><span>All ${entries.length} block types with full JSON Schema for their config.</span></a>
+  <a class="feed" href="./catalog.txt"><code>/catalog.txt</code><span>The same vocabulary, one line per block, cheap to put in a prompt.</span></a>
+  <a class="feed" href="./tools.json"><code>/tools.json</code><span>A ready-to-use <code>compose_site</code> function-calling definition.</span></a>
+</div>
+
 <h2 class="sec">Why it is built this way</h2>
 <div class="why">
   <div><h3>A closed vocabulary</h3><p>A block exists only if it is registered. An unknown type is skipped, so
@@ -379,6 +399,100 @@ the model, no framework runtime, nothing to trust at render time.</p>
   'utf8',
 );
 
+// ── the agent surface ────────────────────────────────────────────────────────
+// This package is composed BY models, so the contract has to be reachable
+// without installing anything. These five files let an agent fetch the entire
+// closed vocabulary — and the rules for using it — in one request each.
+const SITE_URL = 'https://bytesbrains.github.io/weblocks';
+
+writeFileSync(join(out, 'catalog.json'), readFileSync(join(root, 'catalog.json'), 'utf8'), 'utf8');
+writeFileSync(join(out, 'AGENT.md'), readFileSync(join(root, 'AGENT.md'), 'utf8'), 'utf8');
+
+// Compact vocabulary — the token-cheap menu meant to sit in a system prompt.
+writeFileSync(join(out, 'catalog.txt'), `${catalogPrompt()}\n`, 'utf8');
+
+// Ready-to-paste function-calling definition: one tool that returns a whole
+// SiteManifest, with every block type as a discriminated variant.
+const tools = {
+  name: 'compose_site',
+  description:
+    'Compose a complete website as a SiteManifest for @bytesbrains/weblocks. Use ONLY the block types in ' +
+    'the enum — the engine skips anything unknown. The host validates and renders the result to one ' +
+    'self-contained static HTML document.',
+  input_schema: {
+    type: 'object',
+    required: ['meta', 'blocks'],
+    properties: {
+      meta: {
+        type: 'object',
+        required: ['title'],
+        properties: {
+          title: { type: 'string' },
+          description: { type: 'string' },
+          lang: { type: 'string' },
+          favicon: { type: 'string', description: 'A single emoji.' },
+        },
+      },
+      design: {
+        type: 'object',
+        description: 'Optional design tokens; omit for the default palette.',
+        properties: {
+          mode: { type: 'string', enum: ['light', 'dark', 'auto'] },
+          palette: {
+            type: 'object',
+            properties: Object.fromEntries(
+              ['bg', 'surface', 'text', 'muted', 'primary', 'accent'].map((k) => [k, { type: 'string' }]),
+            ),
+          },
+        },
+      },
+      blocks: {
+        type: 'array',
+        description: 'Ordered sections of the page. Each id must be unique.',
+        items: {
+          type: 'object',
+          required: ['id', 'type', 'config'],
+          properties: {
+            id: { type: 'string' },
+            type: { type: 'string', enum: entries.map((e) => e.type) },
+            visible: { type: 'boolean' },
+            config: { type: 'object', description: 'Fields for this block type — see catalog.json.' },
+          },
+        },
+      },
+    },
+  },
+  blockSchemas: Object.fromEntries(catalog().map((b) => [b.type, b.schema])),
+};
+writeFileSync(join(out, 'tools.json'), `${JSON.stringify(tools, null, 2)}\n`, 'utf8');
+
+// llms.txt — the convention for pointing a model at what matters on a site.
+writeFileSync(join(out, 'llms.txt'), `# @bytesbrains/weblocks
+
+> A block engine for AI-composable web apps. A model composes a \`SiteManifest\` from a fixed catalog of
+> ${entries.length} typed blocks — its entire API surface — and the engine validates it and renders one
+> self-contained static HTML document. The model never emits HTML, CSS or JavaScript.
+
+If you are an AI composing a site with this package, read AGENT.md first, then use catalog.json as your
+contract. An unknown block type is skipped rather than rendered, so staying inside the vocabulary is the
+whole game.
+
+## The contract
+- [AGENT.md](${SITE_URL}/AGENT.md): How to use this package as a model — prime directives, composing a manifest, editing with ops, and the guarantees you can rely on.
+- [catalog.json](${SITE_URL}/catalog.json): Machine-readable catalog. Every block type with a full JSON Schema for its config. This is the API reference to send to the model.
+- [catalog.txt](${SITE_URL}/catalog.txt): The same vocabulary compacted to one line per block, for dropping into a system prompt cheaply.
+- [tools.json](${SITE_URL}/tools.json): A ready-to-use function-calling tool definition (\`compose_site\`) with every block type as an enum, plus per-type config schemas.
+
+## Seeing the output
+- [Block wall](${SITE_URL}/blocks/): Every block rendered live, one page each.
+- [Starter templates](${SITE_URL}/templates/): ${Object.keys(TEMPLATES).length} complete starter sites and the blocks composing them.
+
+## Source
+- [GitHub](${REPO_URL}): Source, issues, architecture docs.
+- [npm](${NPM_URL}): \`npm i @bytesbrains/weblocks\` — zero runtime dependencies, Node ${pkg.engines.node}.
+`, 'utf8');
+
+console.log(`agent surface → llms.txt, catalog.json, catalog.txt, tools.json, AGENT.md`);
 console.log(`\nWrote ${entries.length} blocks + ${Object.keys(TEMPLATES).length} templates → ${out}`);
 console.log(`Open ${join(out, 'index.html')}`);
 if (blockFailures || templateFailures) {
