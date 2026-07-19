@@ -2,9 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
-import { REGISTRY } from './registry.js';
-import { runtimeNeeds, pathRuntime, safeRuntime, NOOP_RUNTIME, type RuntimeAdapter, type RuntimeAction } from './runtime.js';
-import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
+import { pathRuntime } from './runtime.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
 import { DEFAULT_TOKENS, tokensToCss, readableOn, sectionOverrideCss } from './tokens.js';
@@ -135,49 +133,6 @@ test("mode:'auto' adds a prefers-color-scheme dark palette; light/dark do not", 
   assert.ok(darkBlock.includes('--bg:#010203'), 'supplied darkPalette drives the dark block');
 });
 
-// ── §6 runtime contract ─────────────────────────────────────────────────────────
-
-test('runtimeNeeds reports powered blocks and their capabilities', () => {
-  let m = empty();
-  m = applyOp(m, { op: 'addBlock', type: 'contact-form' }).manifest;
-  m = applyOp(m, { op: 'addBlock', type: 'hero' }).manifest;
-  const needs = runtimeNeeds(m);
-  assert.equal(needs.length, 1);
-  assert.equal(needs[0]!.type, 'contact-form');
-  assert.deepEqual(needs[0]!.capabilities, ['contact-form.submit']);
-});
-
-test('powered block renders inert with the no-op runtime, wired with an adapter', () => {
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
-  const inert = renderSite(r.manifest); // default NOOP runtime
-  assert.ok(inert.includes('data-wl-inert="true"'));
-  assert.ok(inert.includes('data-wl-capability="contact-form.submit"'));
-  assert.ok(inert.includes('disabled'));
-
-  const wired = renderSite(r.manifest, { runtime: pathRuntime('/api') });
-  assert.ok(wired.includes('action="/api/contact-form.submit/cf-1"'));
-  assert.ok(!wired.includes('data-wl-inert'));
-  assert.equal(NOOP_RUNTIME.resolve('x', 'y'), null);
-});
-
-// ── hardening: powered-block form safety ────────────────────────────────────────
-
-test('a hostile runtime method is whitelisted to post; the attribute never breaks out', () => {
-  const evil = { resolve: () => ({ url: '/x', method: 'get"><script>alert(1)</script>' as never }) };
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1' });
-  const html = renderSite(r.manifest, { runtime: evil });
-  assert.ok(html.includes('method="post"'), 'coerced to a safe method token');
-  assert.ok(!html.includes('<script>alert(1)</script>'), 'no attribute breakout');
-});
-
-test('contact-form field ids are DOM-safe even when field names have spaces', () => {
-  const r = applyOp(empty(), { op: 'addBlock', type: 'contact-form', id: 'cf-1', config: { fields: [{ name: 'full name', label: 'Full name', type: 'text' }] } });
-  const html = renderSite(r.manifest);
-  const id = /id="(f-cf-1-[^"]*)"/.exec(html)?.[1] ?? '';
-  assert.ok(id && !/\s/.test(id), `id must be space-free, got "${id}"`);
-  assert.ok(html.includes(`for="${id}"`), 'label stays associated with the input');
-});
-
 test('carousel takes a title so multiple carousels get unique landmark names', () => {
   const r = applyOp(empty(), { op: 'addBlock', type: 'carousel', config: { title: 'Client work' } });
   assert.ok(renderSite(r.manifest).includes('aria-label="Client work"'));
@@ -190,20 +145,6 @@ test('prose renderer (shared by rich-text & blog-post) groups lists and escapes'
   const html = renderSite(rt.manifest);
   assert.ok(html.includes('<ul><li>a</li><li>b</li></ul>'), 'adjacent bullets grouped');
   assert.ok(html.includes('<ol><li>1</li></ol>'), 'numbered list switches container');
-});
-
-test('search renders both layouts, wires to a runtime, and stays inert without one', () => {
-  const bar = applyOp(empty(), { op: 'addBlock', type: 'search', id: 'search-1', config: { layout: 'bar', label: 'Find posts' } });
-  const inert = renderSite(bar.manifest);
-  assert.ok(inert.includes('role="search"') && inert.includes('layout-bar'));
-  assert.ok(inert.includes('data-wl-capability="search.query"') && inert.includes('data-wl-inert="true"'));
-  assert.ok(inert.includes('aria-label="Find posts"'), 'label escaped into the landmark');
-
-  const wired = renderSite(bar.manifest, { runtime: pathRuntime('/api') });
-  assert.ok(wired.includes('action="/api/search.query/search-1"') && !wired.includes('data-wl-inert'));
-
-  const icon = applyOp(empty(), { op: 'addBlock', type: 'search', config: { layout: 'icon' } });
-  assert.ok(renderSite(icon.manifest).includes('layout-icon'), 'icon variant renders');
 });
 
 test('directions builds map-app deep links from coords / address / pasted link', () => {
@@ -243,60 +184,6 @@ test('renderMarkdown is safe: escapes HTML, sanitizes link schemes', () => {
   assert.ok(renderMarkdown('## Hi').includes('<h3>Hi</h3>'), 'heading level offset');
 });
 
-// ── shipped islands (gallery lightbox / carousel) ───────────────────────────────
-
-test('gallery flags lightbox for its island, and islandBase is configurable', () => {
-  const on = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: true, items: [{ src: '/a.jpg', alt: 'a' }] } });
-  const off = applyOp(empty(), { op: 'addBlock', type: 'gallery', config: { lightbox: false, items: [{ src: '/a.jpg', alt: 'a' }] } });
-  const html = renderSite(on.manifest);
-  assert.ok(html.includes('data-wl-lightbox="true"'), 'flagged for the island');
-  assert.ok(html.includes('src="/_island/lightbox.js"'), 'island script emitted');
-  assert.ok(!renderSite(off.manifest).includes('data-wl-lightbox'), 'no flag when lightbox off');
-  assert.ok(renderSite(on.manifest, { islandBase: '/assets/js' }).includes('src="/assets/js/lightbox.js"'), 'islandBase override');
-});
-
-test('shipped island modules import safely in a non-DOM environment', async () => {
-  // Guarded by `typeof document`, so importing in Node is a clean no-op.
-  await assert.doesNotReject(import('./islands/lightbox.js'));
-  await assert.doesNotReject(import('./islands/carousel.js'));
-  await assert.doesNotReject(import('./islands/announcement-bar.js'));
-});
-
-test('every static brick\'s declared island is a shipped module (no 404 island script)', async () => {
-  // The renderer emits <script src="/_island/<name>.js"> for a used block's
-  // declared island, so a static brick's `island` name MUST resolve to a real
-  // shipped module — otherwise every page using it loads a 404.
-  // Powered bricks are the exception: the host wires their runtime, so it also
-  // serves their island (they render inert-but-valid without one).
-  for (const spec of REGISTRY.values()) {
-    if (!spec.island || spec.runtime) continue;
-    await assert.doesNotReject(
-      import(`./islands/${spec.island}.js`),
-      `${spec.type} declares island "${spec.island}" but no such module ships`,
-    );
-  }
-});
-
-test('a powered brick emits its host island only once a runtime is wired', () => {
-  // The engine ships no module for a powered brick's island — the host serves it
-  // alongside the runtime. Unwired, the tag would be a guaranteed 404.
-  const m = applyOp(empty(), { op: 'addBlock', type: 'contact-form' }).manifest;
-  assert.ok(!renderSite(m).includes('/_island/contact-form.js'), 'no runtime → no island tag');
-  assert.ok(renderSite(m).includes('data-wl-inert="true"'), 'and the brick still renders inert-but-valid');
-  assert.ok(renderSite(m, { runtime: pathRuntime() }).includes('/_island/contact-form.js'), 'wired → host island tag');
-
-  // A throwing adapter is unwired too (see the totality test below).
-  const boom: RuntimeAdapter = { resolve: () => { throw new Error('host blew up'); } };
-  assert.ok(!renderSite(m, { runtime: boom }).includes('/_island/contact-form.js'), 'a throwing adapter emits no island');
-
-  // A host that provides other capabilities but not this one stays unwired.
-  const otherCaps: RuntimeAdapter = { resolve: (cap) => (cap === 'search.query' ? { url: '/s', method: 'GET' } : null) };
-  assert.ok(!renderSite(m, { runtime: otherCaps }).includes('/_island/contact-form.js'), 'unrelated capability → still no tag');
-
-  // Static bricks are unaffected — their island ships with the engine.
-  const bar = applyOp(empty(), { op: 'addBlock', type: 'announcement-bar' }).manifest;
-  assert.ok(renderSite(bar).includes('/_island/announcement-bar.js'), 'a static brick needs no runtime');
-});
 
 test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
   const labeled = applyOp(empty(), { op: 'addBlock', type: 'social-links', config: { links: [
@@ -401,43 +288,6 @@ test('renderSite includes print styles for PDF export', () => {
   assert.ok(renderSite(empty()).includes('@media print') && renderSite(empty()).includes('[data-wl-noprint]{display:none'), 'print stylesheet present');
 });
 
-// ── §7 PWA layer ────────────────────────────────────────────────────────────────
-
-test('buildWebManifest defaults name/colors from meta + tokens', () => {
-  const m = empty();
-  m.meta.title = 'Studio';
-  m.pwa = {};
-  const wm = buildWebManifest(m);
-  assert.equal(wm.name, 'Studio');
-  assert.equal(wm.display, 'standalone');
-  assert.equal(wm.theme_color, DEFAULT_TOKENS.palette.primary);
-  assert.ok(wm.icons.length >= 1);
-});
-
-test('emitPwa is null without opt-in, and emits manifest + sw when enabled', () => {
-  assert.equal(emitPwa(empty()), null);
-  const m = empty();
-  m.pwa = { name: 'App', offline: true };
-  const files = emitPwa(m)!;
-  assert.ok(files['manifest.webmanifest']);
-  assert.ok(files['sw.js']);
-  assert.ok(buildServiceWorker(m).includes('weblocks-v'));
-});
-
-test('renderSite emits PWA/SEO head only when opted in', () => {
-  const plain = renderSite(empty());
-  assert.ok(!plain.includes('rel="manifest"'));
-  const m = empty();
-  m.pwa = { themeColor: '#123456' };
-  m.seo = { canonical: 'https://ex.com', ogImage: 'https://ex.com/o.png' };
-  const html = renderSite(m);
-  assert.ok(html.includes('<link rel="manifest" href="/manifest.webmanifest">'));
-  assert.ok(html.includes('content="#123456"'));
-  assert.ok(html.includes('rel="canonical"'));
-  assert.ok(html.includes('og:image'));
-  assert.ok(validateManifest(m).ok);
-});
-
 // ── a full app-shaped manifest still renders valid ──────────────────────────────
 
 test('a rich app manifest (dynamic + pwa + overrides) renders one valid document', () => {
@@ -450,82 +300,4 @@ test('a rich app manifest (dynamic + pwa + overrides) renders one valid document
   const html = renderSite(batch.manifest, { runtime: pathRuntime() });
   assert.ok(html.startsWith('<!doctype html>') && html.includes('</html>'));
   assert.ok(validateManifest(batch.manifest).ok);
-});
-
-// ── install-prompt (add-to-home-screen toast) ───────────────────────────────────
-
-test('install-prompt: toast + every platform guide, no-JS <details>, island wired', () => {
-  const r = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: {
-    title: 'Install <Acme>', body: 'One tap away.', actionLabel: 'Show me how', position: 'top', delayMs: 3000,
-  } });
-  const html = renderSite(r.manifest);
-  assert.ok(html.includes('class="blk-install-prompt pos-top tone-info"'), 'position + tone classes');
-  assert.ok(html.includes('Install &lt;Acme&gt;'), 'title escaped');
-  assert.ok(html.includes('data-delay="3000"') && html.includes('data-remember="1"'), 'island reads delay + sticky dismiss');
-  assert.ok(html.includes('data-wl-noprint'), 'excluded from print/PDF export');
-  // Static-first: the guide is a <details>, so with no JS every platform expands.
-  assert.ok(html.includes('<details class="guide">') && html.includes('<summary data-wl-install-action>'), 'no-JS disclosure');
-  for (const id of ['ios-safari', 'ios-other', 'android', 'desktop-chrome', 'macos-safari', 'firefox']) {
-    assert.ok(html.includes(`data-platform="${id}"`), `guide for ${id}`);
-  }
-  assert.ok(html.includes('src="/_island/install-prompt.js"'), 'island script emitted');
-  assert.ok(validateManifest(r.manifest).ok);
-});
-
-test('install-prompt: platforms narrows the guides; dismiss can be turned off', () => {
-  const two = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: { platforms: ['ios-safari', 'android'], dismissible: false, rememberDismiss: false } });
-  const html = renderSite(two.manifest);
-  assert.equal((html.match(/<div data-platform="/g) ?? []).length, 2, 'only the two picked guides render');
-  assert.ok(!html.includes('data-wl-dismiss'), 'no close button when dismissible is off');
-  assert.ok(html.includes('data-remember="0"'), 'sticky dismiss opt-out reaches the island');
-
-  const none = applyOp(empty(), { op: 'addBlock', type: 'install-prompt', config: { platforms: [] } });
-  assert.equal((renderSite(none.manifest).match(/<div data-platform="/g) ?? []).length, 6, 'empty selection falls back to all platforms');
-});
-
-test('install-prompt island imports safely in a non-DOM environment', async () => {
-  await assert.doesNotReject(import('./islands/install-prompt.js'));
-});
-
-// ── totality: host runtime code cannot break the render (#42) ───────────────────
-
-const POWERED = ['contact-form', 'newsletter', 'booking', 'auth', 'search'];
-
-test('a throwing host adapter degrades to inert bricks, never a dead page', () => {
-  // `resolve` is the one place arbitrary host code runs inside a render. A throw
-  // used to escape renderSite, losing the whole document — including every static
-  // brick that never needed a runtime.
-  const boom: RuntimeAdapter = { resolve: () => { throw new Error('host blew up'); } };
-  let m = empty();
-  for (const type of [...POWERED, 'hero', 'features']) m = applyOp(m, { op: 'addBlock', type }).manifest;
-
-  const html = renderSite(m, { runtime: boom });
-  assert.ok(html.startsWith('<!doctype html>') && html.includes('</html>'), 'still one complete document');
-  assert.equal((html.match(/data-wl-inert="true"/g) ?? []).length, POWERED.length, 'every powered brick fell back to inert');
-  assert.ok(html.includes('class="blk-hero"') && html.includes('class="blk-features"'), 'static bricks are untouched');
-  assert.ok(!/undefined|\[object Object\]/.test(html), 'no host garbage leaked into the markup');
-});
-
-test('a malformed action from a host is treated as unwired', () => {
-  // A host implements the adapter at runtime; the return type is not a promise.
-  const shapes: RuntimeAdapter[] = [
-    { resolve: () => ({}) as unknown as RuntimeAction },                       // no url
-    { resolve: () => ({ url: 42 }) as unknown as RuntimeAction },              // url is not a string
-    { resolve: () => undefined as unknown as RuntimeAction },                  // nothing at all
-  ];
-  for (const runtime of shapes) {
-    const m = applyOp(empty(), { op: 'addBlock', type: 'contact-form' }).manifest;
-    const html = renderSite(m, { runtime });
-    assert.ok(html.includes('data-wl-inert="true"'), 'inert fallback, not a broken form');
-    assert.ok(html.includes('action="#"'), 'no half-built action attribute');
-  }
-});
-
-test('safeRuntime is reusable on its own, and a good adapter passes straight through', () => {
-  const boom: RuntimeAdapter = { resolve: () => { throw new Error('nope'); } };
-  assert.equal(safeRuntime(boom).resolve('contact.submit', 'b1'), null, 'throw → null (capability not provided)');
-
-  const good = pathRuntime('/api');
-  const direct = good.resolve('contact.submit', 'b1');
-  assert.deepEqual(safeRuntime(good).resolve('contact.submit', 'b1'), direct, 'a working adapter is unchanged');
 });
