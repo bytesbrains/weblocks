@@ -36,6 +36,9 @@ const out = join(root, 'site');
 mkdirSync(join(out, 'blocks'), { recursive: true });
 mkdirSync(join(out, 'templates'), { recursive: true });
 
+// Brand assets — logo, header mark, favicon.
+cpSync(join(root, 'assets'), join(out, 'assets'), { recursive: true });
+
 // Island modules — the engine-shipped ones only; powered bricks' islands are
 // host-served by design, so those stay inert here (see registry.needsIsland).
 cpSync(join(root, 'lib', 'islands'), join(out, '_island'), {
@@ -48,10 +51,12 @@ cpSync(join(root, 'lib', 'islands'), join(out, '_island'), {
  * subject. `home` is relative because the landing page sits one level above the
  * two galleries.
  */
-const shell = (title: string, body: string, extraCss = '', home = '../index.html'): string =>
-  `<!doctype html><html lang="en"><head><meta charset="utf-8">
+const shell = (title: string, body: string, extraCss = '', home = '../index.html'): string => {
+  const up = home.startsWith('./') ? '.' : '..';
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
+<link rel="icon" type="image/png" href="${up}/assets/favicon.png">
 <style>
 /* Themed with the engine's own DEFAULT_TOKENS (and its dark fallback) — the
    showcase runs on the same palette it ships. See src/tokens.ts. */
@@ -63,7 +68,8 @@ const shell = (title: string, body: string, extraCss = '', home = '../index.html
 body{margin:0;font:16px/1.6 system-ui,-apple-system,sans-serif;color:var(--fg);background:var(--bg)}
 .wrap{max-width:1100px;margin:0 auto;padding:0 1.2rem}
 header.top{border-bottom:1px solid var(--line);padding:1.6rem 0}
-header.top a.home{font-weight:700;text-decoration:none;color:var(--fg)}
+header.top a.home{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;text-decoration:none;color:var(--fg)}
+header.top a.home img{width:27px;height:28px;display:block}
 h1{font-size:1.7rem;margin:2rem 0 .4rem}
 p.lede{color:var(--muted);margin:0 0 2rem;max-width:62ch}
 a{color:var(--accent)}
@@ -71,7 +77,7 @@ footer{border-top:1px solid var(--line);margin-top:3rem;padding:1.6rem 0;color:v
 code{font:.9em ui-monospace,SFMono-Regular,Menlo,monospace;background:color-mix(in srgb,var(--fg) 8%,transparent);padding:.1em .35em;border-radius:4px}
 ${extraCss}
 </style></head><body>
-<header class="top"><div class="wrap"><a class="home" href="${escapeAttr(home)}">weblocks</a></div></header>
+<header class="top"><div class="wrap"><a class="home" href="${escapeAttr(home)}"><img src="${up}/assets/weblocks-mark.png" alt="" width="27" height="28">weblocks</a></div></header>
 <main class="wrap">${body}</main>
 <footer class="wrap">Every preview on this page is real <code>renderSite</code> output, generated from
 <code>src/showcase.ts</code> and <code>src/templates.ts</code> on each deploy.
@@ -79,6 +85,7 @@ ${extraCss}
 · <a href="https://github.com/bytesbrains/weblocks">GitHub</a>
 · MIT</footer>
 </body></html>`;
+};
 
 // ── the wall ─────────────────────────────────────────────────────────────────
 const entries = showcaseBlocks();
@@ -268,6 +275,11 @@ const facts: Array<[string, string]> = [
 ];
 
 const landingCss = `
+/* The artwork carries its own near-white ground, so it sits on a light card in
+   both themes rather than glowing as a white square on the dark palette. */
+.logo{display:block;width:230px;height:auto;margin:2.2rem 0 .4rem;background:#fdfdfb;
+  border:1px solid var(--line);border-radius:14px;padding:.6rem}
+h1{margin-top:1.2rem}
 .hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;
   overflow:hidden;margin:0 0 1.1rem;background:var(--surface)}
 .stage{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
@@ -331,7 +343,8 @@ writeFileSync(
   join(out, 'index.html'),
   shell(
     'weblocks — the block engine for AI-composable web apps',
-    `<h1>Lego bricks for AI-composable web apps</h1>
+    `<img class="logo" src="./assets/weblocks-logo.png" alt="weblocks — bricks for AI-composable web apps" width="230" height="230">
+<h1>Lego bricks for AI-composable web apps</h1>
 <p class="lede">A model composes a <code>SiteManifest</code> from a fixed catalog of typed blocks — its entire
 API surface. The engine validates it and renders one self-contained static HTML document. No raw HTML from
 the model, no framework runtime, nothing to trust at render time.</p>
