@@ -6,14 +6,14 @@
  * (a canonical slug that can differ from the block's short CSS class, e.g.
  * `contact-details` → `contact`, `services-catalogue` → `services`) and resolves
  * a nav/CTA link — by its `#hash`, its label, or a common alias — to a real id.
- * Chrome blocks (nav, app-shell, sidebar, announcement-bar) and pure rhythm
+ * Chrome blocks (nav, app-shell, sidebar, announcement-bar, install-prompt) and pure rhythm
  * blocks get no anchor. Unresolved links fall back to `#` (top), never a dead
  * anchor. Render-side, so re-rendering an existing manifest just works.
  */
 import { slugify } from './schema.js';
 import type { Block } from './types.js';
 
-const SKIP = new Set(['nav', 'app-shell', 'sidebar', 'announcement-bar', 'divider', 'spacer']);
+const SKIP = new Set(['nav', 'app-shell', 'sidebar', 'announcement-bar', 'install-prompt', 'divider', 'spacer']);
 
 /** Canonical anchor slug per block type (default = the type name). */
 const SECTION_SLUG: Record<string, string> = {
