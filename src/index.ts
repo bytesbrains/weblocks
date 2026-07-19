@@ -16,7 +16,7 @@ export { TEMPLATES, templateNames, templatesForVertical, getTemplate, type Templ
 export { REGISTRY, getSpec, blockTypes, needsIsland, type BlockSpec, type RenderContext } from './registry.js';
 export { renderSite, type RenderOptions } from './render.js';
 export {
-  NOOP_RUNTIME, pathRuntime, runtimeNeeds,
+  NOOP_RUNTIME, pathRuntime, runtimeNeeds, safeRuntime,
   type RuntimeAdapter, type RuntimeAction, type BlockRuntimeNeeds,
 } from './runtime.js';
 export {

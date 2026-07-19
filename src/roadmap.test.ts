@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
 import { REGISTRY } from './registry.js';
-import { runtimeNeeds, pathRuntime, NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
+import { runtimeNeeds, pathRuntime, safeRuntime, NOOP_RUNTIME, type RuntimeAdapter, type RuntimeAction } from './runtime.js';
 import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
@@ -285,6 +285,10 @@ test('a powered brick emits its host island only once a runtime is wired', () =>
   assert.ok(renderSite(m).includes('data-wl-inert="true"'), 'and the brick still renders inert-but-valid');
   assert.ok(renderSite(m, { runtime: pathRuntime() }).includes('/_island/contact-form.js'), 'wired → host island tag');
 
+  // A throwing adapter is unwired too (see the totality test below).
+  const boom: RuntimeAdapter = { resolve: () => { throw new Error('host blew up'); } };
+  assert.ok(!renderSite(m, { runtime: boom }).includes('/_island/contact-form.js'), 'a throwing adapter emits no island');
+
   // A host that provides other capabilities but not this one stays unwired.
   const otherCaps: RuntimeAdapter = { resolve: (cap) => (cap === 'search.query' ? { url: '/s', method: 'GET' } : null) };
   assert.ok(!renderSite(m, { runtime: otherCaps }).includes('/_island/contact-form.js'), 'unrelated capability → still no tag');
@@ -481,4 +485,47 @@ test('install-prompt: platforms narrows the guides; dismiss can be turned off', 
 
 test('install-prompt island imports safely in a non-DOM environment', async () => {
   await assert.doesNotReject(import('./islands/install-prompt.js'));
+});
+
+// ── totality: host runtime code cannot break the render (#42) ───────────────────
+
+const POWERED = ['contact-form', 'newsletter', 'booking', 'auth', 'search'];
+
+test('a throwing host adapter degrades to inert bricks, never a dead page', () => {
+  // `resolve` is the one place arbitrary host code runs inside a render. A throw
+  // used to escape renderSite, losing the whole document — including every static
+  // brick that never needed a runtime.
+  const boom: RuntimeAdapter = { resolve: () => { throw new Error('host blew up'); } };
+  let m = empty();
+  for (const type of [...POWERED, 'hero', 'features']) m = applyOp(m, { op: 'addBlock', type }).manifest;
+
+  const html = renderSite(m, { runtime: boom });
+  assert.ok(html.startsWith('<!doctype html>') && html.includes('</html>'), 'still one complete document');
+  assert.equal((html.match(/data-wl-inert="true"/g) ?? []).length, POWERED.length, 'every powered brick fell back to inert');
+  assert.ok(html.includes('class="blk-hero"') && html.includes('class="blk-features"'), 'static bricks are untouched');
+  assert.ok(!/undefined|\[object Object\]/.test(html), 'no host garbage leaked into the markup');
+});
+
+test('a malformed action from a host is treated as unwired', () => {
+  // A host implements the adapter at runtime; the return type is not a promise.
+  const shapes: RuntimeAdapter[] = [
+    { resolve: () => ({}) as unknown as RuntimeAction },                       // no url
+    { resolve: () => ({ url: 42 }) as unknown as RuntimeAction },              // url is not a string
+    { resolve: () => undefined as unknown as RuntimeAction },                  // nothing at all
+  ];
+  for (const runtime of shapes) {
+    const m = applyOp(empty(), { op: 'addBlock', type: 'contact-form' }).manifest;
+    const html = renderSite(m, { runtime });
+    assert.ok(html.includes('data-wl-inert="true"'), 'inert fallback, not a broken form');
+    assert.ok(html.includes('action="#"'), 'no half-built action attribute');
+  }
+});
+
+test('safeRuntime is reusable on its own, and a good adapter passes straight through', () => {
+  const boom: RuntimeAdapter = { resolve: () => { throw new Error('nope'); } };
+  assert.equal(safeRuntime(boom).resolve('contact.submit', 'b1'), null, 'throw → null (capability not provided)');
+
+  const good = pathRuntime('/api');
+  const direct = good.resolve('contact.submit', 'b1');
+  assert.deepEqual(safeRuntime(good).resolve('contact.submit', 'b1'), direct, 'a working adapter is unchanged');
 });

@@ -40,6 +40,16 @@ are minor, breaking changes to either are major.
   capabilities. Unwired pages ship strictly less JS; wired pages are unchanged.
   `needsIsland` takes the adapter (and block id) as optional trailing arguments —
   additive, and the default is the previous "unwired" answer.
+- **`renderSite` is total again: a throwing host runtime can no longer kill the
+  page (#42).** `RuntimeAdapter.resolve` is the one place arbitrary host code runs
+  inside a render, and the powered bricks call it directly — so a throw (a bad URL
+  parse, an undefined lookup, a typo on one capability) escaped `renderSite` and
+  lost the whole document, including every static brick that never needed a
+  runtime. The adapter is now wrapped once per render by the new exported
+  `safeRuntime`: a throw — or an action with no usable `url` — reads exactly like
+  "the host does not provide that capability", so the brick renders its documented
+  inert-but-valid fallback. One bad capability costs one form, never the page. No
+  API change; a working adapter passes straight through.
 - **A regression guard for the whole class:** a test now asserts that every
   *static* brick's declared island resolves to a real shipped module. Powered
   bricks are the documented exception, now enforced by the rule above.
