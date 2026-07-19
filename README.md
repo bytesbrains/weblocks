@@ -222,6 +222,11 @@ With no runtime, powered blocks render **inert-but-valid** (a disabled control +
 note), keeping `data-wl-*` hooks so a host can enhance them client-side. Captcha,
 server-side validation, delivery, abuse limits, and identity are the host’s job.
 
+Your adapter is the one piece of host code that runs *inside* a render, so
+`renderSite` wraps it (`safeRuntime`): if `resolve` throws, or hands back an
+action without a usable `url`, that capability simply reads as unprovided and the
+brick falls back to inert. One bad capability costs you one form, never the page.
+
 ## PWA
 
 Add a `pwa` field and the engine derives an installable app shell:
@@ -292,7 +297,7 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
 | **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
 | **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `getTemplate` |
-| **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` |
+| **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` · `safeRuntime` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
 
