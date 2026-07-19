@@ -140,9 +140,19 @@ export function blockTypes(): string[] {
  * Whether a used block needs its island hydrated in THIS config. Static bricks
  * (and interactive bricks with their behaviour toggled off, e.g. gallery with
  * `lightbox:false`) ship zero JS — the "static-first" invariant.
+ *
+ * A powered brick's island is served by the HOST, alongside the runtime it wires
+ * — the engine ships no module for it. So it is only worth a `<script>` tag once
+ * that runtime actually resolves one of the brick's capabilities; unwired, the
+ * brick renders inert-but-valid and the tag would just 404. Pass the render's
+ * adapter and the placed block's id to make that call (omitted ⇒ unwired).
  */
-export function needsIsland(spec: BlockSpec, config: Record<string, unknown>): boolean {
+export function needsIsland(spec: BlockSpec, config: Record<string, unknown>, runtime?: RuntimeAdapter, blockId = ''): boolean {
   if (!spec.island) return false;
+  const caps = spec.runtime?.capabilities ?? [];
+  // `resolve` is host code — a throw must not break the render (total).
+  const wired = (cap: string): boolean => { try { return !!runtime?.resolve(cap, blockId); } catch { return false; } };
+  if (caps.length && !caps.some(wired)) return false;
   if (spec.type === 'gallery') return config.lightbox === true;
   // profile-header only needs the resume island when an action button is shown.
   if (spec.type === 'profile-header') return config.showDownload === true || config.showShare === true;

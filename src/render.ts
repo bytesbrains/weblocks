@@ -80,7 +80,7 @@ export function renderSite(manifest: SiteManifest, options: RenderOptions = {}):
   for (const b of blocks) {
     const spec = getSpec(b.type)!;
     const { value } = parse(spec.schema, b.config ?? {});
-    if (needsIsland(spec, value)) islands.add(spec.island!);
+    if (needsIsland(spec, value, runtime, b.id)) islands.add(spec.island!);
   }
   const islandBase = (options.islandBase ?? '/_island').replace(/\/+$/, '');
   const islandTags = [...islands]

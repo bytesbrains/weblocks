@@ -265,9 +265,10 @@ all.
 **Powered blocks are the exception.** `contact-form`, `newsletter`, `booking` and
 `auth` declare an island the *host* serves alongside the runtime it wires — the
 engine ships no module for them, because what that script does (live slots,
-inline validation, an auth SDK) is the host's call. They render inert-but-valid
-and post natively without one, so serve a file at their island URL or leave the
-block out.
+inline validation, an auth SDK) is the host's call. Their `<script>` tag is
+therefore emitted **only when the runtime you pass resolves that block's
+capability**; with no runtime they render inert-but-valid and ship no JS, so an
+unwired page never requests a file you don't serve.
 
 ## API reference
 

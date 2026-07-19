@@ -17,10 +17,17 @@ are minor, breaking changes to either are major.
   `stats.js` counts plainly numeric figures up when they scroll into view
   (skipped under `prefers-reduced-motion`, and non-numeric values like `24/7` are
   left untouched). Pure progressive enhancement — no markup or schema change.
+- **A powered brick no longer emits an island `<script>` the host can't serve.**
+  `contact-form`, `newsletter`, `booking` and `auth` declare an island the host
+  serves alongside the runtime it wires — so with no runtime configured, that tag
+  was a guaranteed 404 on a page whose bricks are inert anyway. `renderSite` now
+  emits it only once the adapter actually resolves one of the brick's
+  capabilities. Unwired pages ship strictly less JS; wired pages are unchanged.
+  `needsIsland` takes the adapter (and block id) as optional trailing arguments —
+  additive, and the default is the previous "unwired" answer.
 - **A regression guard for the whole class:** a test now asserts that every
   *static* brick's declared island resolves to a real shipped module. Powered
-  bricks (`contact-form`, `newsletter`, `booking`, `auth`) are the documented
-  exception — the host serves their island along with the runtime it wires.
+  bricks are the documented exception, now enforced by the rule above.
 
 ## 0.7.0 — 2026-07-17
 

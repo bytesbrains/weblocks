@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { applyOp, applyOps } from './ops.js';
 import { renderSite } from './render.js';
 import { REGISTRY } from './registry.js';
-import { runtimeNeeds, pathRuntime, NOOP_RUNTIME } from './runtime.js';
+import { runtimeNeeds, pathRuntime, NOOP_RUNTIME, type RuntimeAdapter } from './runtime.js';
 import { buildWebManifest, emitPwa, buildServiceWorker } from './pwa.js';
 import { getPreset, presetNames } from './presets.js';
 import { validateManifest } from './validate.js';
@@ -275,6 +275,23 @@ test('every static brick\'s declared island is a shipped module (no 404 island s
       `${spec.type} declares island "${spec.island}" but no such module ships`,
     );
   }
+});
+
+test('a powered brick emits its host island only once a runtime is wired', () => {
+  // The engine ships no module for a powered brick's island — the host serves it
+  // alongside the runtime. Unwired, the tag would be a guaranteed 404.
+  const m = applyOp(empty(), { op: 'addBlock', type: 'contact-form' }).manifest;
+  assert.ok(!renderSite(m).includes('/_island/contact-form.js'), 'no runtime → no island tag');
+  assert.ok(renderSite(m).includes('data-wl-inert="true"'), 'and the brick still renders inert-but-valid');
+  assert.ok(renderSite(m, { runtime: pathRuntime() }).includes('/_island/contact-form.js'), 'wired → host island tag');
+
+  // A host that provides other capabilities but not this one stays unwired.
+  const otherCaps: RuntimeAdapter = { resolve: (cap) => (cap === 'search.query' ? { url: '/s', method: 'GET' } : null) };
+  assert.ok(!renderSite(m, { runtime: otherCaps }).includes('/_island/contact-form.js'), 'unrelated capability → still no tag');
+
+  // Static bricks are unaffected — their island ships with the engine.
+  const bar = applyOp(empty(), { op: 'addBlock', type: 'announcement-bar' }).manifest;
+  assert.ok(renderSite(bar).includes('/_island/announcement-bar.js'), 'a static brick needs no runtime');
 });
 
 test('social-links: platform → brand icon + label, variants, custom fallback, hidden-when-unset', () => {
