@@ -24,6 +24,7 @@ const SECTION_SLUG: Record<string, string> = {
   testimonials: 'reviews',
   'blog-list': 'blog', 'blog-post': 'blog',
   'video-gallery': 'videos',
+  'chat-thread': 'chat',
 };
 
 /** Common nav-label slugs → the canonical section slug they mean. */
@@ -34,6 +35,7 @@ const ALIAS: Record<string, string> = {
   testimonials: 'reviews', feedback: 'reviews',
   work: 'gallery', portfolio: 'gallery', photos: 'gallery',
   questions: 'faq', help: 'faq',
+  conversation: 'chat', transcript: 'chat', 'chat-thread': 'chat',
   plans: 'pricing', prices: 'pricing',
 };
 

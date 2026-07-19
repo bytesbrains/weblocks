@@ -4,6 +4,7 @@ import { getSpec } from './registry.js';
 import { parse } from './schema.js';
 import { DEFAULT_TOKENS } from './tokens.js';
 import { NOOP_RUNTIME } from './runtime.js';
+import { buildAnchors } from './anchors.js';
 
 // The decisions recorded on weblocks#58 are load-bearing, not cosmetic: each one
 // is a promise about what the markup does. These pin them so a later tweak has
@@ -154,4 +155,13 @@ test('body nodes compose in order inside one bubble', () => {
 test('the thread is a real ordered list of turns', () => {
   const html = render({ participants: people, messages: [{ from: 'b', body: [{ kind: 'text', text: 'x' }] }] });
   assert.match(html, /<ol>[\s\S]*<li class=/, 'turns are list items, not styled divs');
+});
+
+test('chat-thread gets a clean anchor slug so nav links read as #chat', () => {
+  const anchors = buildAnchors([
+    { id: 'hero', type: 'hero', visible: true, config: {} },
+    { id: 'talk', type: 'chat-thread', visible: true, config: {} },
+  ]);
+  assert.equal(anchors.idFor.get('talk'), 'chat', 'not the raw type name');
+  assert.equal(anchors.resolve('#conversation'), '#chat', 'a nav label alias resolves too');
 });
