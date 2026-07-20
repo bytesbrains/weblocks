@@ -449,6 +449,10 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 - **[`CATALOG.md`](./CATALOG.md)** — every block’s fields.
 - **[`CHANGELOG.md`](./CHANGELOG.md)** · **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** · **[`SECURITY.md`](./SECURITY.md)**
 
+Contributing in one line: branch off **`dev`** and open your PR against `dev`,
+which is squash-merged — `main` takes tagged release PRs from `dev` only. See
+[Branches & releases](./CONTRIBUTING.md#branches--releases).
+
 ## License
 
 [MIT](./LICENSE) © bytesbrains

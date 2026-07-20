@@ -257,4 +257,12 @@ If you are modifying this repo (not just using it):
 - After changes: `npm run build && npm test && npm run emit:catalog` (the shared
   suite in `src/blocks.test.ts` enforces the DoD for every block), and update the
   closed-vocabulary list in `blocks.test.ts`.
+- To add a **starter template**, append a `tpl({...})` entry to its vertical's
+  array in `src/templates/<vertical>.ts` — that is the only file to touch. Check
+  it with `npm run check:templates <vertical>`, which catches config keys the
+  block schema would silently drop.
+- **Branch off `dev` and open PRs against `dev`**, which is squash-merged — all
+  continuous work lands there. `main` receives *only* tagged release PRs from
+  `dev`. Never target `main` directly. See
+  [`CONTRIBUTING.md`](./CONTRIBUTING.md#branches--releases).
 - Keep everything **consumer-neutral** — no host, backend, or downstream names.
