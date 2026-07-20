@@ -5,7 +5,7 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.10.0 — 2026-07-20
 
 The starter library goes from a sampler to something you can actually pick from.
 Additive and **non-breaking** — every existing template id, vertical id and
@@ -61,12 +61,25 @@ manifest is unchanged; the catalog stays at 52 blocks.
   an agent reading it had no idea the library existed, and composed from scratch
   every time.
 
+- **Docs for the template subsystem and the branching policy.**
+  `docs/ARCHITECTURE.md` documented every other module but had no section on
+  verticals or templates; it now covers the registry's duplicate-id guard, why
+  `layout` is deliberately orthogonal to `vertical`, why `preset` is stored as a
+  name, and the silent-drop hazard. `CONTRIBUTING.md` gains **Adding a starter
+  template** (it had only "Adding a block") and **Branches & releases**, which
+  writes down what was previously implicit: continuous work lands on `dev` via
+  squash merge, and `main` takes tagged release PRs from `dev` only.
+
 ### Changed
 - **Templates moved to one file per vertical** under `src/templates/`, each
   declared with a single `tpl({...})` call from `src/templates/_helpers.ts`.
   `src/templates.ts` is now just the registry, and it throws at import time on a
   duplicate id rather than letting one template silently shadow another. Adding a
   template is a one-file change. The public API is unchanged.
+
+- **`npm run example:templates` groups its index by vertical** and annotates each
+  starter with its layout and preset. A flat list of 160 was unscannable, and it
+  still claimed "one starter per business vertical".
 
 ## 0.9.0 — 2026-07-19
 
