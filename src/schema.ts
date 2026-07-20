@@ -15,7 +15,7 @@
  */
 
 export type Field =
-  | { kind: 'string'; required?: boolean; default?: string; max?: number }
+  | { kind: 'string'; required?: boolean; default?: string; min?: number; max?: number }
   | { kind: 'enum'; values: readonly string[]; required?: boolean; default?: string }
   | { kind: 'boolean'; default?: boolean }
   | { kind: 'int'; oneOf?: readonly number[]; default?: number; min?: number; max?: number }
@@ -53,6 +53,12 @@ function parseField(field: Field, raw: unknown, path: string, ctx: Ctx): unknown
       if (field.max !== undefined && raw.length > field.max) {
         ctx.warnings.push(`${path}: truncated to ${field.max} chars`);
         return raw.slice(0, field.max);
+      }
+      // HARD: a too-short value cannot be repaired the way a too-long one can —
+      // there is nothing to fall back to for an identifier. Surfacing an error
+      // beats silently dropping whatever referenced it.
+      if (field.min !== undefined && raw.length < field.min) {
+        ctx.errors.push(`${path}: must be at least ${field.min} character${field.min === 1 ? '' : 's'}`);
       }
       return raw;
     }

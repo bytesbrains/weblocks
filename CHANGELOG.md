@@ -5,6 +5,47 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.9.0 — 2026-07-19
+
+A conversation block, and the schema constraint that makes its identifiers
+trustworthy. Additive and **non-breaking** — every `0.8.x` manifest still
+validates and renders identically. Catalog 51 → 52.
+
+### Added
+- **`chat-thread` block (#58).** Catalog 51 → 52. An authored conversation
+  rendered as a thread of rich message bubbles: named participants with avatars
+  or generated initials, optional per-message times, and **typed message
+  bodies** — `text`, `code`, `image`, `list`, `buttons` — that compose in one
+  bubble. Static and JS-free: the transcript is content, for showing how an
+  assistant or a support team answers. A live chatbot is a separate powered
+  brick, deliberately not this one.
+
+  Design decisions are recorded on #58: only `user` sits on the right (`bot` and
+  `agent` are told apart by name and avatar, never by colour alone); quick
+  replies render inert unless they carry an `href`, since a chip that looks
+  clickable but isn't misleads the reader; times are freeform labels rather than
+  `<time>`, which would demand a machine-readable value the brick cannot
+  validate without a parser. The node set is intentionally small — new kinds are
+  additive, removing one is breaking.
+
+  Placed in the `service-local` starter so the schema is exercised by a real
+  composition, not only by the showcase.
+
+- **`min` on string fields** (`Schema`). Mirrors the `min` that `int` already
+  had, and surfaces as `minLength` in `catalog.json` so the constraint reaches
+  the model. Unlike `max` (truncate + warn) it is a **hard error**: a too-long
+  value can be repaired, a too-short identifier cannot. Purely additive — no
+  existing field sets it.
+
+### Fixed
+- **An empty required string could silently drop data (#59).** `required` means
+  "present", not "non-empty", so `chat-thread`'s `participants[].id: ''` passed
+  validation, the participant was skipped, and every message referencing that id
+  vanished — from a manifest reporting `ok: true` with no warnings. `id`, `name`
+  and `messages[].from` now set `min: 1`, so the state is reported instead of
+  swallowed. The renderer stays total: an invalid manifest still renders, it
+  just no longer claims to be valid.
+
 ## 0.8.1 — 2026-07-19
 
 Documentation and distribution only — **no change to the engine, the block

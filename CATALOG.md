@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.8.1)
+# @bytesbrains/weblocks — Block Catalog (v0.9.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -357,6 +357,17 @@ An accordion of question/answer pairs. Expands/collapses natively (no JS).
 |---|---|---|---|
 | `title` | string |  |  |
 | `items` | array |  |  |
+
+## `chat-thread`
+
+A conversation rendered as a thread of rich message bubbles: named participants with avatars or initials, optional per-message times, and typed message bodies that mix text, code, images, lists and quick replies. Static — an authored transcript for showing how an assistant or support team answers, not a live chatbot.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `subtitle` | string |  |  |
+| `participants` | array |  |  |
+| `messages` | array |  |  |
 
 ## `blog-list`
 

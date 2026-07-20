@@ -73,3 +73,17 @@ test('sanitizeUrl collapses dangerous schemes to #', () => {
   assert.equal(sanitizeUrl('java\nscript:alert(1)'), '#');
   assert.equal(sanitizeUrl(null), '#');
 });
+
+test('string min is a hard error — a too-short value cannot be repaired', () => {
+  // Unlike max (truncate + warn), there is no sensible fallback for a value
+  // that is too short, so it must surface rather than degrade silently.
+  const r = parse({ id: { kind: 'string', required: true, default: '', min: 1, max: 10 } }, { id: '' });
+  assert.ok(r.errors.some((e) => /id: must be at least 1 character/.test(e)));
+  assert.equal((r.value as { id: string }).id, '', 'the raw value is preserved for the caller to handle');
+});
+
+test('string min leaves acceptable values untouched', () => {
+  const r = parse({ id: { kind: 'string', min: 2, max: 10 } }, { id: 'ok' });
+  assert.deepEqual(r.errors, []);
+  assert.equal((r.value as { id: string }).id, 'ok');
+});
