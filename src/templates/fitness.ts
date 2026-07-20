@@ -1,0 +1,398 @@
+/**
+ * `fitness` starter templates — strength gyms, yoga, CrossFit-style boxes, 1:1 coaching,
+ * reformer pilates, a BJJ dojo, and a dance studio, across seven page shapes.
+ */
+import { tpl, img, b, type Template } from './_helpers.js';
+
+export const fitnessTemplates: Template[] = [
+  // ── strength gym (legacy) ──────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-gym',
+    vertical: 'fitness',
+    label: 'Gym — Strength',
+    description: 'A no-nonsense strength gym selling coached small-group training and memberships.',
+    tags: ['gym', 'strength', 'pricing', 'booking', 'dark'],
+    layout: 'classic',
+    preset: 'midnight',
+    meta: { title: 'Ironwood Strength', description: 'A no-nonsense strength gym with real coaching.', lang: 'en', favicon: '🏋️' },
+    blocks: [
+      b('nav', 'nav', { brand: 'Ironwood', sticky: true, links: [{ label: 'Training', href: '#training' }, { label: 'Membership', href: '#membership' }, { label: 'Coaches', href: '#coaches' }], cta: { label: 'Start free trial', href: '#join' } }),
+      b('hero', 'hero', { eyebrow: 'Strength & conditioning', headline: 'Get strong. For real this time.', subhead: 'Coached small-group sessions and a floor built for lifting — not selfies.', align: 'center', minHeight: 'lg', image: img('gym-hero'), overlay: 'dark', cta: { label: 'Book a free session', href: '#join' } }),
+      b('training', 'features', { title: 'How we train', columns: 3, items: [
+        { icon: '🏋️', title: 'Small-group strength', text: 'Max 6 per session, coached every rep.' },
+        { icon: '📈', title: 'Real progression', text: 'Your numbers tracked week to week.' },
+        { icon: '🧑‍🏫', title: 'Proper coaching', text: 'Certified coaches, no ego, all form.' },
+      ] }),
+      b('membership', 'pricing', { title: 'Membership', subtitle: 'No joining fee. Cancel anytime.', plans: [
+        { name: 'Off-peak', price: '£39', period: '/mo', features: ['Weekdays before 4pm', 'All group sessions', 'App programming'], ctaLabel: 'Choose', ctaHref: '#join' },
+        { name: 'Full', price: '£59', period: '/mo', features: ['Anytime access', 'All group sessions', 'App programming', 'Monthly check-in'], ctaLabel: 'Choose', ctaHref: '#join', featured: true },
+        { name: '1:1 coaching', price: '£120', period: '/mo', features: ['Everything in Full', 'Weekly 1:1 session', 'Bespoke programming'], ctaLabel: 'Enquire', ctaHref: '#join' },
+      ] }),
+      b('coaches', 'team', { title: 'Your coaches', columns: 3, members: [
+        { name: 'Marcus Bell', role: 'Head Coach', photo: img('coach-1'), bio: 'S&C coach, 10 years. Powerlifting background.' },
+        { name: 'Nadia Hart', role: 'Coach', photo: img('coach-2'), bio: 'Weightlifting and mobility specialist.' },
+        { name: 'Theo Fyfe', role: 'Coach', photo: img('coach-3'), bio: 'Conditioning and return-to-training.' },
+      ] }),
+      b('reviews', 'testimonials', { title: 'Member results', items: [
+        { quote: 'Added 40kg to my deadlift in a year and my back stopped hurting.', author: 'James', role: 'Member, 1yr' },
+        { quote: 'First gym I’ve actually stuck with. The coaching is the difference.', author: 'Leah', role: 'Member' },
+      ] }),
+      b('join', 'cta', { headline: 'Your first session is on us', subhead: 'Book a free intro and try a coached session — no pressure.', background: 'primary', button: { label: 'Book a free session', href: '#' } }),
+      b('visit', 'contact-details', { title: 'Find the gym', address: 'Unit 7, Dock Road, Liverpool L3 4EN', phone: '+44 151 000 0000', email: 'train@ironwood.gym', hours: 'Mon–Fri 6:00–21:00 · Sat–Sun 8:00–14:00' }),
+      b('footer', 'footer', { brand: 'Ironwood Strength', tagline: 'Coached strength training.', links: [{ label: 'Membership', href: '#membership' }, { label: 'Trial', href: '#join' }], copyright: '© Ironwood Strength' }),
+    ],
+  }),
+
+  // ── yoga studio ────────────────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-yoga',
+    vertical: 'fitness',
+    label: 'Yoga Studio — Editorial',
+    description: 'A slow, type-led studio page for a yoga shala that sells its philosophy before its timetable.',
+    tags: ['yoga', 'long-form', 'booking', 'local', 'light'],
+    layout: 'editorial',
+    preset: 'forest',
+    meta: { title: 'Prāṇa Shala — Yoga in Bengaluru', description: 'A small Hatha and Ashtanga shala in Cooke Town. Six mats, one teacher, no mirrors.', lang: 'en', favicon: '🧘' },
+    blocks: [
+      b('nav', 'nav', { brand: 'Prāṇa Shala', sticky: false, links: [{ label: 'Practice', href: '#practice' }, { label: 'Timetable', href: '#timetable' }, { label: 'Teachers', href: '#teachers' }, { label: 'Visit', href: '#visit' }], cta: { label: 'Book a mat', href: '#book' } }),
+      b('hero', 'hero', { eyebrow: 'Cooke Town · since 2014', headline: 'Six mats. One teacher. No mirrors.', subhead: 'A small shala for Hatha and Mysore-style Ashtanga, where the teacher knows your name and your knees.', align: 'left', minHeight: 'md', image: img('yoga-shala-hero'), overlay: 'light', cta: { label: 'Read how we practise', href: '#practice' } }),
+      b('practice', 'about', { eyebrow: 'How we practise', title: 'Slow is not the same as easy', body: 'We keep classes to six people because that is how many bodies one teacher can actually watch. There is no music, no counting to a beat, and no photographs of anyone practising on the internet. You arrive, you are given the next posture when the last one is honest, and you leave. Beginners are welcome on any morning — you will be taught the standing sequence on your own for the first fortnight before joining the room. Most people find that awkward for four days and then find it is the reason they stayed.', image: img('yoga-shala-about'), imageAlt: 'Morning light across an empty practice room', imageSide: 'right' }),
+      b('essay', 'rich-text', { blocks: [
+        { kind: 'heading', text: 'What a first month looks like' },
+        { kind: 'paragraph', text: 'Week one is short: twenty minutes of breathing and the first five standing postures, and you are sent home while your legs still work. Week two adds the seated sequence. By week four most people are practising forty-five minutes, five mornings a week, and have stopped asking how long it takes.' },
+        { kind: 'quote', text: 'Practice, and all is coming. — Sri K. Pattabhi Jois' },
+        { kind: 'subheading', text: 'What to bring' },
+        { kind: 'bullet', text: 'A mat if you own one — we lend clean cotton mats otherwise, at no charge.' },
+        { kind: 'bullet', text: 'Clothes you can fold forward in. No socks on the boards.' },
+        { kind: 'bullet', text: 'An empty stomach — three hours after a meal is the rule.' },
+        { kind: 'paragraph', text: 'We are closed on new-moon and full-moon days, and for ten days in October. Those dates go up on the noticeboard by the shoe rack a month ahead.' },
+      ] }),
+      b('timetable', 'feed', { title: 'This week at the shala', layout: 'list', items: [
+        { title: 'Mysore-style Ashtanga', subtitle: 'Mon–Fri · 6:00–8:30', text: 'Come any time in the window and practise at your own pace. Adjustments as needed.', badge: 'All levels' },
+        { title: 'Led Primary Series', subtitle: 'Saturday · 7:00–8:30', text: 'The full sequence counted out loud. Best once you know the first half by heart.', badge: 'Intermediate' },
+        { title: 'Hatha & pranayama', subtitle: 'Tue & Thu · 18:30–19:45', text: 'Slower, longer holds, twenty minutes of breathwork to close. Good after a desk day.', badge: 'Beginners' },
+        { title: 'Sunday chanting', subtitle: 'Sunday · 8:00–9:00', text: 'Free and open to anyone, including people who have never set foot on a mat.', badge: 'Free' },
+      ] }),
+      b('teachers', 'team', { title: 'Who teaches', columns: 2, members: [
+        { name: 'Anjali Rao', role: 'Founder & lead teacher', photo: img('yoga-teacher-anjali'), bio: 'Authorised Level 2, Mysore. Teaching for nineteen years, the last twelve in this room.' },
+        { name: 'Devan Pillai', role: 'Morning assistant', photo: img('yoga-teacher-devan'), bio: 'Physiotherapist by training; handles hips, shoulders and everyone returning from injury.' },
+      ] }),
+      b('voices', 'reviews', { title: 'What students say', average: '4.9', count: '86 reviews', source: 'Google', items: [
+        { rating: 5, quote: 'I came in with a frozen shoulder and a bad attitude about yoga. Anjali fixed one of them in a month and the other took a year.', author: 'Meera K.', date: 'March 2026', source: 'google' },
+        { rating: 5, quote: 'No music, no incense, no talk of energy. Just careful teaching. I drive across town for it.', author: 'Sanjay B.', date: 'January 2026', source: 'google' },
+        { rating: 4, quote: 'The 6am start is brutal in December, and worth it by February.', author: 'Tara N.', date: 'February 2026', source: 'google' },
+      ] }),
+      b('book', 'booking', { title: 'Book a mat', intro: 'Mats are limited to six a session, so we ask everyone — including regulars — to reserve. First class is free.', serviceLabel: 'Which class', services: [
+        { name: 'Mysore-style Ashtanga', duration: 'come and go, 6:00–8:30', price: '₹500' },
+        { name: 'Led Primary Series', duration: '90 min', price: '₹600' },
+        { name: 'Hatha & pranayama', duration: '75 min', price: '₹500' },
+        { name: 'Monthly unlimited', duration: 'any class, any morning', price: '₹4,800' },
+      ], askDate: true, askTime: true, askPhone: true, askNotes: true, notesLabel: 'Injuries or anything we should know', submitLabel: 'Request a mat', successMessage: 'Thank you — Anjali will confirm by WhatsApp within a day.' }),
+      b('visit', 'contact-details', { title: 'Finding us', address: '2nd Floor, 14 Wheeler Road, Cooke Town, Bengaluru 560005', phone: '+91 80 4123 8800', email: 'shala@pranashala.in', hours: 'Mon–Fri 6:00–8:30 & 18:30–19:45 · Sat 7:00–8:30 · Sun 8:00–9:00' }),
+      b('footer', 'footer', { brand: 'Prāṇa Shala', tagline: 'Hatha and Ashtanga, taught one body at a time.', links: [{ label: 'Timetable', href: '#timetable' }, { label: 'Book a mat', href: '#book' }, { label: 'Instagram', href: '#' }], copyright: '© Prāṇa Shala, Bengaluru' }),
+    ],
+  }),
+
+  // ── CrossFit-style box ─────────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-box',
+    vertical: 'fitness',
+    label: 'Box — Bold',
+    description: 'A loud, high-contrast conversion page for a CrossFit-style box pushing its six-week on-ramp.',
+    tags: ['crossfit', 'pricing', 'faq', 'reviews', 'dark'],
+    layout: 'bold',
+    preset: 'mono',
+    meta: { title: 'Cedar & Iron Athletics — Austin, TX', description: 'Coached group classes, a six-week on-ramp, and a 5am crew that actually shows up.', lang: 'en', favicon: '⚡' },
+    blocks: [
+      b('promo', 'announcement-bar', { text: 'January on-ramp starts Jan 6 — 9 of 16 spots left.', linkLabel: 'Claim a spot', href: '#pricing', tone: 'promo', dismissible: true }),
+      b('nav', 'nav', { brand: 'CEDAR & IRON', sticky: true, links: [{ label: 'Start here', href: '#onramp' }, { label: 'Pricing', href: '#pricing' }, { label: 'Results', href: '#results' }, { label: 'FAQ', href: '#faq' }], cta: { label: 'Free week', href: '#trial' } }),
+      b('hero', 'hero', { eyebrow: 'East Austin · 8,000 sq ft', headline: 'You will not be the least fit person here.', subhead: 'Everyone starts on the same six-week on-ramp. Scaled weights, coached form, and a whiteboard you are allowed to ignore.', align: 'center', minHeight: 'full', image: img('box-hero-rig'), overlay: 'dark', cta: { label: 'Take a free week', href: '#trial' } }),
+      b('numbers', 'stats', { title: 'The box in numbers', columns: 4, items: [
+        { value: '412', label: 'Current members' },
+        { value: '9', label: 'Coaches on staff' },
+        { value: '38', label: 'Classes a week' },
+        { value: '11', label: 'Years in East Austin' },
+      ] }),
+      b('onramp', 'steps', { title: 'How you actually start', subtitle: 'Nobody gets thrown into a metcon on day one. This is the whole path.', items: [
+        { title: 'Book a free week', text: 'Five classes, no card on file. Come to whichever times fit your week.' },
+        { title: 'Movement screen', text: 'Twenty minutes with a coach: squat, hinge, press, overhead. We find what to work around.' },
+        { title: 'Six-week on-ramp', text: 'Twice a week, small groups of eight. You learn every lift and every scaling option.' },
+        { title: 'Join the regular classes', text: 'By week seven you know the language, the equipment and about forty people’s names.' },
+      ] }),
+      b('pricing', 'pricing', { title: 'Membership', subtitle: 'Month to month. No contracts, no cancellation fee, no sales call.', plans: [
+        { name: 'On-ramp', price: '$249', period: 'one-off', features: ['Six weeks, twice a week', 'Groups of eight max', 'Movement screen included', 'Rolls into any plan below'], ctaLabel: 'Claim a spot', ctaHref: '#trial' },
+        { name: '3x a week', price: '$149', period: '/mo', features: ['Twelve classes a month', 'All class times', 'Open gym on weekends', 'Members app + programming'], ctaLabel: 'Join', ctaHref: '#trial' },
+        { name: 'Unlimited', price: '$189', period: '/mo', features: ['Every class, every day', 'Open gym any time', 'Members app + programming', 'Quarterly benchmark retest', 'Bring a guest each month'], ctaLabel: 'Join', ctaHref: '#trial', featured: true },
+        { name: 'Barbell club', price: '$99', period: '/mo', features: ['Add-on to any plan', 'Tue/Thu 7pm snatch & clean', 'Weightlifting-only programming'], ctaLabel: 'Add it on', ctaHref: '#trial' },
+      ] }),
+      b('results', 'reviews', { title: 'Straight from the whiteboard', subtitle: 'Unedited, including the ones that took a while.', average: '4.8', count: '213 reviews', source: 'Google', items: [
+        { rating: 5, quote: 'I was forty-one, had not trained since college, and genuinely scared of the rig. Nine months later I have a bodyweight back squat and a group chat I cannot escape.', author: 'Dana W.', date: 'Nov 2025', source: 'google' },
+        { rating: 5, quote: 'The coaches scale everything without making it a whole conversation. That is the entire reason I stayed.', author: 'Marcus O.', date: 'Sep 2025', source: 'google' },
+        { rating: 4, quote: 'The 5:30am class fills up fast and the parking lot is a nightmare on Saturdays. Worth it anyway.', author: 'Priya S.', date: 'Dec 2025', source: 'google' },
+      ] }),
+      b('faq', 'faq', { title: 'The questions everyone emails us', items: [
+        { question: 'I have never lifted a barbell. Is this for me?', answer: 'Yes — that is precisely who the on-ramp exists for. Roughly seven in ten people who start it have never trained with a barbell before.' },
+        { question: 'Do I need to be fit before I join?', answer: 'No. Every workout is written with three scaling levels, and the coach will pick one with you before the clock starts.' },
+        { question: 'What about my bad knee, shoulder or back?', answer: 'Tell us at the movement screen. Several of our coaches hold rehab certifications and we program around injuries every single day.' },
+        { question: 'Is there a contract?', answer: 'Month to month. Cancel in the app before your renewal date and nothing else happens.' },
+        { question: 'Can I drop in while travelling?', answer: '$25 a class, or free if you have been a member at another affiliate for more than a year. Just email ahead so we know to expect you.' },
+      ] }),
+      b('trial', 'cta', { headline: 'Take the free week. Decide after.', subhead: 'Five classes, a movement screen, and zero obligation to come back.', background: 'accent', button: { label: 'Start my free week', href: '#' } }),
+      b('footer', 'footer', { brand: 'Cedar & Iron Athletics', tagline: '1907 E 6th St, Austin TX 78702 · (512) 555 0148', links: [{ label: 'Pricing', href: '#pricing' }, { label: 'FAQ', href: '#faq' }, { label: 'Free week', href: '#trial' }], copyright: '© Cedar & Iron Athletics' }),
+    ],
+  }),
+
+  // ── one-to-one personal trainer ────────────────────────────────────────────
+  tpl({
+    id: 'fitness-trainer',
+    vertical: 'fitness',
+    label: 'Personal Trainer — Profile',
+    description: 'A one-person page for an independent trainer: credentials, specialisms, rates and an enquiry form.',
+    tags: ['personal-trainer', 'one-pager', 'portfolio', 'remote', 'light'],
+    layout: 'profile',
+    preset: 'sand',
+    meta: { title: 'Tessa Okonjo — Personal Trainer, Melbourne', description: 'Strength coaching for people coming back from injury, pregnancy, or twenty years off.', lang: 'en', favicon: '💪' },
+    blocks: [
+      b('header', 'profile-header', {
+        name: 'Tessa Okonjo',
+        headline: 'Personal trainer & strength coach · Brunswick, Melbourne',
+        location: 'Studio in Brunswick VIC + online worldwide',
+        avatar: img('trainer-tessa-portrait'),
+        summary: 'I coach adults who are starting over — after an injury, after a baby, or after two decades of meaning to. Fourteen years in, mostly one-to-one, mostly people who thought they had left it too late.',
+        contacts: [
+          { type: 'email', value: 'tessa@okonjostrength.com.au', label: 'Email' },
+          { type: 'phone', value: '+61 3 9000 4471', label: 'Studio' },
+          { type: 'location', value: 'Sydney Road, Brunswick VIC 3056' },
+          { type: 'website', value: 'okonjostrength.com.au' },
+        ],
+        showDownload: true,
+        downloadLabel: 'Download rates & policies',
+        showShare: true,
+        shareLabel: 'Share',
+      }),
+      b('experience', 'experience', { title: 'Background', items: [
+        { role: 'Independent strength coach', org: 'Okonjo Strength', period: '2018 — present', location: 'Brunswick VIC', summary: 'Private studio, one-to-one and pairs. Around thirty regular clients at any time.', bullets: [
+          'Built a post-natal return-to-lifting program now used by two other Melbourne studios.',
+          'Coached 40+ clients through their first bodyweight chin-up.',
+          'Take referrals from three local physiotherapy practices.',
+        ] },
+        { role: 'Senior trainer', org: 'Northside Barbell', period: '2014 — 2018', location: 'Coburg VIC', summary: 'Ran the beginner barbell program and mentored four junior trainers.', bullets: [
+          'Grew the beginners course from 6 to 44 people a term.',
+          'Wrote the gym’s onboarding assessment, still in use.',
+        ] },
+        { role: 'Rehabilitation assistant', org: 'Merri Creek Physiotherapy', period: '2012 — 2014', location: 'Fitzroy North VIC', summary: 'Supervised loaded rehab for post-surgical knee and shoulder clients.' },
+      ] }),
+      b('credentials', 'experience', { title: 'Qualifications', items: [
+        { role: 'BSc Exercise & Sport Science', org: 'Deakin University', period: '2012' },
+        { role: 'Registered Exercise Professional, Level 2', org: 'AusREPs', period: 'current' },
+        { role: 'Pre & Post-Natal Coaching Certification', org: 'Girls Gone Strong', period: '2019' },
+        { role: 'Level 1 Weightlifting Coach', org: 'Australian Weightlifting Federation', period: '2016' },
+      ] }),
+      b('skills', 'skills', { title: 'What I actually work on', display: 'bars', groups: [
+        { name: 'Coaching', items: [
+          { label: 'Return-to-lifting after injury', level: 5 },
+          { label: 'Pre & post-natal strength', level: 5 },
+          { label: 'Barbell technique', level: 4 },
+          { label: 'Over-60s strength & balance', level: 4 },
+        ] },
+        { name: 'Programming', items: [
+          { label: 'Beginner linear progression', level: 5 },
+          { label: 'Powerlifting meet prep', level: 3 },
+          { label: 'Online remote coaching', level: 4 },
+        ] },
+      ] }),
+      b('rates', 'services-catalogue', { title: 'Rates', subtitle: 'Sessions are 55 minutes in the Brunswick studio unless noted. GST included.', items: [
+        { name: 'Single session', description: 'One-to-one, in the studio. Good for a technique tune-up or a one-off.', price: 'A$110' },
+        { name: 'Ten-session block', description: 'Paid up front, valid twelve months. The usual way people work with me.', price: 'A$980' },
+        { name: 'Pairs session', description: 'Two of you, same session, split the cost. Popular with couples and siblings.', price: 'A$70 each' },
+        { name: 'Online coaching', description: 'Monthly programming, weekly video review, and messages answered on weekdays.', price: 'A$220/mo' },
+        { name: 'Free consult', description: 'Thirty minutes, no training. We talk about what you want and whether I am the right coach.', price: 'Free', ctaLabel: 'Book a consult', ctaHref: '#enquire' },
+      ] }),
+      b('words', 'testimonials', { title: 'Clients', items: [
+        { quote: 'I found Tessa eleven months after a knee reconstruction, when I was still afraid of stairs. I deadlifted 80kg last week and I did not cry, which is progress.', author: 'Bec', role: 'Client, two years' },
+        { quote: 'She was the first coach who asked what my week actually looks like before writing anything down.', author: 'Hamish', role: 'Online client' },
+        { quote: 'Came back to lifting eight months after my second child. No shame, no bounce-back talk, just sensible loading.', author: 'Ash', role: 'Client' },
+      ] }),
+      b('enquire', 'contact-form', { title: 'Get in touch', intro: 'Tell me roughly what you are after. I answer every enquiry myself, usually within two working days.', submitLabel: 'Send enquiry', successMessage: 'Got it — I will reply from tessa@okonjostrength.com.au shortly.', fields: [
+        { name: 'name', label: 'Your name', type: 'text', required: true, placeholder: 'First name is fine' },
+        { name: 'email', label: 'Email', type: 'email', required: true },
+        { name: 'phone', label: 'Phone', type: 'tel', placeholder: 'Optional' },
+        { name: 'goal', label: 'What brings you here', type: 'select', required: true, options: ['Coming back from an injury', 'Post-natal return to training', 'General strength', 'Powerlifting or competing', 'Not sure yet'] },
+        { name: 'format', label: 'Studio or online', type: 'select', options: ['Brunswick studio', 'Online', 'Either'] },
+        { name: 'message', label: 'Anything else', type: 'textarea', placeholder: 'Injuries, schedule, what has not worked before…' },
+      ] }),
+      b('social', 'social-links', { title: 'Elsewhere', layout: 'row', variant: 'labeled', align: 'center', links: [
+        { platform: 'instagram', href: '#', label: '@okonjostrength' },
+        { platform: 'youtube', href: '#', label: 'Technique library' },
+        { platform: 'email', href: '#', label: 'tessa@okonjostrength.com.au' },
+      ] }),
+      b('copyright', 'copyright', { holder: 'Tessa Okonjo', text: 'ABN 41 552 908 776. Brunswick, Victoria.', showSymbol: true, align: 'center' }),
+    ],
+  }),
+
+  // ── pilates reformer studio ────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-pilates',
+    vertical: 'fitness',
+    label: 'Pilates Studio — Catalogue',
+    description: 'A reformer studio where the class list and the class-pack prices carry the whole page.',
+    tags: ['pilates', 'booking', 'pricing', 'faq', 'local'],
+    layout: 'catalogue',
+    preset: 'ocean',
+    meta: { title: 'Reformwerk Berlin — Reformer Pilates, Kreuzberg', description: 'Eight reformers, small classes, and instructors who correct you by name.', lang: 'en', favicon: '🩰' },
+    blocks: [
+      b('nav', 'nav', { brand: 'Reformwerk', sticky: true, links: [{ label: 'Classes', href: '#classes' }, { label: 'Packs', href: '#packs' }, { label: 'Hours', href: '#hours' }, { label: 'Questions', href: '#faq' }], cta: { label: 'Book', href: '#book' } }),
+      b('hero', 'hero', { eyebrow: 'Kreuzberg · 8 reformers', headline: 'Springs, straps, and fifty minutes that go quickly', subhead: 'Classical reformer Pilates in a quiet ground-floor studio off Bergmannstraße, taught in German and English. Pick a class below and book it.', align: 'left', minHeight: 'sm', cta: { label: 'See the classes', href: '#classes' } }),
+      b('classes', 'services-catalogue', { title: 'Classes', subtitle: 'Every class is 50 minutes and capped at eight. Book the level below the one you think you are.', items: [
+        { name: 'Reformer Foundations', description: 'Your first six weeks. Springs, footwork, breathing, and where your ribs are meant to go.', price: '€28', ctaLabel: 'Book', ctaHref: '#book' },
+        { name: 'Reformer Flow', description: 'Continuous, moderate pace. Assumes you know the spring settings without being told.', price: '€28', ctaLabel: 'Book', ctaHref: '#book' },
+        { name: 'Reformer Advanced', description: 'Long spine, short spine, snake and twist. By instructor invitation, usually after a year.', price: '€30', ctaLabel: 'Book', ctaHref: '#book' },
+        { name: 'Pre & Post-Natal', description: 'Modified through pregnancy and for the first year after. Bring the baby if you like.', price: '€30', ctaLabel: 'Book', ctaHref: '#book' },
+        { name: 'Tower & Mat', description: 'No reformer. Wall tower, mat work, and a lot of attention to the shoulder girdle.', price: '€22', ctaLabel: 'Book', ctaHref: '#book' },
+        { name: 'Private (1:1)', description: 'One instructor, one reformer, one hour. The fastest way through an injury.', price: '€85', ctaLabel: 'Enquire', ctaHref: '#book' },
+        { name: 'Duet (2:1)', description: 'Bring a friend and split an instructor between two machines.', price: '€55 each', ctaLabel: 'Enquire', ctaHref: '#book' },
+      ] }),
+      b('packs', 'pricing', { title: 'Class packs & memberships', subtitle: 'Packs are valid six months. Memberships pause free for up to eight weeks a year.', plans: [
+        { name: 'Drop-in', price: '€28', period: 'per class', features: ['Any class you are cleared for', 'Cancel free up to 12h before'], ctaLabel: 'Book one', ctaHref: '#book' },
+        { name: '10er Karte', price: '€250', period: '10 classes', features: ['€25 a class', 'Valid six months', 'Shareable with one other person'], ctaLabel: 'Buy a pack', ctaHref: '#book', featured: true },
+        { name: 'Unlimited', price: '€169', period: '/Monat', features: ['Every class, every week', 'Two guest passes a month', 'Free pause up to eight weeks', '15% off privates'], ctaLabel: 'Join', ctaHref: '#book' },
+      ] }),
+      b('book', 'booking', { title: 'Reserve a reformer', intro: 'Spots open fourteen days ahead. If a class is full, ask for the waitlist — roughly a third of them clear.', serviceLabel: 'Class', services: [
+        { name: 'Reformer Foundations', duration: '50 min', price: '€28' },
+        { name: 'Reformer Flow', duration: '50 min', price: '€28' },
+        { name: 'Reformer Advanced', duration: '50 min', price: '€30' },
+        { name: 'Pre & Post-Natal', duration: '50 min', price: '€30' },
+        { name: 'Tower & Mat', duration: '50 min', price: '€22' },
+        { name: 'Private (1:1)', duration: '60 min', price: '€85' },
+      ], askDate: true, askTime: true, askPhone: true, askNotes: true, notesLabel: 'Injuries, surgeries, or pregnancy week', submitLabel: 'Request a spot', successMessage: 'Danke! You will get a confirmation email within a few hours.' }),
+      b('hours', 'hours', { title: 'Studio hours', timezone: 'Europe/Berlin', note: 'The door is locked between classes — please arrive no earlier than ten minutes before yours.', days: [
+        { day: 'mon', open: '07:00', close: '20:30' },
+        { day: 'tue', open: '07:00', close: '20:30' },
+        { day: 'wed', open: '09:00', close: '20:30' },
+        { day: 'thu', open: '07:00', close: '20:30' },
+        { day: 'fri', open: '07:00', close: '18:00' },
+        { day: 'sat', open: '09:00', close: '14:00' },
+        { day: 'sun', closed: true },
+      ] }),
+      b('faq', 'faq', { title: 'Before your first class', items: [
+        { question: 'Do I need my own grip socks?', answer: 'You need grip socks; you do not need to own them yet. We sell them at the desk for €14 and lend a clean pair to anyone who forgets.' },
+        { question: 'I have never used a reformer. Where do I start?', answer: 'Reformer Foundations, for at least six weeks. Instructors will tell you when you are ready for Flow — please do not skip ahead, the springs are unforgiving.' },
+        { question: 'Wird auf Deutsch unterrichtet?', answer: 'Ja. Morning classes are taught in German with English cues; evening classes are the reverse. Both instructors switch happily mid-class.' },
+        { question: 'What is the cancellation policy?', answer: 'Free up to twelve hours before. Inside twelve hours the class comes off your pack — the reformer sits empty either way.' },
+        { question: 'Is the studio accessible?', answer: 'Ground floor, one 4cm lip at the entrance, accessible toilet. Two reformers have removable boxes for transfers — email ahead and we will set one aside.' },
+      ] }),
+      b('map', 'map', { query: 'Bergmannstraße 68, 10961 Berlin', zoom: 16, height: 360, label: 'Reformwerk Berlin — Bergmannstraße 68' }),
+      b('footer', 'footer', { brand: 'Reformwerk Berlin', tagline: 'Bergmannstraße 68, 10961 Berlin · +49 30 5557 2210', links: [{ label: 'Classes', href: '#classes' }, { label: 'Packs', href: '#packs' }, { label: 'Book', href: '#book' }], copyright: '© Reformwerk Berlin GbR' }),
+    ],
+  }),
+
+  // ── martial arts / BJJ dojo ────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-dojo',
+    vertical: 'fitness',
+    label: 'BJJ Dojo — Showcase',
+    description: 'An image- and video-led page for a jiu-jitsu academy, with the mat doing the persuading.',
+    tags: ['martial-arts', 'gallery', 'video', 'family', 'dark'],
+    layout: 'showcase',
+    preset: 'midnight',
+    meta: { title: 'Academia Corda Preta — Brazilian Jiu-Jitsu, São Paulo', description: 'Gi and no-gi jiu-jitsu in Vila Madalena. Adults, kids, and a competition team.', lang: 'en', favicon: '🥋' },
+    blocks: [
+      b('nav', 'nav', { brand: 'Corda Preta', sticky: true, links: [{ label: 'The mat', href: '#mat' }, { label: 'Watch', href: '#watch' }, { label: 'Programs', href: '#programs' }, { label: 'History', href: '#history' }], cta: { label: 'First class free', href: '#visit' } }),
+      b('hero', 'hero', { eyebrow: 'Vila Madalena · founded 1998', headline: 'Twenty-eight years, one academy, no shortcuts', subhead: 'Gi and no-gi jiu-jitsu for adults and kids, taught by black belts who still train every session they teach.', align: 'center', minHeight: 'full', image: img('dojo-mat-hero'), overlay: 'scrim', cta: { label: 'Come and watch a class', href: '#visit' } }),
+      b('mat', 'gallery', { layout: 'masonry', columns: 3, gap: 'lg', lightbox: true, items: [
+        { src: img('dojo-roll-guard'), alt: 'Two students working from closed guard', caption: 'Wednesday no-gi' },
+        { src: img('dojo-kids-line'), alt: 'Children lined up bowing onto the mat', caption: 'Kids 8–11, Tuesday' },
+        { src: img('dojo-belt-wall'), alt: 'Belts hung along the academy wall' },
+        { src: img('dojo-drilling'), alt: 'Students drilling an armbar in pairs', caption: 'Fundamentals hour' },
+        { src: img('dojo-competition-mat'), alt: 'The competition team warming up at a tournament' },
+        { src: img('dojo-old-photo'), alt: 'A framed photo of the academy in its first year', caption: 'Rua Harmonia, 1998' },
+      ] }),
+      b('watch', 'video-gallery', { title: 'Watch a class before you come', layout: 'grid', columns: 3, items: [
+        { provider: 'youtube', src: 'mJ4qN7bVx2S', title: 'A full fundamentals class, uncut (58 min)', poster: img('dojo-video-fundamentals') },
+        { provider: 'youtube', src: 'tR6cZ1kWp8D', title: 'Kids class: what a first session looks like', poster: img('dojo-video-kids') },
+        { provider: 'vimeo', src: '418723905', title: 'Professor Ítalo on why the fundamentals class never changes', poster: img('dojo-video-italo') },
+      ] }),
+      b('programs', 'split', { rows: [
+        { title: 'Fundamentals — your first year', text: 'Four positions a month, taught on a rotation so you can start any week without missing the thread. Mondays and Wednesdays at 19:00, Saturdays at 10:00. R$220/mês, gi included for the first three months.', image: img('dojo-fundamentals-row'), imageAlt: 'A coach correcting a student’s grip' },
+        { title: 'Kids & teens', text: 'Split into 5–7, 8–11 and 12–15 so nobody trains with someone twice their size. Games first, technique second, and a hard rule that nothing learned here leaves the mat. R$180/mês.', image: img('dojo-kids-row'), imageAlt: 'Children practising a takedown onto crash mats' },
+        { title: 'Competition team', text: 'By invitation, usually after your blue belt. Two extra sessions a week, a shared travel fund, and a coach in your corner at every tournament in the state. Included in any adult membership.', image: img('dojo-comp-row'), imageAlt: 'A coach calling instructions from the edge of a competition mat' },
+      ] }),
+      b('history', 'timeline', { title: 'How the academy got here', items: [
+        { date: '1998', title: 'A rented room on Rua Harmonia', text: 'Professor Ítalo Vasques starts teaching four evenings a week on 40m² of borrowed mat.' },
+        { date: '2004', title: 'First black belt promoted', text: 'Carla Menezes, who still teaches the Tuesday women-only class today.' },
+        { date: '2011', title: 'A bigger room on Rua Girassol', text: '300m² of mat, a proper changing room, and the kids program starts that September.' },
+        { date: '2019', title: 'Fifty black belts', text: 'The academy promotes its fiftieth, and starts the travel fund for the competition team.' },
+        { date: '2026', title: 'Two hundred students a week', text: 'Adults, kids, teens, and a Sunday open mat anyone from any academy can drop into.' },
+      ] }),
+      b('voices', 'testimonials', { title: 'From the mat', items: [
+        { quote: 'I walked in at thirty-six with no athletic history whatsoever. Nobody smashed me, nobody made a thing of it, and three years later I am a blue belt who sleeps properly.', author: 'Rodrigo', role: 'Blue belt' },
+        { quote: 'My daughter joined the 8–11 class because of bullying at school. What changed was not her armbar, it was how she stands.', author: 'Fernanda', role: 'Parent' },
+        { quote: 'Sunday open mat is the friendliest room in São Paulo. I train elsewhere and they still know my name.', author: 'Kenji', role: 'Visiting purple belt' },
+      ] }),
+      b('visit', 'contact-details', { title: 'Come and watch', address: 'Rua Girassol 512, Vila Madalena, São Paulo — SP, 05433-001', phone: '+55 11 3031 7742', email: 'contato@cordapreta.com.br', hours: 'Seg–Sex 07:00–22:00 · Sáb 09:00–13:00 · Dom open mat 10:00–12:00' }),
+      b('join', 'cta', { headline: 'Your first class is free — gi and all', subhead: 'Turn up ten minutes early in a t-shirt and shorts. We lend you everything else.', background: 'primary', button: { label: 'Message us on WhatsApp', href: '#' } }),
+      b('footer', 'footer', { brand: 'Academia Corda Preta', tagline: 'Brazilian jiu-jitsu since 1998.', links: [{ label: 'Programs', href: '#programs' }, { label: 'Watch', href: '#watch' }, { label: 'Visit', href: '#visit' }], copyright: '© Academia Corda Preta' }),
+    ],
+  }),
+
+  // ── dance studio ───────────────────────────────────────────────────────────
+  tpl({
+    id: 'fitness-dance',
+    vertical: 'fitness',
+    label: 'Dance Studio — App',
+    description: 'An app-shaped page for a drop-in dance studio: schedule feed, class packs, add-to-home-screen.',
+    tags: ['dance', 'mobile-first', 'newsletter', 'pricing', 'social'],
+    layout: 'app',
+    preset: 'candy',
+    meta: { title: 'Studio Nord — Drop-in Dance, Toronto', description: 'Drop-in hip hop, heels, contemporary and salsa on Ossington. Book from your phone.', lang: 'en', favicon: '🎶' },
+    blocks: [
+      b('shell', 'app-shell', { brand: 'Studio Nord', tabs: [
+        { label: 'Home', href: '#home', icon: '🏠' },
+        { label: 'Schedule', href: '#schedule', icon: '🗓️' },
+        { label: 'Styles', href: '#styles', icon: '🎧' },
+        { label: 'Passes', href: '#passes', icon: '🎟️' },
+        { label: 'Studio', href: '#studio', icon: '📍' },
+      ] }),
+      b('home', 'hero-app', {
+        headline: 'Every class is drop-in. Book the 7pm at 6:40.',
+        subhead: 'Hip hop, heels, contemporary and salsa on Ossington — no terms, no auditions, no series you have to start in week one.',
+        installLabel: 'Add to home screen',
+        installHref: '#install',
+        screenshots: [
+          { src: img('dance-app-schedule'), alt: 'Schedule screen showing tonight’s classes' },
+          { src: img('dance-app-booking'), alt: 'Booking screen with a class pack balance' },
+          { src: img('dance-app-studio'), alt: 'The studio floor and its mirrored wall' },
+          { src: img('dance-app-pass'), alt: 'Pass screen showing five credits left' },
+        ],
+      }),
+      b('install', 'install-prompt', { title: 'Book faster next time', body: 'Add Studio Nord to your home screen and your pass balance opens in one tap.', actionLabel: 'Show me how', position: 'bottom', tone: 'promo', delayMs: 8000, dismissible: true, rememberDismiss: true, platforms: ['ios-safari', 'android', 'desktop-chrome'] }),
+      b('schedule', 'feed', { title: 'This week', layout: 'cards', items: [
+        { title: 'Hip Hop Fundamentals', subtitle: 'Mon 19:00 · Studio A · Deej', text: 'Groove, bounce, and one 8-count you will take a week to stop practising in the kitchen.', badge: 'Beginner', image: img('dance-class-hiphop') },
+        { title: 'Heels', subtitle: 'Tue 20:00 · Studio B · Marisol', text: 'Bring heels you can actually walk in, or do the whole class barefoot — half the room does.', badge: 'Open level', image: img('dance-class-heels') },
+        { title: 'Contemporary', subtitle: 'Wed 19:30 · Studio A · Jae', text: 'Floorwork, release technique, and a phrase built over four weeks. Join in any week.', badge: 'Int/Adv', image: img('dance-class-contemporary') },
+        { title: 'Salsa On2', subtitle: 'Thu 20:00 · Studio B · Yanet & Osvaldo', text: 'Partner rotation, no partner needed. Social night at the Rivoli on the last Thursday.', badge: 'Beginner', image: img('dance-class-salsa') },
+        { title: 'Saturday Open Floor', subtitle: 'Sat 13:00–16:00 · Studio A', text: 'Three hours, no teacher, sound system on. Free with any pass, $10 without.', badge: 'Free with pass', image: img('dance-class-openfloor') },
+      ] }),
+      b('styles', 'accordion', { title: 'What each class is actually like', items: [
+        { heading: 'Hip Hop Fundamentals — never danced before?', body: 'Start here. Forty minutes of grooves and drills, twenty minutes of choreography, and a filmed run at the end that you are welcome to opt out of. Wear whatever you would wear to walk the dog.' },
+        { heading: 'Heels — do I need heels?', body: 'No. About half the room dances barefoot or in sneakers, especially in the first month. If you do bring heels, a 3-inch block heel is far kinder than a stiletto.' },
+        { heading: 'Contemporary — is it open level?', body: 'It is billed intermediate because of the floorwork, but Jae scales everything and there is a mat by the mirror for knees that need it. If you have done any dance before, you will keep up.' },
+        { heading: 'Salsa On2 — do I need a partner?', body: 'Never. We rotate every four minutes, and lead or follow is a choice you make on the night, not a role you are assigned at the door.' },
+      ] }),
+      b('passes', 'pricing', { title: 'Passes', subtitle: 'No memberships, no contracts. Credits never expire.', plans: [
+        { name: 'Single class', price: '$24', period: 'drop-in', features: ['Any class, any style', 'Cancel free up to 2h before'], ctaLabel: 'Book a class', ctaHref: '#schedule' },
+        { name: '5-class pass', price: '$105', period: '5 credits', features: ['$21 a class', 'Credits never expire', 'Free Saturday open floor'], ctaLabel: 'Buy 5', ctaHref: '#schedule' },
+        { name: '10-class pass', price: '$190', period: '10 credits', features: ['$19 a class', 'Credits never expire', 'Free Saturday open floor', 'Share with one other person', '10% off workshops'], ctaLabel: 'Buy 10', ctaHref: '#schedule', featured: true },
+      ] }),
+      b('studio', 'directions', { title: 'The studio', place: 'Studio Nord', address: '244 Ossington Ave, 2nd Floor, Toronto, ON M6J 2Z7', lat: '43.6489', lng: '-79.4203', directionsLabel: 'Open in maps', appleMaps: true }),
+      b('join', 'newsletter', { title: 'Thursday drop', intro: 'One email a week: next week’s schedule, any pop-up workshops, and which teacher is covering what.', placeholder: 'you@email.com', submitLabel: 'Sign me up', successMessage: 'You are on the list — the first one lands Thursday.' }),
+      b('social', 'social-links', { title: 'See the classes', layout: 'row', variant: 'icon', align: 'center', links: [
+        { platform: 'instagram', href: '#', label: '@studionordto' },
+        { platform: 'tiktok', href: '#', label: 'Studio Nord' },
+        { platform: 'youtube', href: '#', label: 'Class recaps' },
+        { platform: 'phone', href: '#', label: '(416) 555 0182' },
+      ] }),
+      b('footer', 'footer', { brand: 'Studio Nord', tagline: 'Drop-in dance on Ossington.', links: [{ label: 'Schedule', href: '#schedule' }, { label: 'Passes', href: '#passes' }, { label: 'Studio', href: '#studio' }], copyright: '© Studio Nord Dance Inc.' }),
+    ],
+  }),
+];

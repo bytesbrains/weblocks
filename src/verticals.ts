@@ -111,6 +111,36 @@ const VERTICAL_DEFS: Record<string, Vertical> = {
     tone: 'heartfelt, purposeful, mobilising',
     blocks: ['nav', 'hero', 'about', 'stats', 'steps', 'team', 'testimonials', 'cta', 'footer'],
   },
+  creator: {
+    id: 'creator', label: 'Creator & Influencer', icon: 'stars', preset: 'candy',
+    tone: 'personal, magnetic, audience-first',
+    blocks: ['nav', 'profile-header', 'social-links', 'feed', 'video-gallery', 'logos', 'newsletter', 'contact-details', 'footer'],
+  },
+  blog: {
+    id: 'blog', label: 'Blog & Writing', icon: 'edit_note', preset: 'mono',
+    tone: 'thoughtful, readable, unhurried',
+    blocks: ['nav', 'hero', 'blog-list', 'about', 'newsletter', 'social-links', 'footer'],
+  },
+  care: {
+    id: 'care', label: 'Care & Pet Services', icon: 'volunteer_activism', preset: 'candy', booking: true,
+    tone: 'warm, trustworthy, reassuring',
+    blocks: ['nav', 'hero', 'about', 'services-catalogue', 'steps', 'reviews', 'faq', 'contact-details', 'cta', 'footer'],
+  },
+  trades: {
+    id: 'trades', label: 'Skilled Trades', icon: 'construction', preset: 'forest',
+    tone: 'practical, proven, no-nonsense',
+    blocks: ['nav', 'hero', 'services-catalogue', 'gallery', 'steps', 'reviews', 'faq', 'contact-details', 'cta', 'footer'],
+  },
+  transport: {
+    id: 'transport', label: 'Transport & Logistics', icon: 'local_shipping', preset: 'midnight', booking: true,
+    tone: 'punctual, safe, professional',
+    blocks: ['nav', 'hero', 'services-catalogue', 'features', 'steps', 'pricing', 'reviews', 'contact-details', 'cta', 'footer'],
+  },
+  professional: {
+    id: 'professional', label: 'Professional Practice', icon: 'workspace_premium', preset: 'ocean',
+    tone: 'authoritative, precise, credible',
+    blocks: ['nav', 'hero', 'about', 'services-catalogue', 'experience', 'stats', 'testimonials', 'faq', 'contact-details', 'footer'],
+  },
   other: {
     id: 'other', label: 'Other', icon: 'category', preset: 'sand',
     tone: 'clear, neutral, professional',

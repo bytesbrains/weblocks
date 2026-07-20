@@ -1,0 +1,177 @@
+/**
+ * `other` starter templates — the catch-all vertical: a generic one-pager, a
+ * pre-launch holding page, a link hub, and a plain community notice board.
+ */
+import { tpl, img, b, type Template } from './_helpers.js';
+
+export const otherTemplates: Template[] = [
+  tpl({
+    id: 'other-basic',
+    vertical: 'other',
+    label: 'Basic — One-pager',
+    description: 'The safe starting point for any small business that just needs a name, an offer and a phone number.',
+    tags: ['one-pager', 'local', 'b2c', 'light'],
+    layout: 'classic',
+    preset: 'sand',
+    meta: { title: 'Acme Co', description: 'A simple, clear one-page site for any small business.', lang: 'en', favicon: '⭐' },
+    blocks: [
+      b('nav', 'nav', { brand: 'Acme Co', sticky: true, links: [{ label: 'What we do', href: '#features' }, { label: 'Contact', href: '#contact' }], cta: { label: 'Get in touch', href: '#contact' } }),
+      b('hero', 'hero', { eyebrow: 'Welcome', headline: 'A clear, simple site for your business', subhead: 'Tell people who you are, what you do, and how to reach you — nothing more, nothing less.', align: 'center', minHeight: 'md', image: img('generic-hero'), overlay: 'scrim', cta: { label: 'Get in touch', href: '#contact' } }),
+      b('features', 'features', { title: 'What we do', columns: 3, items: [
+        { icon: '✅', title: 'Do great work', text: 'A short, honest line about your service.' },
+        { icon: '🤝', title: 'Look after people', text: 'Why customers keep coming back.' },
+        { icon: '📍', title: 'Local & reliable', text: 'Where you are and who you serve.' },
+      ] }),
+      b('contact', 'contact-details', { title: 'Get in touch', address: '1 High Street, Anytown AN1 1AA', phone: '+44 0000 000 000', email: 'hello@acme.co', hours: 'Mon–Fri 9:00–17:00' }),
+      b('footer', 'footer', { brand: 'Acme Co', tagline: 'Your tagline here.', links: [{ label: 'Contact', href: '#contact' }], copyright: '© Acme Co' }),
+    ],
+  }),
+
+  tpl({
+    id: 'other-coming-soon',
+    vertical: 'other',
+    label: 'Coming soon — Pre-launch',
+    description: 'A dark holding page for a business that has a date but not a door yet: tease, timeline, collect emails.',
+    tags: ['one-pager', 'newsletter', 'dark', 'social'],
+    layout: 'landing',
+    preset: 'midnight',
+    meta: { title: 'Fernpost — opening September', description: 'A stationery counter and slow coffee bar opening on SE Clinton, Portland.', lang: 'en', favicon: '✉️' },
+    blocks: [
+      b('bar', 'announcement-bar', { text: 'Doors open 12 September. Founding members get first pick of the letterpress run.', linkLabel: 'Get on the list', href: '#notify', tone: 'promo', dismissible: false }),
+      b('hero', 'hero', { eyebrow: 'Opening 12 September 2026', headline: 'Fernpost is almost open', subhead: 'A stationery counter, a letterpress bench and a slow coffee bar, all in one long room on SE Clinton. We are painting the walls; you can already reserve your first box of cards.', align: 'center', minHeight: 'full', image: img('fernpost-shopfront-dusk'), overlay: 'dark', cta: { label: 'Tell me when it opens', href: '#notify' } }),
+      b('numbers', 'stats', { title: 'Where we are up to', columns: 3, items: [
+        { value: '412', label: 'People on the list' },
+        { value: '6', label: 'Weeks to opening' },
+        { value: '1926', label: 'Year our press was built' },
+      ] }),
+      b('plan', 'timeline', { title: 'The countdown', items: [
+        { date: 'Jun 2026', title: 'Keys to 2140 SE Clinton', text: 'A former bike shop with a skylight and, it turns out, a very good concrete floor under the carpet.' },
+        { date: 'Jul 2026', title: 'The press arrives', text: 'A 1926 platen press came up from Eugene on a flatbed. It took five people and a pallet jack.' },
+        { date: 'Aug 2026', title: 'First print run', text: 'Two hundred boxes of cotton-stock notecards, printed in-house. Members get first refusal.' },
+        { date: '12 Sep 2026', title: 'Doors open, 8am', text: 'Coffee from Rose City Roasters, and the press running all day so you can watch.' },
+      ] }),
+      b('notify', 'newsletter', { title: 'Be there on day one', intro: 'One email when we open, one the week before, and nothing else. Founding members get 20% off the first print run.', placeholder: 'you@example.com', submitLabel: 'Join the list', successMessage: 'You are on the list — see you on the 12th.' }),
+      b('questions', 'faq', { title: 'While you wait', items: [
+        { question: 'Where exactly are you?', answer: '2140 SE Clinton Street, Portland, OR 97202 — between 21st and 22nd, on the south side. The old bike shop with the green awning.' },
+        { question: 'Can I use the press?', answer: 'Yes, from October. Bench time will be $28/hour including polymer plates, and we will run a beginners evening twice a month.' },
+        { question: 'Will you ship?', answer: 'Domestic US shipping from launch week. International once we have worked out how to pack a box of cards so it survives.' },
+        { question: 'Are you hiring?', answer: 'Two counter roles, 20–30 hours, starting late August. Email jobs@fernpost.co with a paragraph about yourself — no CV needed.' },
+      ] }),
+      b('social', 'social-links', { title: 'Follow the build', layout: 'row', variant: 'labeled', align: 'center', links: [
+        { platform: 'instagram', href: '#', label: '@fernpost' },
+        { platform: 'email', href: '#', label: 'hello@fernpost.co' },
+      ] }),
+      b('footer', 'footer', { brand: 'Fernpost', tagline: 'Stationery, letterpress and coffee. Portland, Oregon.', links: [{ label: 'Get on the list', href: '#notify' }, { label: 'Questions', href: '#questions' }], copyright: '© 2026 Fernpost LLC' }),
+    ],
+  }),
+
+  tpl({
+    id: 'other-link-hub',
+    vertical: 'other',
+    label: 'Link hub — Small organisation',
+    description: 'One tap-friendly page of links for a group whose real life happens on other platforms.',
+    tags: ['link-hub', 'mobile-first', 'social', 'nonprofit', 'one-pager'],
+    layout: 'profile',
+    preset: 'candy',
+    meta: { title: 'Bandra Bike Kitchen', description: 'A volunteer-run community bicycle workshop in Bandra West, Mumbai. Every link in one place.', lang: 'en', favicon: '🚲' },
+    blocks: [
+      b('profile', 'profile-header', {
+        name: 'Bandra Bike Kitchen',
+        headline: 'Volunteer-run community bicycle workshop',
+        location: 'Bandra West, Mumbai',
+        avatar: img('bandra-bike-kitchen-avatar'),
+        summary: 'Bring your bike, borrow our tools, fix it yourself with someone showing you how. Free for everyone, always. Open Wednesday and Friday evenings and Saturday mornings, behind the Chapel Road community hall.',
+        contacts: [
+          { type: 'email', value: 'hello@bandrabikekitchen.in', label: 'Email us' },
+          { type: 'phone', value: '+91 98200 41177', label: 'WhatsApp only' },
+          { type: 'location', value: 'Chapel Road, Bandra West, Mumbai 400050' },
+        ],
+        showShare: true,
+        shareLabel: 'Share this page',
+      }),
+      b('links', 'feed', { title: 'Everything, in one place', layout: 'cards', items: [
+        { title: 'Book a workstand', subtitle: 'Wednesdays & Fridays', text: 'Six stands, two-hour slots. Free, but please book so you are not standing in the lane with a wheel off.', href: '#', badge: 'Popular' },
+        { title: 'Donate a bike', subtitle: 'Any condition', text: 'We strip what cannot be saved and rebuild the rest for the school-run programme. Drop-off during open hours.', href: '#' },
+        { title: 'Volunteer with us', subtitle: 'No experience needed', text: 'We will teach you. Two evenings a month is plenty, and the tea is on us.', href: '#' },
+        { title: 'Learn to fix a puncture', subtitle: 'Free workshop, first Saturday', text: 'Ninety minutes, tools provided, ten places. Runs in English, Hindi and Marathi.', href: '#', badge: 'Free' },
+        { title: 'Spare parts wish list', subtitle: 'What we are short of', text: 'Mostly 26in tubes, brake cable and anything 7-speed. The list is live and we update it weekly.', href: '#' },
+        { title: 'Support us monthly', subtitle: '₹300 keeps a stand stocked', text: 'Roughly one set of tubes, patches and cable per month. Cancel any time, no receipts to chase.', href: '#' },
+      ] }),
+      b('rule', 'divider', { style: 'dots' }),
+      b('open', 'hours', { title: 'When the shutter is up', timezone: 'IST', note: 'Closed on public holidays and during heavy monsoon warnings — check Instagram before you ride over.', days: [
+        { day: 'mon', closed: true },
+        { day: 'tue', closed: true },
+        { day: 'wed', open: '18:00', close: '21:00' },
+        { day: 'thu', closed: true },
+        { day: 'fri', open: '18:00', close: '21:00' },
+        { day: 'sat', open: '09:00', close: '13:00' },
+        { day: 'sun', closed: true },
+      ] }),
+      b('social', 'social-links', { title: 'Find us elsewhere', layout: 'grid', variant: 'labeled', align: 'center', links: [
+        { platform: 'instagram', href: '#', label: '@bandrabikekitchen' },
+        { platform: 'whatsapp', href: '#', label: 'Announcements group' },
+        { platform: 'youtube', href: '#', label: 'Repair videos' },
+        { platform: 'email', href: '#', label: 'hello@bandrabikekitchen.in' },
+      ] }),
+      b('news', 'newsletter', { title: 'Monthly note', intro: 'What we fixed last month, the parts we are short of, and the date of the next free workshop. Goes out on the 1st; we never send anything in between.', placeholder: 'name@yourmail.in', submitLabel: 'Sign me up', successMessage: 'Done — first note goes out on the 1st.' }),
+      b('rights', 'copyright', { holder: 'Bandra Bike Kitchen', year: '2026', text: 'A registered public trust. Run by volunteers.', showSymbol: true, align: 'center' }),
+    ],
+  }),
+
+  tpl({
+    id: 'other-notice-board',
+    vertical: 'other',
+    label: 'Notice board — Community info',
+    description: 'A plain, text-first information page for a hall, committee or residents group that needs to be read, not admired.',
+    tags: ['nonprofit', 'long-form', 'local', 'faq', 'light'],
+    layout: 'editorial',
+    preset: 'forest',
+    meta: { title: 'Wattle Grove Community Hall', description: 'Hall hire, opening hours, committee notices and how to get there. Wattle Grove, Perth WA.', lang: 'en', favicon: '📋' },
+    blocks: [
+      b('alert', 'announcement-bar', { text: 'Water main works on Kerrigan Street until 8 August — use the rear car park off Nardine Close.', linkLabel: 'Read the notice', href: '#notice', tone: 'warning', dismissible: true }),
+      b('nav', 'nav', { brand: 'Wattle Grove Hall', sticky: true, links: [{ label: 'Notices', href: '#notice' }, { label: 'Hire conditions', href: '#rules' }, { label: 'Office hours', href: '#open' }, { label: 'Getting here', href: '#getting-here' }], cta: { label: 'Ask the committee', href: '#ask' } }),
+      b('notice', 'rich-text', { blocks: [
+        { kind: 'heading', text: 'Wattle Grove Community Hall' },
+        { kind: 'paragraph', text: 'The hall has been run by a volunteer committee of nine residents since 1978. It is available to any Wattle Grove resident or community group, and to outside hirers when the calendar allows. This page is the official record of hire terms, hours and committee notices — if something here contradicts a flyer on the noticeboard, this page wins.' },
+        { kind: 'subheading', text: 'Current notices' },
+        { kind: 'bullet', text: 'Water main renewal, Kerrigan Street: 21 July – 8 August. Front car park closed. Use the rear entrance off Nardine Close; the ramp is open and lit.' },
+        { kind: 'bullet', text: 'Annual General Meeting: Tuesday 15 September, 7pm, main hall. Three committee positions are up, including Treasurer. Nominations close 1 September.' },
+        { kind: 'bullet', text: 'The upright piano has been retuned and is back in the small room. Please do not move it — ask us and we will.' },
+        { kind: 'subheading', text: 'Hire rates from 1 July 2026' },
+        { kind: 'paragraph', text: 'Main hall $28 per hour for residents and local not-for-profits, $45 per hour otherwise. Small room $15 per hour flat. Kitchen access adds $20 per booking. A $200 refundable bond applies to any booking involving alcohol or amplified music, refunded within five working days of a clean hand-back.' },
+        { kind: 'quote', text: 'We would rather the hall was busy and a bit scuffed than spotless and empty. Book it.' },
+      ] }),
+      b('rules', 'accordion', { title: 'Hire conditions, in full', items: [
+        { heading: 'Booking and cancellation', body: 'Bookings are confirmed only when the hire form is returned and the deposit has cleared. Cancel more than 14 days ahead for a full refund; between 14 and 3 days you forfeit the deposit; inside 3 days the full fee is payable. The committee waives this for illness or bereavement — just tell us.' },
+        { heading: 'Keys and access', body: 'Keys are collected from the Nardine Close key safe. The code is sent by SMS at 9am on the day of hire and changes after every booking. The rear door must not be propped open after 9pm, as it triggers the monitored alarm.' },
+        { heading: 'Noise, music and finish times', body: 'Amplified music must stop by 10pm Sunday to Thursday and 11pm Friday and Saturday, under the City of Kalamunda noise policy. The hall must be vacated within 30 minutes of your finish time. Repeated breaches lose you future bookings.' },
+        { heading: 'Cleaning and hand-back', body: 'Sweep the floor, wipe the kitchen benches, bag all rubbish and take it to the bins on Nardine Close. Tables and chairs go back on the racks along the west wall. Photograph the room when you leave — it settles most bond disputes in your favour.' },
+        { heading: 'Insurance and who is responsible', body: 'The hall carries public liability for the building. Hirers running a commercial or ticketed event need their own cover of at least $10 million and must send a certificate of currency a week ahead. The named hirer must be over 18 and present for the whole booking.' },
+      ] }),
+      b('open', 'hours', { title: 'Office and drop-in hours', timezone: 'AWST', note: 'The hall itself is open whenever it is booked. These are the hours a committee member is actually in the office to take a payment or hand over a key.', days: [
+        { day: 'mon', closed: true },
+        { day: 'tue', open: '09:30', close: '12:30' },
+        { day: 'wed', closed: true },
+        { day: 'thu', open: '09:30', close: '12:30' },
+        { day: 'fri', open: '16:00', close: '18:00' },
+        { day: 'sat', open: '09:00', close: '11:00' },
+        { day: 'sun', closed: true },
+      ] }),
+      b('where', 'map', { query: 'Wattle Grove Community Hall, Kerrigan Street, Wattle Grove WA 6107', zoom: 15, height: 340, label: 'Kerrigan Street, Wattle Grove WA 6107' }),
+      b('getting-here', 'directions', { title: 'Getting here', place: 'Wattle Grove Community Hall', address: '14 Kerrigan Street, Wattle Grove WA 6107', mapUrl: '#', directionsLabel: 'Open in maps', appleMaps: true }),
+      b('ask', 'contact-form', { title: 'Ask the committee', intro: 'Hire enquiries, noticeboard requests and anything else. One of us answers within two working days — faster if you say what date you are after.', submitLabel: 'Send to the committee', successMessage: 'Received. Someone will reply within two working days.', fields: [
+        { name: 'name', label: 'Your name', type: 'text', placeholder: 'Alex Nguyen', required: true },
+        { name: 'email', label: 'Email', type: 'email', placeholder: 'you@example.com', required: true },
+        { name: 'topic', label: 'What is this about?', type: 'select', required: true, options: ['Hall hire enquiry', 'Existing booking', 'Noticeboard request', 'Maintenance or a hazard', 'Something else'] },
+        { name: 'message', label: 'Details', type: 'textarea', placeholder: 'Date, times, roughly how many people…', required: true },
+      ] }),
+      b('contact', 'contact-details', { title: 'Committee contacts', address: '14 Kerrigan Street, Wattle Grove WA 6107', phone: '+61 8 9293 0114', email: 'hall@wattlegrovehall.org.au', hours: 'Office: Tue & Thu 9:30–12:30, Fri 16:00–18:00, Sat 9:00–11:00' }),
+      b('documents', 'legal', { title: 'Governing documents', align: 'start', separator: '·', documents: [
+        { label: 'Hire agreement', title: 'Standard hire agreement (2026)', content: 'The full hire agreement signed by every hirer. Covers the fee schedule, the $200 bond, cancellation windows, noise limits under the City of Kalamunda policy, cleaning standards and the insurance threshold for commercial events. Superseded versions are held in the office folder and are available on request.' },
+        { label: 'Constitution', title: 'Wattle Grove Community Hall Association Constitution', content: 'Adopted 1978, last amended at the 2023 AGM. Sets out membership eligibility for Wattle Grove residents, the nine committee positions and their terms, quorum for general meetings, and the process for calling a special general meeting with the signatures of fifteen members.' },
+        { label: 'Privacy', title: 'How we handle your details', content: 'We keep hirer names, contact details and booking dates for seven years to satisfy our insurer and our auditor. We do not share them with anyone else, and we do not use them for anything except your booking. Ask at hall@wattlegrovehall.org.au and we will tell you exactly what we hold on you, or delete it once the retention period has passed.' },
+      ] }),
+      b('footer', 'footer', { brand: 'Wattle Grove Community Hall', tagline: 'Run by residents since 1978. Incorporated association A0018842W.', links: [{ label: 'Notices', href: '#notice' }, { label: 'Hire conditions', href: '#rules' }, { label: 'Getting here', href: '#getting-here' }, { label: 'Contact', href: '#contact' }], copyright: '© Wattle Grove Community Hall Association Inc.' }),
+    ],
+  }),
+];

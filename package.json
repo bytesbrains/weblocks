@@ -60,6 +60,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.islands.json",
     "emit:catalog": "node scripts/emit-catalog.mjs",
+    "check:templates": "node scripts/check-templates.mjs",
     "test": "npm run build && node --test lib/*.test.js test/*.mjs",
     "example": "tsc -p tsconfig.json && node lib/example.js",
     "example:resume": "tsc -p tsconfig.json && node lib/example-resume.js",

@@ -5,6 +5,69 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+The starter library goes from a sampler to something you can actually pick from.
+Additive and **non-breaking** — every existing template id, vertical id and
+manifest is unchanged; the catalog stays at 52 blocks.
+
+### Added
+- **160 starter templates, up from 17.** Every vertical now carries 4–9 genuinely
+  different starters rather than a single example — a café *and* a fine-dining
+  room, a food truck, a bakery, a ghost kitchen; a carpenter, an electrician, a
+  roofer. Copy is specific and locale-varied (UK/US/EU/India/Australia), and the
+  set now exercises **51 of the 52 blocks** (previously 22), so the block wall
+  draws far more of its demo config from real compositions.
+
+- **Six new verticals** — `creator`, `blog`, `care`, `trades`, `transport`,
+  `professional`. These cover the people the old taxonomy could only file under
+  `service` or `personal`: influencers and podcasters whose social surface *is*
+  the product, personal and food blogs, babysitters and dog walkers and elder
+  carers, the building trades, drivers and movers, and credentialed practices
+  (doctors, solicitors, architects, accountants). Purely additive — no existing
+  vertical id was renamed or repurposed, so persisted `businessType` values are
+  untouched.
+
+- **Two new filter axes on `Template`,** because 160 items need more than one
+  question asked of them:
+  - `layout` — the page *shape*, orthogonal to the vertical's *subject*:
+    `classic` · `editorial` · `minimal` · `bold` · `app` · `profile` ·
+    `catalogue` · `showcase` · `landing` · `conversational`. This is what lets a
+    host offer "same business, different look".
+  - `tags` — free lowercase-kebab facets (`booking`, `pets`, `portfolio`,
+    `one-pager`, …), 216 of them in use.
+
+  Plus `description` (a picker needs a line under the label) and `preset` — the
+  preset *name*, which was previously unrecoverable once `getPreset()` had been
+  inlined into `manifest.design`.
+
+  New accessors: `templatesForLayout` · `templatesByTag` · `templateTags`.
+
+- **`npm run check:templates`** (`scripts/check-templates.mjs`) — the authoring
+  loop, scopable to one vertical. It catches what `validateManifest` structurally
+  cannot: **config keys the schema would silently drop**. `parse` is
+  schema-driven, so an invented `hero.buttonText` is not an error — it is
+  discarded, and the template validates while rendering with the content missing.
+  It also flags dangling `#anchor` links, duplicate placeholder image seeds, and
+  metadata claiming a preset the manifest doesn't actually carry. The first three
+  are now unit-tested too, so they gate CI rather than only the authoring loop.
+
+- **A filter on the published starter gallery** — search over labels, tags and
+  block vocabulary, plus vertical and layout selects, with a live count. Browsing
+  160 cards unaided was the bottleneck. Progressive enhancement: with JS off,
+  every card is shown.
+
+- **`AGENT.md` now documents starter templates**, which it had never mentioned —
+  an agent reading it had no idea the library existed, and composed from scratch
+  every time.
+
+### Changed
+- **Templates moved to one file per vertical** under `src/templates/`, each
+  declared with a single `tpl({...})` call from `src/templates/_helpers.ts`.
+  `src/templates.ts` is now just the registry, and it throws at import time on a
+  duplicate id rather than letting one template silently shadow another. Adding a
+  template is a one-file change. The public API is unchanged.
+
 ## 0.9.0 — 2026-07-19
 
 A conversation block, and the schema constraint that makes its identifiers
