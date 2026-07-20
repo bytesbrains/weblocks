@@ -109,6 +109,34 @@ Worked example — a bakery landing page:
 }
 ```
 
+## Starting from a starter template
+
+You rarely need to compose from nothing. The package ships a large library of
+**starter templates** — complete, validated manifests with real copy, one file per
+vertical under `src/templates/`. Reach for one when the brief matches something
+that already exists (a café, a carpenter, a dog walker, a podcaster, a dental
+practice, a personal blog), and rewrite it rather than reinventing the structure.
+
+```ts
+import { templatesForVertical, templatesByTag, templatesForLayout, getTemplate } from '@bytesbrains/weblocks';
+
+templatesForVertical('trades');    // by KIND of business
+templatesForLayout('editorial');   // by SHAPE of page — same business, different look
+templatesByTag('booking');         // by facet
+getTemplate('care-dog-walker');    // → { id, vertical, label, description, tags, layout, preset, manifest }
+```
+
+Two ways to use one:
+
+- **As output.** Render `template.manifest` directly for an instant, zero-LLM
+  starter. Nothing to generate.
+- **As a scaffold.** Pass `{ template: 'restaurant-modern' }` to `generateSite`
+  and the template's block structure is seeded into your prompt. Then **keep the
+  structure, rewrite every string** for the actual subject. A scaffolded manifest
+  that still says "Brew & Bloom" is a failure.
+
+When a brief doesn't match any template, compose from the catalog as usual.
+
 ## Design tokens & theming
 
 Set `design` once; every block styles from it.
