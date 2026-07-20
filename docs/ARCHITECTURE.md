@@ -166,6 +166,50 @@ out-of-range enum falls back to a default, so a bad token value can never reach
 the CSS. `presets.ts` ships named `DesignTokens` sets (`sand`, `midnight`, …) the
 AI or a picker selects by name via `applyPreset`.
 
+## Verticals (`verticals.ts`) & starter templates (`templates.ts`, `templates/`)
+
+Two layers of "what kind of site is this", both **data, not behaviour** — nothing
+here can make a manifest render differently, so they stay advisory.
+
+`verticals.ts` is the taxonomy: a stable `id` (hosts persist it as e.g.
+`businessType`), a label + icon, the recommended section order, a fitting preset,
+a copy-tone hint, and a `booking` flag. `VERTICALS` is **deep-frozen** because a
+vertical is interpolated into the AI system prompt — a dependency mutating one at
+runtime would rewrite the prompt.
+
+`templates/` holds the starter sites, **one file per vertical**, each entry
+declared with a single `tpl({...})` call from `templates/_helpers.ts` that pairs
+the picker metadata with the copy it describes. `templates.ts` is only the
+registry: it flattens those arrays into `TEMPLATES` and **throws at import on a
+duplicate id**, since a duplicate would silently shadow an earlier template and
+break the never-rename-an-id contract from the other side.
+
+Templates are filterable on three independent axes, because one taxonomy cannot
+answer every question a picker asks:
+
+| Axis | Question | Values |
+| --- | --- | --- |
+| `vertical` | what *kind* of business or person | `verticalNames()` |
+| `layout` | what *shape* the page takes | `classic` · `editorial` · `minimal` · `bold` · `app` · `profile` · `catalogue` · `showcase` · `landing` · `conversational` |
+| `tags` | free facets for search | `templateTags()` |
+
+`layout` is deliberately orthogonal to `vertical` — subject and shape vary
+independently, which is what makes "same business, different look" expressible.
+`preset` is stored as its *name* as well as being baked into `manifest.design`,
+because `getPreset()` inlines the tokens and the name is otherwise unrecoverable.
+
+One authoring hazard has no runtime symptom and so is gated by tests plus
+`scripts/check-templates.mjs`: **`parse` is schema-driven, so a config key the
+schema doesn't declare is not an error — it is discarded.** A template can invent
+`hero.buttonText`, pass `validateManifest`, and render with the content missing.
+The check walks every config against its block schema (recursing into object
+fields and array-item shapes), and also catches `#anchor` links resolving to no
+block id, and metadata claiming a preset the manifest doesn't carry.
+
+Templates feed two consumers from one source: `generate.ts` seeds one as a
+scaffold to personalise, and `showcase.ts` harvests the first placement of each
+block type as the block wall's demo config — so tuned copy is written once.
+
 ## Powered bricks & the runtime contract (`runtime.ts`)
 
 A powered brick declares `runtime: { capabilities: [...] }`. On render it emits

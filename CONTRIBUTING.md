@@ -44,6 +44,30 @@ npm run emit:catalog # regenerate catalog.json + CATALOG.md from code
    `npm run site`.
 6. `npm run emit:catalog` and update docs if needed.
 
+## Adding a starter template
+
+One file to touch: append a `tpl({...})` entry to its vertical's array in
+`src/templates/<vertical>.ts`. The registry in `src/templates.ts` picks it up.
+
+1. Read the block schemas you need in [`CATALOG.md`](./CATALOG.md) /
+   `catalog.json` **before** writing config. Unknown keys are *silently dropped*
+   by `parse`, so a guessed field means content vanishes from the render while
+   validation still passes.
+2. Give it complete metadata — `description`, 3–6 lowercase-kebab `tags`, a
+   `layout` the blocks actually match, and the `preset` you pass to `tpl()`.
+3. Write **real, specific copy** — a named business, plausible prices, addresses
+   and hours, testimonials that sound like a person wrote them. Keep each
+   template internally consistent in currency, address and phone format.
+4. Make it *different* from its siblings: vary the block set and order, not just
+   the nouns. Use distinct `img()` seeds — a reused seed shows the same photo
+   twice in the gallery.
+5. `npm run check:templates <vertical>` until clean, then `npm test`.
+6. Never rename an existing template `id` — hosts persist them.
+
+New vertical? Add it to `src/verticals.ts` first (additive only — never rename or
+repurpose an existing `id`), then create `src/templates/<vertical>.ts` and list it
+in `src/templates.ts`.
+
 ## Branches & releases
 
 Two long-lived branches, with different jobs:
