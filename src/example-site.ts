@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { renderSite } from './render.js';
 import { validateManifest } from './validate.js';
-import { TEMPLATES } from './templates.js';
+import { TEMPLATES, templatesForVertical, templatesForLayout } from './templates.js';
 import { escapeAttr, escapeHtml } from './schema.js';
 import { showcaseBlocks, showcaseManifest } from './showcase.js';
 import { catalog, catalogPrompt } from './catalog.js';
@@ -205,20 +205,44 @@ const cardsHtml = Object.values(TEMPLATES).map((t) => {
   const rest = types.length - SPINE_SHOWN;
   const spine = shown + (rest > 0 ? `<span class="chip more">+${rest}</span>` : '');
 
-  return `<a class="tpl" href="./${escapeAttr(file)}">
+  // Everything the filter matches on, pre-lowercased into one haystack so the
+  // client script stays a substring test rather than a scoring exercise.
+  const haystack = [t.id, t.label, t.description, t.vertical, t.layout, ...t.tags, ...types].join(' ').toLowerCase();
+
+  return `<a class="tpl" href="./${escapeAttr(file)}"
+  data-vertical="${escapeAttr(t.vertical)}" data-layout="${escapeAttr(t.layout)}" data-search="${escapeAttr(haystack)}">
   <span class="shot"><iframe src="./${escapeAttr(file)}" title="" aria-hidden="true" tabindex="-1" loading="lazy" scrolling="no"></iframe></span>
   <span class="body">
-    <span class="eyebrow">${escapeHtml(t.vertical)}</span>
+    <span class="eyebrow">${escapeHtml(t.vertical)} <span class="sep">·</span> ${escapeHtml(t.layout)}</span>
     <span class="name">${escapeHtml(t.label)}${v.ok ? '' : ' <b class="bad">INVALID</b>'}</span>
+    <span class="desc">${escapeHtml(t.description)}</span>
     <span class="spine">${spine}</span>
     <span class="foot"><code>${escapeHtml(t.id)}</code><em>${types.length} blocks</em></span>
   </span>
 </a>`;
 }).join('\n');
 
-// No vertical filter here on purpose: the set is currently one starter per
-// vertical, so every filter option would match exactly one card. Add one when a
-// vertical grows a second variant.
+// The set is large enough now that browsing it unaided is the bottleneck, so the
+// gallery ships a filter over the same three axes the library exposes in code —
+// vertical (what it is), layout (what shape it takes), and free text over labels,
+// tags and block types. Progressive enhancement: with JS off every card is shown.
+const option = (value: string, label: string): string => `<option value="${escapeAttr(value)}">${escapeHtml(label)}</option>`;
+const verticalOptions = [...new Set(Object.values(TEMPLATES).map((t) => t.vertical))].sort()
+  .map((v) => option(v, `${v} (${templatesForVertical(v).length})`)).join('');
+const layoutOptions = [...new Set(Object.values(TEMPLATES).map((t) => t.layout))].sort()
+  .map((l) => option(l, `${l} (${templatesForLayout(l).length})`)).join('');
+
+const filterHtml = `<form class="filters" role="search" aria-label="Filter starter templates">
+  <label class="f-search">
+    <span class="vh">Search templates</span>
+    <input type="search" id="q" placeholder="Search — carpenter, podcast, booking, gallery…" autocomplete="off">
+  </label>
+  <label class="f-sel"><span class="vh">Vertical</span>
+    <select id="f-vertical">${option('', 'All verticals')}${verticalOptions}</select></label>
+  <label class="f-sel"><span class="vh">Layout</span>
+    <select id="f-layout">${option('', 'All layouts')}${layoutOptions}</select></label>
+  <p class="count" id="count" role="status" aria-live="polite"></p>
+</form>`;
 const galleryCss = `
 :root{--shot:#efeae1;--chipbg:rgba(42,38,34,.06)}
 @media(prefers-color-scheme:dark){:root{--shot:#161b22;--chipbg:rgba(230,237,243,.08)}}
@@ -233,8 +257,20 @@ const galleryCss = `
   transform:scale(var(--s,.24));transform-origin:0 0}
 .body{display:flex;flex-direction:column;gap:.5rem;padding:.95rem 1rem 1.05rem}
 .eyebrow{font:.7rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.eyebrow .sep{opacity:.45}
 .name{font-size:1.02rem;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+.desc{font-size:.83rem;line-height:1.45;color:var(--muted)}
 .bad{color:#c0392b;font-size:.75rem;font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:0 0 1.6rem}
+.filters input,.filters select{font:inherit;font-size:.9rem;color:var(--fg);background:var(--bg);
+  border:1px solid var(--line);border-radius:7px;padding:.5em .7em}
+.filters input:focus-visible,.filters select:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.f-search{flex:1 1 18rem;display:block}
+.f-search input{width:100%}
+.count{margin:0;font-size:.8rem;color:var(--muted);flex-basis:100%}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tpl[hidden]{display:none}
+.empty{color:var(--muted);font-style:italic}
 .spine{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.1rem}
 .chip{font:.68rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);
   background:var(--chipbg);border-radius:4px;padding:.1em .42em}
@@ -253,6 +289,28 @@ const galleryScript = `<script>
   var shots=document.querySelectorAll('.shot');
   var fit=function(){shots.forEach(function(s){var w=s.clientWidth;if(w)s.style.setProperty('--s',w/1280);});};
   fit();addEventListener('resize',fit);addEventListener('load',fit);
+
+  var cards=[].slice.call(document.querySelectorAll('.tpl'));
+  var q=document.getElementById('q'),fv=document.getElementById('f-vertical'),
+      fl=document.getElementById('f-layout'),count=document.getElementById('count');
+  if(!q||!fv||!fl||!count)return;
+  // Every space-separated word must appear somewhere in the card's haystack, so
+  // "dog booking" narrows instead of widening the way an OR match would.
+  var apply=function(){
+    var words=q.value.toLowerCase().split(/\\s+/).filter(Boolean),v=fv.value,l=fl.value,shown=0;
+    cards.forEach(function(c){
+      var hay=c.getAttribute('data-search')||'';
+      var ok=(!v||c.getAttribute('data-vertical')===v)&&(!l||c.getAttribute('data-layout')===l)&&
+        words.every(function(w){return hay.indexOf(w)>-1;});
+      c.hidden=!ok; if(ok)shown++;
+    });
+    count.textContent=shown+' of '+cards.length+' templates'+(shown?'':' — nothing matches, try fewer words');
+    count.className=shown?'count':'count empty';
+    fit();
+  };
+  q.addEventListener('input',apply);fv.addEventListener('change',apply);fl.addEventListener('change',apply);
+  document.querySelector('.filters').addEventListener('submit',function(e){e.preventDefault();});
+  apply();
 })();
 </script>`;
 
@@ -261,14 +319,16 @@ writeFileSync(
   shell(
     'weblocks — starter templates',
     `<h1>Starter templates</h1>
-<p class="lede">One complete starter per vertical, each a validated <code>SiteManifest</code> rendered to a
-self-contained document — the same output a host gets with zero LLM calls. Every preview below is the real
-page; the chips under it are the blocks it is composed from.</p>
+<p class="lede">${Object.keys(TEMPLATES).length} complete starters across ${new Set(Object.values(TEMPLATES).map((t) => t.vertical)).size}
+verticals, each a validated <code>SiteManifest</code> rendered to a self-contained document — the same output a host
+gets with zero LLM calls. Every preview below is the real page; the chips under it are the blocks it is composed from.
+Filter by trade, by page shape, or search the copy and block vocabulary.</p>
+${filterHtml}
 <div class="grid">${cardsHtml}</div>`,
     galleryCss,
     '../index.html',
     '/templates/',
-    `${Object.keys(TEMPLATES).length} complete starter sites for weblocks, one per vertical — each a validated SiteManifest rendered to a self-contained document.`,
+    `${Object.keys(TEMPLATES).length} complete starter sites for weblocks across ${new Set(Object.values(TEMPLATES).map((t) => t.vertical)).size} verticals — each a validated SiteManifest rendered to a self-contained document.`,
   ).replace('</body>', `${galleryScript}</body>`),
   'utf8',
 );
@@ -408,7 +468,7 @@ the model, no framework runtime, nothing to trust at render time.</p>
   <a class="big" href="./blocks/index.html"><strong>The block wall →</strong>
     <span>All ${entries.length} bricks, rendered live, each labelled with the island it hydrates with.</span></a>
   <a class="big" href="./templates/index.html"><strong>Starter templates →</strong>
-    <span>${Object.keys(TEMPLATES).length} complete starter sites, one per vertical, with the blocks that compose them.</span></a>
+    <span>${Object.keys(TEMPLATES).length} complete starter sites across ${new Set(Object.values(TEMPLATES).map((t) => t.vertical)).size} verticals, filterable by trade and page shape.</span></a>
 </div>
 
 <h2 class="sec">For AI agents</h2>

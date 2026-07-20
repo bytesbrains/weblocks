@@ -20,7 +20,7 @@ provider- and host-neutral, zero runtime dependencies.
 
 **[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
 [all 52 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
-[17 starter templates](https://bytesbrains.github.io/weblocks/templates/)
+[160 starter templates](https://bytesbrains.github.io/weblocks/templates/)
 
 </div>
 
@@ -305,7 +305,7 @@ All exports are named; types are shipped (`lib/index.d.ts`).
 | **Registry** | `REGISTRY` · `getSpec` · `blockTypes` · `needsIsland` |
 | **Theming** | `DEFAULT_TOKENS` · `normalizeTokens` · `tokensToCss` · `sectionOverrideCss` · `readableOn` · `PRESETS` · `presetNames` · `getPreset` |
 | **Verticals** | `VERTICALS` · `verticalNames` · `getVertical` |
-| **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `getTemplate` |
+| **Templates** | `TEMPLATES` · `templateNames` · `templatesForVertical` · `templatesForLayout` · `templatesByTag` · `templateTags` · `getTemplate` |
 | **Runtime** | `NOOP_RUNTIME` · `pathRuntime` · `runtimeNeeds` · `safeRuntime` |
 | **PWA** | `buildWebManifest` · `buildWebManifestJson` · `buildServiceWorker` · `emitPwa` |
 | **Schema utils** | `parse` · `escapeHtml` · `escapeAttr` · `sanitizeUrl` |
@@ -342,28 +342,53 @@ never renamed or repurposed.
 
 ## Templates
 
-`templates.ts` ships **named starter templates** — one complete, validated
-`SiteManifest` per vertical, with realistic copy and a fitting preset baked in.
-They serve two callers from one source of truth: a host renders one as an
-instant, zero-LLM starter/preview, and generation seeds one as a scaffold to
-personalise.
+`templates.ts` ships **named starter templates** — complete, validated
+`SiteManifest`s with realistic copy and a fitting preset baked in, spanning every
+vertical from restaurants and trades to creators, carers and personal blogs. They
+serve two callers from one source of truth: a host renders one as an instant,
+zero-LLM starter/preview, and generation seeds one as a scaffold to personalise.
+
+Each is filterable on three independent axes, so a picker can ask different
+questions of the same set:
+
+| Axis | What it answers | Values |
+| --- | --- | --- |
+| `vertical` | What **kind** of business or person is this? | `verticalNames()` |
+| `layout` | What **shape** does the page take? | `classic` · `editorial` · `minimal` · `bold` · `app` · `profile` · `catalogue` · `showcase` · `landing` · `conversational` |
+| `tags` | Free facets for search | `templateTags()` — `booking`, `pets`, `portfolio`, `one-pager`, … |
 
 ```ts
-import { templatesForVertical, getTemplate, generateSite, renderSite } from '@bytesbrains/weblocks';
+import {
+  templatesForVertical, templatesForLayout, templatesByTag, getTemplate,
+  generateSite, renderSite,
+} from '@bytesbrains/weblocks';
 
-templatesForVertical('salon');            // [{ id:'salon-spa', label, manifest }, …]
-renderSite(getTemplate('salon-spa')!.manifest);   // instant preview, no model call
+templatesForVertical('trades');           // every carpenter/electrician/roofer starter
+templatesForLayout('editorial');          // the type-led ones, across all verticals
+templatesByTag('booking');                // everything appointment-driven
+
+const t = getTemplate('salon-spa')!;
+t.label;        // 'Salon & Spa — Booking'
+t.description;  // one line for the picker
+t.layout;       // 'classic'
+t.preset;       // 'candy' — recoverable, unlike design tokens alone
+renderSite(t.manifest);                   // instant preview, no model call
 
 // Or scaffold generation from a template — keep the structure, rewrite the copy:
 await generateSite('a taco truck in Austin', callModel, { template: 'restaurant-modern' });
 // A raw SiteManifest works too: { template: myManifest }. Omit → blank-slate compose.
 ```
 
-Browse them rendered at
+Browse them rendered and filterable at
 **[the starter gallery](https://bytesbrains.github.io/weblocks/templates/)**, or
 build them locally: `npm run example:templates` → `templates-output/index.html`.
-Templates are additive and stable (ids never renamed); every manifest is
-`validateManifest`-clean (unit-tested).
+
+Templates live one file per vertical under `src/templates/`, each declared with
+`tpl()` from `src/templates/_helpers.ts`; `src/templates.ts` is just the registry.
+To add one, append to its vertical's array — nothing else needs touching. They are
+additive and stable (ids never renamed); every manifest is `validateManifest`-clean,
+free of config keys the schema would silently drop, and free of dangling in-page
+anchors — all unit-tested, with `npm run check:templates` as the authoring loop.
 
 ## Adding a block
 
@@ -389,6 +414,7 @@ npm run example:resume  # render a live résumé/CV → resume-output.html (try 
 npm run example:templates # render every starter template → templates-output/index.html
 npm run site            # build the published gallery (wall + templates) → site/index.html
 npm run emit:catalog    # regenerate catalog.json + CATALOG.md from code
+npm run check:templates # authoring check for starter templates (add a vertical id to scope it)
 ```
 
 Drive it end-to-end with a real model (dev harness — provider is env, not code):
@@ -422,6 +448,10 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 - **[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)** — internals.
 - **[`CATALOG.md`](./CATALOG.md)** — every block’s fields.
 - **[`CHANGELOG.md`](./CHANGELOG.md)** · **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** · **[`SECURITY.md`](./SECURITY.md)**
+
+Contributing in one line: branch off **`dev`** and open your PR against `dev`,
+which is squash-merged — `main` takes tagged release PRs from `dev` only. See
+[Branches & releases](./CONTRIBUTING.md#branches--releases).
 
 ## License
 
