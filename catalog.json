@@ -20,6 +20,7 @@
     "split",
     "steps",
     "stats",
+    "progress",
     "services-catalogue",
     "menu",
     "product",
@@ -942,6 +943,132 @@
               "additionalProperties": false
             },
             "maxItems": 8
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "type": "progress",
+      "description": "Progress and goal indicators — fundraising totals, completion, capacity or scarcity — as bars, discrete segments, donut rings or scaled meters, each with units and an optional target marker.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "default": ""
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 240,
+            "default": ""
+          },
+          "display": {
+            "enum": [
+              "bars",
+              "segments",
+              "rings",
+              "meters"
+            ],
+            "default": "bars"
+          },
+          "layout": {
+            "enum": [
+              "stack",
+              "grid",
+              "inline"
+            ],
+            "default": "stack"
+          },
+          "columns": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "default": 3
+          },
+          "size": {
+            "enum": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md"
+          },
+          "showValue": {
+            "type": "boolean",
+            "default": true
+          },
+          "animate": {
+            "type": "boolean",
+            "default": false
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "value": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 0
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "default": 100
+                },
+                "prefix": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                },
+                "suffix": {
+                  "type": "string",
+                  "maxLength": 16,
+                  "default": ""
+                },
+                "caption": {
+                  "type": "string",
+                  "maxLength": 160,
+                  "default": ""
+                },
+                "threshold": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 0
+                },
+                "state": {
+                  "enum": [
+                    "default",
+                    "accent",
+                    "success",
+                    "warning",
+                    "danger"
+                  ],
+                  "default": "default"
+                },
+                "icon": {
+                  "type": "string",
+                  "maxLength": 8,
+                  "default": ""
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 12
           }
         },
         "additionalProperties": false

@@ -5,6 +5,50 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## Unreleased
+
+### Added
+- **`progress` block (#65).** Catalog 52 → 53. Value-toward-a-target indicators —
+  fundraising totals, completion, capacity and scarcity — in four shapes over one
+  schema: `bars`, `segments` (discrete cells), `rings` (SVG donut) and `meters`
+  (scale plus an optional target marker), across `stack` / `grid` / `inline`
+  layouts and three sizes. Every item is a real `value` against a real `max` with
+  unit affixes, so "€612,000 of €900,000" and "61 of 400 left" come from the same
+  contract.
+
+  Deliberately **not** a rating — `skills` already owns 0–5 proficiency. A
+  stepper is deliberately absent too: position-in-a-flow needs
+  `aria-current="step"` and completed/current/upcoming states rather than a
+  value, so it belongs in its own brick (#65, open question 1).
+
+  Accessibility is the feature, not a finish: each indicator is a real
+  `role="progressbar"` with `aria-valuenow/min/max` and an `aria-valuetext` that
+  spells out units, because a bare "62" read aloud means nothing. A prefix
+  repeats across both operands (currency) while a suffix lands once — otherwise
+  `suffix: ' of 41'` announces as *"34 of 41 of 41 of 41"*. Colour never carries
+  meaning alone; the figure is always reachable as text, even with
+  `showValue: false`. Arithmetic is total: values clamp into `0..max`, and a zero
+  or missing `max` cannot divide by zero.
+
+  Static by default. The optional `animate` island is pure progressive
+  enhancement — the correct width is already inline and ARIA is never touched, so
+  a JS-off reader and a mid-flight screen reader both see the true value.
+  `needsIsland` returns false unless `animate` is on, keeping static-first.
+
+  Placed in four starters rather than `SUPPLEMENT`, so the copy is real: a
+  `nonprofit` relief-appeal goal (the gap that motivated #65 — six nonprofit
+  starters and none could show a target), `education` cohort outcomes,
+  `ecommerce` drop scarcity, and `fitness` client results.
+
+### Fixed
+- **`skills` bars were invisible to assistive tech.** They rendered as bare
+  styled `<span>`s with an inline `width` — no `role="progressbar"`, no
+  `aria-value*`, and the level appeared nowhere in text, so a screen-reader user
+  heard "Welsh" where a sighted reader saw `Welsh ▓▓▓▓░`. Bars now carry a full
+  progressbar role (unrated `level: 0` is `aria-hidden` instead, since an empty
+  track asserts nothing), and the decorative tag dots keep a visually-hidden
+  "4 out of 5" alongside them.
+
 ## 0.10.0 — 2026-07-20
 
 The starter library goes from a sampler to something you can actually pick from.

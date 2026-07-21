@@ -19,7 +19,7 @@ provider- and host-neutral, zero runtime dependencies.
 [![live gallery](https://img.shields.io/badge/live-gallery-3a5a40.svg)](https://bytesbrains.github.io/weblocks/)
 
 **[▶ Live gallery](https://bytesbrains.github.io/weblocks/)** —
-[all 52 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
+[all 53 blocks, rendered](https://bytesbrains.github.io/weblocks/blocks/) ·
 [160 starter templates](https://bytesbrains.github.io/weblocks/templates/)
 
 </div>
@@ -439,7 +439,7 @@ PROVIDER=openai OPENAI_API_KEY=sk-… npm run ai -- edit "make it dark, add a ga
 |---|---|
 | [`/llms.txt`](https://bytesbrains.github.io/weblocks/llms.txt) | Index of everything below, in the convention models look for. |
 | [`/AGENT.md`](https://bytesbrains.github.io/weblocks/AGENT.md) | Prime directives, composing a manifest, editing with ops, guarantees. |
-| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 52 block types with full JSON Schema for their config. |
+| [`/catalog.json`](https://bytesbrains.github.io/weblocks/catalog.json) | All 53 block types with full JSON Schema for their config. |
 | [`/catalog.txt`](https://bytesbrains.github.io/weblocks/catalog.txt) | The same vocabulary, one line per block — cheap to drop in a system prompt. |
 | [`/tools.json`](https://bytesbrains.github.io/weblocks/tools.json) | A ready-to-use `compose_site` function-calling definition. |
 

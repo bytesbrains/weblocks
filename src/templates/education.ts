@@ -330,6 +330,11 @@ export const educationTemplates: Template[] = [
           { src: img('edu-partner-quiltdev'), alt: 'Quilt Developer Tools' },
         ],
       }),
+      b('outcomes', 'progress', { title: 'The last cohort, honestly', subtitle: 'Cohort 11 finished in March. We publish these whether or not they flatter us.', display: 'bars', layout: 'stack', size: 'md', showValue: true, animate: true, items: [
+        { label: 'Completed the programme', value: 38, max: 44, suffix: ' of 44', state: 'success' },
+        { label: 'In a developer role within six months', value: 29, max: 38, suffix: ' of 38', state: 'default', caption: 'Counted from the 38 who finished, not the 44 who started.' },
+        { label: 'Still looking at the six-month mark', value: 6, max: 38, suffix: ' of 38', state: 'warning', caption: 'We keep coaching these people at no cost until they land.' },
+      ] }),
       b('tuition', 'pricing', {
         title: 'Tuition',
         subtitle: 'Three ways to pay. The income share is capped and expires — read the agreement before you sign anything, here or anywhere.',
