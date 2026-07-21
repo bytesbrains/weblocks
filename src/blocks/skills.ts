@@ -47,6 +47,7 @@ const css = `
 .blk-skills .bar .blabel{font-weight:600;font-size:var(--fs-base)}
 .blk-skills .track{height:8px;border-radius:999px;background:color-mix(in srgb,var(--text) 12%,transparent);overflow:hidden}
 .blk-skills .fill{height:100%;background:var(--primary);border-radius:999px}
+.blk-skills .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:480px){.blk-skills .bar{grid-template-columns:1fr}}
 `.trim();
 
@@ -56,7 +57,10 @@ interface Group { name: string; items: Skill[] }
 function dots(level: number): string {
   const n = Math.max(0, Math.min(5, level | 0));
   if (!n) return '';
-  return `<span class="dots" aria-hidden="true">${Array.from({ length: 5 }, (_v, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
+  // The dots stay decorative, but the rating they encode is spelled out for
+  // assistive tech — otherwise `aria-hidden` silently drops it.
+  return `<span class="dots" aria-hidden="true">${Array.from({ length: 5 }, (_v, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`
+    + `<span class="vh">${n} out of 5</span>`;
 }
 
 function group(g: Group, display: string): string {
@@ -65,8 +69,15 @@ function group(g: Group, display: string): string {
   let body: string;
   if (display === 'bars') {
     body = `<div class="bars">${items.map((s) => {
-      const pct = Math.max(0, Math.min(5, s.level | 0)) * 20;
-      return `<div class="bar"><span class="blabel">${escapeHtml(s.label)}</span><span class="track"><span class="fill" style="width:${pct}%"></span></span></div>`;
+      const level = Math.max(0, Math.min(5, s.level | 0));
+      const pct = level * 20;
+      // The bar is pure CSS width, so without these the level is visible only to
+      // sighted readers — a screen reader would hear the label and nothing else.
+      const meter = level
+        ? ` role="progressbar" aria-valuenow="${level}" aria-valuemin="0" aria-valuemax="5"`
+          + ` aria-valuetext="${escapeAttr(`${level} out of 5`)}" aria-label="${escapeAttr(s.label)}"`
+        : ' aria-hidden="true"'; // unrated (0) — the empty track carries no meaning
+      return `<div class="bar"><span class="blabel">${escapeHtml(s.label)}</span><span class="track"${meter}><span class="fill" style="width:${pct}%"></span></span></div>`;
     }).join('')}</div>`;
   } else {
     body = `<div class="tags">${items.map((s) => `<span class="tag">${escapeHtml(s.label)}${dots(s.level)}</span>`).join('')}</div>`;
