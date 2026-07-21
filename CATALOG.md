@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.10.0)
+# @bytesbrains/weblocks — Block Catalog (v0.11.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `progress` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
 
 ## `app-shell`
 
@@ -182,6 +182,22 @@ A grid of metric counters: each stat shows an optional prefix/suffix around a bi
 |---|---|---|---|
 | `title` | string |  |  |
 | `columns` | integer (2\|3\|4) |  |  |
+| `items` | array |  |  |
+
+## `progress`
+
+Progress and goal indicators — fundraising totals, completion, capacity or scarcity — as bars, discrete segments, donut rings or scaled meters, each with units and an optional target marker.
+
+| field | type | required | notes |
+|---|---|---|---|
+| `title` | string |  |  |
+| `subtitle` | string |  |  |
+| `display` | undefined (bars\|segments\|rings\|meters) |  |  |
+| `layout` | undefined (stack\|grid\|inline) |  |  |
+| `columns` | integer (1\|2\|3\|4) |  |  |
+| `size` | undefined (sm\|md\|lg) |  |  |
+| `showValue` | boolean |  |  |
+| `animate` | boolean |  |  |
 | `items` | array |  |  |
 
 ## `services-catalogue`

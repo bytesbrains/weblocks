@@ -46,13 +46,14 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 52 block types, by group:
+The 53 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `install-prompt` (add-to-home-screen toast with per-platform steps — use it on PWA-enabled sites), `footer`
 - **Heroes:** `hero`, `hero-app`
 - **Résumé / profile:** `profile-header` (avatar, name, contacts, Download-PDF/Share buttons), `experience` (dated entries — reuse for Education/Certifications by changing its title), `skills` (tags or level bars)
 - **Content:** `features`, `about`, `rich-text`, `split`, `steps`, `stats`,
-  `services-catalogue`, `menu` (food/drink menu — sections, dietary tags, spice), `product` (shoppable grid — price, badge, buy/enquire), `pricing`, `logos`, `team`
+  `services-catalogue`, `menu` (food/drink menu — sections, dietary tags, spice), `product` (shoppable grid — price, badge, buy/enquire), `pricing`, `logos`, `team`,
+  `progress` (value toward a target — fundraising totals, completion, capacity/scarcity — as bars, segments, rings or meters. Every item needs a real `value` and `max` with units; for a 0–5 proficiency rating use `skills` instead)
 - **Media:** `gallery`, `carousel`, `video`, `video-gallery`, `map`
 - **Location:** `directions` (deep links to open the visitor’s map app)
 - **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `reviews` (star ratings + source), `faq`, `chat-thread` (an authored conversation as rich bubbles — participants plus messages whose bodies are typed nodes: text, code, image, list, buttons. Static: use it to *show* how an assistant or support team answers, never as a live chatbot)

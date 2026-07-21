@@ -24,6 +24,7 @@ import { richText } from './blocks/richText.js';
 import { split } from './blocks/split.js';
 import { steps } from './blocks/steps.js';
 import { stats } from './blocks/stats.js';
+import { progress } from './blocks/progress.js';
 import { services } from './blocks/services.js';
 import { menu } from './blocks/menu.js';
 import { product } from './blocks/product.js';
@@ -110,7 +111,7 @@ const SPECS: readonly BlockSpec[] = [
   // résumé / profile
   profileHeader, experience, skills,
   // content
-  features, about, richText, split, steps, stats,
+  features, about, richText, split, steps, stats, progress,
   services, menu, product, pricing, logos, team,
   // media
   gallery, carousel, video, videoGallery, map,
@@ -156,6 +157,8 @@ export function needsIsland(spec: BlockSpec, config: Record<string, unknown>, ru
   const wired = (cap: string): boolean => { try { return !!runtime?.resolve(cap, blockId); } catch { return false; } };
   if (caps.length && !caps.some(wired)) return false;
   if (spec.type === 'gallery') return config.lightbox === true;
+  // progress renders its real values inline; the island only animates them in.
+  if (spec.type === 'progress') return config.animate === true;
   // profile-header only needs the resume island when an action button is shown.
   if (spec.type === 'profile-header') return config.showDownload === true || config.showShare === true;
   return true;
