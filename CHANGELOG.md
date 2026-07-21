@@ -5,7 +5,11 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
-## Unreleased
+## 0.11.0 — 2026-07-21
+
+A progress brick, and the accessibility fix its survey turned up. Additive and
+**non-breaking** — every `0.10.x` manifest still validates and renders
+identically. Catalog 52 → 53.
 
 ### Added
 - **`progress` block (#65).** Catalog 52 → 53. Value-toward-a-target indicators —
