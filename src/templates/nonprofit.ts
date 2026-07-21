@@ -188,6 +188,10 @@ export const nonprofitTemplates: Template[] = [
     blocks: [
       b('announce', 'announcement-bar', { text: 'Every euro doubled until 31 August — the Fondation Lacaze is matching all gifts.', linkLabel: 'Give now', href: '#give', tone: 'warning', dismissible: false }),
       b('hero', 'hero', { eyebrow: 'Aude valley floods · Day 11', headline: '40,000 people. Eleven days. No power.', subhead: 'Our teams have been in Limoux since the second night. We are running eight water points and a cash-grant desk, and we are funded through Friday. Not past it.', align: 'center', minHeight: 'full', image: img('relief-aude-floodwater'), overlay: 'dark', cta: { label: 'Give now', href: '#give' } }),
+      b('appeal', 'progress', { title: 'Where the appeal stands', subtitle: 'Updated every morning at 09:00 CET. The matched total is the one that closes on 31 August.', display: 'meters', layout: 'stack', size: 'lg', showValue: true, items: [
+        { label: 'Emergency appeal', value: 612000, max: 900000, prefix: '€', threshold: 750000, state: 'default', caption: '€612,000 raised of a €900,000 target. The marker is the point at which every water point is funded to the end of September.' },
+        { label: 'Matched by the Fondation Lacaze', value: 180000, max: 250000, prefix: '€', state: 'accent', caption: 'Matching stops at €250,000 or on 31 August, whichever comes first.' },
+      ] }),
       b('impact', 'stats', { title: 'What has been delivered so far', columns: 4, items: [
         { value: '1.2m', label: 'Litres of clean water' },
         { value: '6,400', label: 'Shelter kits handed out' },

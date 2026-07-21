@@ -218,6 +218,11 @@ export const ecommerceTemplates: Template[] = [
       b('alert', 'announcement-bar', { text: 'Raffle for Drop 014 closes Thursday 9:00pm AEST — winners notified by 11pm.', linkLabel: 'Enter the raffle', href: '#raffle', tone: 'warning', dismissible: false }),
       b('nav', 'nav', { brand: 'BLOK 22', sticky: true, links: [{ label: 'Drop 014', href: '#drop' }, { label: 'Calendar', href: '#calendar' }, { label: 'Raffle', href: '#raffle' }, { label: 'Archive', href: '#archive' }], cta: { label: 'Enter', href: '#raffle' } }),
       b('hero', 'hero', { eyebrow: 'Drop 014 · 400 pairs · Melbourne', headline: 'TERRACE LOW / CHALK', subhead: 'Suede upper, gum sole, dyed in a single 400-pair run. No restock, no second colourway, no "back by popular demand".', align: 'center', minHeight: 'full', image: img('ec-drop-hero'), overlay: 'dark', cta: { label: 'Enter the raffle', href: '#raffle' } }),
+      b('stock', 'progress', { title: 'What is left', subtitle: 'Live against the raffle allocation. Open stock is not capped and is not shown here.', display: 'segments', layout: 'inline', size: 'md', showValue: true, items: [
+        { label: 'Terrace Low — Chalk', value: 61, max: 400, suffix: ' left', state: 'danger', caption: 'Raffle closes Thursday 23:59 AEST.' },
+        { label: 'Terrace Hoodie — Chalk', value: 138, max: 250, suffix: ' left', state: 'warning' },
+        { label: 'Drop 014 Tee', value: 900, max: 900, suffix: ' available', state: 'success', caption: 'Open stock — buys straight through, no raffle.' },
+      ] }),
       b('drop', 'product', { title: 'Drop 014', subtitle: 'Sizes AU 5–14, including half sizes to AU 12.', columns: 3, items: [
         { name: 'Terrace Low — Chalk', description: 'Pig suede upper, gum outsole, hand-numbered inside the tongue.', price: 'A$249', image: img('ec-drop-shoe'), badge: '400 pairs', ctaLabel: 'Enter raffle', ctaHref: '#raffle' },
         { name: 'Terrace Hoodie — Chalk', description: '480gsm loopback cotton, milled in Portugal. 250 units.', price: 'A$189', image: img('ec-drop-hoodie'), badge: '250 units', ctaLabel: 'Enter raffle', ctaHref: '#raffle' },

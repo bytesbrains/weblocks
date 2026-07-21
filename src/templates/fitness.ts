@@ -188,6 +188,11 @@ export const fitnessTemplates: Template[] = [
         { role: 'Pre & Post-Natal Coaching Certification', org: 'Girls Gone Strong', period: '2019' },
         { role: 'Level 1 Weightlifting Coach', org: 'Australian Weightlifting Federation', period: '2016' },
       ] }),
+      b('results', 'progress', { title: 'A typical twelve weeks', subtitle: 'Median change across the 34 clients who finished a full block last year. Your numbers will not be these numbers — they are here so you know what I am aiming at.', display: 'rings', layout: 'grid', columns: 3, size: 'md', showValue: true, items: [
+        { label: 'Finished the full block', value: 34, max: 41, state: 'success', caption: 'Seven stopped early — three injuries unrelated to training, four moved away.' },
+        { label: 'Deadlift, median gain', value: 27, max: 100, suffix: '%', state: 'default' },
+        { label: 'Training weeks attended', value: 89, max: 100, suffix: '%', state: 'accent', caption: 'Missing a session is normal. Missing four in a row is where progress stalls.' },
+      ] }),
       b('skills', 'skills', { title: 'What I actually work on', display: 'bars', groups: [
         { name: 'Coaching', items: [
           { label: 'Return-to-lifting after injury', level: 5 },
