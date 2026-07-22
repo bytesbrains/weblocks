@@ -67,6 +67,20 @@ test('design tokens flow into :root custom properties', () => {
   assert.ok(renderSite(m).includes('--primary:#123456'));
 });
 
+test('nav CTA text keeps --on-primary — generic link rules cannot outrank it (issue #69)', () => {
+  const html = renderSite(manifest([
+    { id: 'n', type: 'nav', visible: true, config: { brand: 'B', links: [{ label: 'About', href: '#about' }], cta: { label: 'Connect', href: '#contact' } } },
+  ]));
+  // The CTA pill declares its on-fill text colour…
+  assert.ok(/\.blk-nav \.cta\{[^}]*color:var\(--on-primary\)/.test(html), 'CTA rule sets color:var(--on-primary)');
+  // …and every nav rule colouring links must exclude the CTA, so the (0,2,1)
+  // `.links a` selector can never again out-specify `.cta` (0,2,0) and leave
+  // muted text on the primary fill (1.3:1 on the default palette).
+  const rules = (html.match(/\.blk-nav[^{}]*\{[^}]*\}/g) ?? []).filter((r) => r.includes('.links a') && /[{;]color:/.test(r));
+  assert.ok(rules.length > 0, 'expected nav link colour rules in the emitted CSS');
+  for (const rule of rules) assert.ok(rule.includes(':not(.cta)'), `rule recolours the CTA: ${rule}`);
+});
+
 test('static-first: island ships only when its behaviour is on', () => {
   const on = renderSite(manifest([{ id: 'g', type: 'gallery', visible: true, config: { lightbox: true, items: [{ src: '/a.jpg', alt: 'a' }] } }]));
   assert.ok(on.includes('/_island/lightbox.js'));
