@@ -5,6 +5,32 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.11.1 — 2026-07-22
+
+Two contrast fixes, one page-wide. **Non-breaking** — no change to the block
+catalog or the `SiteManifest` shape; every `0.11.0` manifest still validates
+and renders. Sites with a nav CTA, or a mid-tone `primary`/`accent`, render
+with legible on-fill text where they previously failed WCAG AA.
+
+### Fixed
+- **The nav CTA was unreadable on every preset (#69).** The CTA anchor sits
+  inside `.links`, and `.blk-nav .links a` (specificity 0-2-1) out-ranked
+  `.blk-nav .cta` (0-2-0) — so the "highlighted" button rendered muted-on-primary:
+  1.32:1 on the default palette, failing AA on all 6 presets and 133 of the 160
+  starter templates, and on `mono` the hover state was `#111` on `#111` — fully
+  invisible. The generic link rules now exclude the CTA (`:not(.cta)`), which
+  keeps `--on-primary` in every state, and the CTA gains a deliberate hover
+  affordance (brightness) in place of the accidental recolour. A regression test
+  asserts no emitted nav rule can recolour the CTA from a generic link selector.
+- **`readableOn` mis-picked mid-tone fills.** The black/white flip sat at
+  luminance 0.45, but the contrast crossover is ~0.19 — so fills like
+  `midnight`'s `#4c8dff` got white text at 3.2:1 where near-black passes at
+  5.7:1. It now returns whichever side clears the higher WCAG ratio (optimal by
+  construction), verified by an RGB-grid sweep asserting 4.5:1 wherever either
+  choice can reach it. Visually: buttons on mid-tone palettes (`midnight`,
+  `candy`) switch from white to near-black text — intentional. After both
+  fixes the nav CTA measures 4.87–18.88:1 across all presets (was 1.04–3.29:1).
+
 ## 0.11.0 — 2026-07-21
 
 A progress brick, and the accessibility fix its survey turned up. Additive and
