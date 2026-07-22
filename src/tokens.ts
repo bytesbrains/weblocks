@@ -47,9 +47,15 @@ function oneOf<T extends string>(value: unknown, allowed: readonly T[], def: T):
   return allowed.includes(value as T) ? (value as T) : def;
 }
 
+/** WCAG relative luminance of `#111111` — the dark half of the readableOn pair. */
+const L_DARK = 0.0056;
+
 /**
- * A legible text colour (near-black or white) for text on a given fill, by
- * WCAG relative luminance. Total: any unparseable colour falls back to white.
+ * A legible text colour (near-black or white) for text on a given fill:
+ * whichever of the two clears the higher WCAG contrast ratio on that fill.
+ * (A fixed luminance threshold mis-picks mid-tone fills — e.g. white on
+ * `#4c8dff` is 3.2:1 while near-black is 5.7:1 — so compare both ratios.)
+ * Total: any unparseable colour falls back to white.
  */
 export function readableOn(color: string): string {
   const h = String(color ?? '').trim().replace(/^#/, '');
@@ -58,7 +64,9 @@ export function readableOn(color: string): string {
   const chan = (i: number) => parseInt(full.slice(i, i + 2), 16) / 255;
   const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
   const L = 0.2126 * lin(chan(0)) + 0.7152 * lin(chan(2)) + 0.0722 * lin(chan(4));
-  return L > 0.45 ? '#111111' : '#ffffff';
+  const darkRatio = (L + 0.05) / (L_DARK + 0.05);
+  const whiteRatio = 1.05 / (L + 0.05);
+  return darkRatio >= whiteRatio ? '#111111' : '#ffffff';
 }
 
 /** The six palette roles + the two derived on-fill text colours. */

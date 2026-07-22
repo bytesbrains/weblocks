@@ -18,9 +18,10 @@ const css = `
 .blk-nav .wrap{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:calc(var(--space)*1.2);padding:.9rem var(--space)}
 .blk-nav .brand{font-weight:800;font-size:var(--fs-lg);color:var(--text);text-decoration:none}
 .blk-nav .links{display:flex;gap:calc(var(--space)*1.1);margin-left:auto;flex-wrap:wrap}
-.blk-nav .links a{color:var(--muted);text-decoration:none;font-weight:500}
-.blk-nav .links a:hover{color:var(--text)}
-.blk-nav .cta{background:var(--primary);color:var(--on-primary);padding:.5em 1.1em;border-radius:var(--radius);text-decoration:none;font-weight:600}
+.blk-nav .links a:not(.cta){color:var(--muted);text-decoration:none;font-weight:500}
+.blk-nav .links a:not(.cta):hover{color:var(--text)}
+.blk-nav .cta{background:var(--primary);color:var(--on-primary);padding:.5em 1.1em;border-radius:var(--radius);text-decoration:none;font-weight:600;transition:filter var(--motion)}
+.blk-nav .cta:hover{filter:brightness(1.08)}
 `.trim();
 
 type Link = { label: string; href: string };
