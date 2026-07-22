@@ -112,7 +112,32 @@ test('readableOn picks legible text for any fill', () => {
   assert.equal(readableOn('#ffffff'), '#111111'); // dark text on white
   assert.equal(readableOn('#000000'), '#ffffff'); // white text on black
   assert.equal(readableOn('#3a5a40'), '#ffffff'); // white on the default primary
+  assert.equal(readableOn('#4c8dff'), '#111111'); // mid-tone: dark is 5.7:1 where white is only 3.2:1
+  assert.equal(readableOn('#e0468b'), '#111111'); // mid-tone: dark is 5.1:1 where white is only 3.9:1
   assert.equal(readableOn('not-a-color'), '#ffffff'); // total: safe fallback
+});
+
+test('readableOn maximises contrast: never worse than the other choice, AA wherever reachable', () => {
+  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const lum = (hex: string) => {
+    const f = hex.replace('#', '');
+    const ch = (i: number) => lin(parseInt(f.slice(i, i + 2), 16) / 255);
+    return 0.2126 * ch(0) + 0.7152 * ch(2) + 0.0722 * ch(4);
+  };
+  const ratio = (a: string, b: string) => {
+    const la = lum(a), lb = lum(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  };
+  // Sweep a coarse RGB grid; the chosen colour must beat-or-match the rejected
+  // one, and clear 4.5:1 whenever either choice can (mid-tones may max out lower).
+  for (let r = 0; r <= 255; r += 51) for (let g = 0; g <= 255; g += 51) for (let b = 0; b <= 255; b += 51) {
+    const fill = `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+    const pick = readableOn(fill);
+    const other = pick === '#111111' ? '#ffffff' : '#111111';
+    assert.ok(ratio(pick, fill) >= ratio(other, fill), `${fill}: picked the lower-contrast side`);
+    const best = Math.max(ratio('#111111', fill), ratio('#ffffff', fill));
+    if (best >= 4.5) assert.ok(ratio(pick, fill) >= 4.5, `${fill}: AA reachable but pick is ${ratio(pick, fill).toFixed(2)}:1`);
+  }
 });
 
 test('tokensToCss emits --on-primary/--on-accent, contrast-correct', () => {
