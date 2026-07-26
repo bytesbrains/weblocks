@@ -46,7 +46,7 @@ its exact config schema:
 - `catalogPrompt()` — a compact text menu for a system prompt.
 - `CATALOG.md` — the same, human-readable.
 
-The 53 block types, by group:
+The 54 block types, by group:
 
 - **Chrome/app-shell:** `nav`, `app-shell`, `sidebar`, `announcement-bar`, `install-prompt` (add-to-home-screen toast with per-platform steps — use it on PWA-enabled sites), `footer`
 - **Heroes:** `hero`, `hero-app`
@@ -59,7 +59,7 @@ The 53 block types, by group:
 - **Structured:** `timeline`, `tabs`, `accordion`, `testimonials`, `reviews` (star ratings + source), `faq`, `chat-thread` (an authored conversation as rich bubbles — participants plus messages whose bodies are typed nodes: text, code, image, list, buttons. Static: use it to *show* how an assistant or support team answers, never as a live chatbot)
 - **Collections:** `blog-list`, `blog-post`, `feed`
 - **Dynamic (powered):** `booking` (appointment/reservation request — service, date, time), `contact-form`, `newsletter`, `search`, `auth`
-- **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `hours` (structured weekly opening hours with a live open-now badge), `divider`, `spacer`, `copyright`
+- **Conversion/rhythm:** `cta`, `social-links`, `contact-details`, `hours` (structured weekly opening hours with a live open-now badge), `divider`, `spacer`, `copyright`, `credit` (a "Powered by / Created by / Managed by *X*" line that links out to the maker — see [Crediting the maker](#crediting-the-maker))
 - **Legal:** `legal` (terms/privacy links that open safe-Markdown dialogs; content is Markdown, never raw HTML)
 
 Interactivity is safe to enable: `gallery` with `lightbox: true`, `carousel` with
@@ -195,6 +195,69 @@ fill their typed config (fields, labels, providers, placeholder). The block decl
 capability it needs; the **host** wires the endpoint. If no runtime is wired, the
 block renders inert-but-valid — that is expected, not an error. Never put secrets,
 endpoints, captcha keys, or backend logic in the config.
+
+## Crediting the maker
+
+The `credit` block is the "Powered by / Created by / Managed by *X*" line at the
+very bottom of a page. Use it whenever the site should name — and link to — the
+studio, tool, or person that built or runs it.
+
+How to use it:
+
+- **`label` is free text**, not a fixed list: `"Created by"`, `"Powered by"`,
+  `"Managed by"`, `"Built by"`, `"Designed and built by"`, `"A project of"`.
+  Pick the one that is actually true; `"Powered by"` is the default.
+- **`name` is who gets the credit**, `href` is where clicking it goes. Leave
+  `href` blank for an unlinked credit.
+- **`newTab` defaults to `true`** — a credit points off this site, so it opens in
+  a new tab and the engine adds `rel="noopener noreferrer"` plus a hidden
+  "(opens in a new tab)" for screen readers. Set `false` only for a link that
+  stays on the same site.
+- **`logo`** takes an image URL *or* a single emoji; **`note`** adds a trailing
+  aside after a `·`.
+- **`variant`**: `bar` (full-width strip with a hairline above — the default),
+  `badge` (a pill), `inline` (a bare line). **`align`**: `start`/`center`/`end`.
+- **Place it last** — after `footer`, or under a `copyright` bar. `copyright`
+  asserts *ownership* (© year holder); `credit` names the *maker*. Use both when
+  the owner and the builder are different, and use neither more than once.
+
+Two worked samples — drop either straight into `blocks`:
+
+```json
+{
+  "type": "credit",
+  "config": {
+    "label": "Created by",
+    "name": "BytesBrains",
+    "href": "https://bytesbrains.com",
+    "newTab": true,
+    "variant": "bar",
+    "align": "center"
+  }
+}
+```
+
+```json
+{
+  "type": "credit",
+  "config": {
+    "label": "Created by",
+    "name": "AiToolK.it",
+    "href": "https://aitoolk.it",
+    "newTab": true,
+    "logo": "🛠️",
+    "note": "Built in minutes, not weeks",
+    "variant": "badge",
+    "align": "center"
+  }
+}
+```
+
+As an edit op on an existing site, it is one line:
+
+```json
+[ { "op": "addBlock", "type": "credit", "config": { "label": "Powered by", "name": "AiToolK.it", "href": "https://aitoolk.it" } } ]
+```
 
 ## Favicon & hero banner
 

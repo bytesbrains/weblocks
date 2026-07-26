@@ -60,6 +60,7 @@ import { legal } from './blocks/legal.js';
 import { divider } from './blocks/divider.js';
 import { spacer } from './blocks/spacer.js';
 import { copyright } from './blocks/copyright.js';
+import { credit } from './blocks/credit.js';
 import { appShell } from './blocks/appShell.js';
 import { sidebar } from './blocks/sidebar.js';
 import { footer } from './blocks/footer.js';
@@ -125,7 +126,7 @@ const SPECS: readonly BlockSpec[] = [
   cta, socialLinks, contactDetails, hours, directions, legal,
   // rhythm
   divider, spacer,
-  copyright, footer,
+  copyright, credit, footer,
 ];
 
 export const REGISTRY: ReadonlyMap<string, BlockSpec> = new Map(SPECS.map((s) => [s.type, s]));
