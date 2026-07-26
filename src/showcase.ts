@@ -319,6 +319,17 @@ const SUPPLEMENT: Record<string, Record<string, unknown>> = {
     showSymbol: true,
     align: 'center',
   },
+  // The wall is this package's own page, so the demo credits its actual maker
+  // rather than a made-up one — the block is only honest when it names someone
+  // real. The second worked sample lives in AGENT.md.
+  credit: {
+    label: 'Created by',
+    name: 'BytesBrains',
+    href: 'https://bytesbrains.com',
+    newTab: true,
+    variant: 'badge',
+    align: 'center',
+  },
 };
 
 export interface ShowcaseEntry {

@@ -1,8 +1,8 @@
-# @bytesbrains/weblocks — Block Catalog (v0.11.1)
+# @bytesbrains/weblocks — Block Catalog (v0.12.0)
 
 The AI composes a `SiteManifest` (`{ meta, design, blocks[] }`) using **only** the block types below, then the engine validates + renders it to static HTML. This file is generated from the code (`npm run emit:catalog`) — do not edit by hand.
 
-**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `progress` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `footer`
+**Block types:** `app-shell` · `nav` · `announcement-bar` · `install-prompt` · `sidebar` · `hero` · `hero-app` · `profile-header` · `experience` · `skills` · `features` · `about` · `rich-text` · `split` · `steps` · `stats` · `progress` · `services-catalogue` · `menu` · `product` · `pricing` · `logos` · `team` · `gallery` · `carousel` · `video` · `video-gallery` · `map` · `timeline` · `tabs` · `accordion` · `testimonials` · `reviews` · `faq` · `chat-thread` · `blog-list` · `blog-post` · `feed` · `booking` · `contact-form` · `newsletter` · `search` · `auth` · `cta` · `social-links` · `contact-details` · `hours` · `directions` · `legal` · `divider` · `spacer` · `copyright` · `credit` · `footer`
 
 ## `app-shell`
 
@@ -583,6 +583,21 @@ A small copyright bar (© year holder + rights text) for the bottom of a page; t
 | `year` | string |  |  |
 | `text` | string |  |  |
 | `showSymbol` | boolean |  |  |
+| `align` | undefined (start\|center\|end) |  |  |
+
+## `credit`
+
+A one-line attribution — "Powered by / Created by / Managed by <name>" — with an optional logo and an outbound link that opens in a new tab; credits the maker or operator (use `copyright` for ownership).
+
+| field | type | required | notes |
+|---|---|---|---|
+| `label` | string |  |  |
+| `name` | string | yes |  |
+| `href` | string |  |  |
+| `newTab` | boolean |  |  |
+| `logo` | string |  |  |
+| `note` | string |  |  |
+| `variant` | undefined (bar\|badge\|inline) |  |  |
 | `align` | undefined (start\|center\|end) |  |  |
 
 ## `footer`

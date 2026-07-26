@@ -5,6 +5,33 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.12.0 — 2026-07-26
+
+An attribution brick. Additive and **non-breaking** — every `0.11.x` manifest
+still validates and renders identically. Catalog 53 → 54.
+
+### Added
+- **`credit` block.** Catalog 53 → 54. The "Powered by / Created by / Managed by
+  *X*" line every generated site wants at the very bottom, and the one thing the
+  catalog could not express without inventing markup: an outbound link to
+  *whoever made or runs the site*. The relationship word is the free-text `label`
+  ("Built by", "Designed and built by", "A project of"), so new phrasings need no
+  new field; `name`, an optional `logo` (image URL or emoji) and a `note` fill
+  the rest, in `bar` / `badge` / `inline` variants.
+
+  Distinct from `copyright`, which asserts *ownership* (© year holder). This one
+  credits the maker or operator, and the two compose — a copyright bar above a
+  credit line.
+
+  The link is the whole point, so it is the part that is guarded: `href` runs
+  through `sanitizeUrl`, and a hostile scheme degrades to unlinked plain text
+  rather than `href="#"`. Outbound means `newTab: true` by default, which brings
+  `rel="noopener noreferrer"` and a visually hidden *"(opens in a new tab)"* —
+  the ↗ glyph is `aria-hidden` and announces nothing on its own. `newTab: false`
+  drops both the target and the warning together, so the promise always matches
+  the behaviour. A blank `href` renders an unlinked credit; blank everything
+  still renders its landmark.
+
 ## 0.11.1 — 2026-07-22
 
 Two contrast fixes, one page-wide. **Non-breaking** — no change to the block

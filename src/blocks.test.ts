@@ -56,7 +56,7 @@ test('catalog is the closed vocabulary — the full named brick set', () => {
     [
       'about', 'accordion', 'announcement-bar', 'app-shell', 'auth', 'blog-list',
       'blog-post', 'booking', 'carousel', 'chat-thread', 'contact-details', 'contact-form', 'copyright',
-      'cta', 'directions', 'divider', 'experience',
+      'credit', 'cta', 'directions', 'divider', 'experience',
       'faq', 'features', 'feed', 'footer', 'gallery', 'hero', 'hero-app', 'hours', 'install-prompt',
       'legal',
       'logos', 'map', 'menu', 'nav', 'newsletter', 'pricing', 'product', 'profile-header', 'progress',
