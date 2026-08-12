@@ -259,6 +259,25 @@ As an edit op on an existing site, it is one line:
 [ { "op": "addBlock", "type": "credit", "config": { "label": "Powered by", "name": "AiToolK.it", "href": "https://aitoolk.it" } } ]
 ```
 
+## Header brand lockup
+
+The `nav` brand is a lockup, not one string — `brand` is the wordmark, `logo` is
+the image, and either half can stand alone:
+
+- **Title only** — set `brand`, leave `logo` unset. This is the default.
+- **Logo + title** — set `brand` *and* `logo.src`.
+- **Logo only** — set `logo.src` and set `brand` to `""` **explicitly**. Leaving
+  `brand` out falls back to `"Brand"`, which would sit next to the mark.
+
+Use `logo.alt` to name the site when the mark stands alone; beside a visible
+wordmark the image is marked decorative, so it is not announced twice. An
+unusable or unsafe `logo.src` degrades to the wordmark rather than emitting a
+broken image. `logo.height` (16–64px) sizes the mark.
+
+Set `logo.placeholder: true` to stand the built-in weblocks mark in while real
+artwork does not exist yet. It is **opt-in** — never add it to a site the author
+did not ask for it on, and replace it before the site ships.
+
 ## Favicon & hero banner
 
 - **Favicon:** set `meta.favicon` to an icon **URL** or a single **emoji** (e.g.

@@ -105,7 +105,7 @@
     },
     {
       "type": "nav",
-      "description": "Top navigation bar: brand/logo text, a row of links, and an optional call-to-action button. Place first.",
+      "description": "Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Place first.",
       "schema": {
         "type": "object",
         "properties": {
@@ -113,6 +113,32 @@
             "type": "string",
             "maxLength": 60,
             "default": "Brand"
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string",
+                "maxLength": 500,
+                "default": ""
+              },
+              "alt": {
+                "type": "string",
+                "maxLength": 120,
+                "default": ""
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 64,
+                "default": 28
+              },
+              "placeholder": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "additionalProperties": false
           },
           "sticky": {
             "type": "boolean",
@@ -158,9 +184,6 @@
             "additionalProperties": false
           }
         },
-        "required": [
-          "brand"
-        ],
         "additionalProperties": false
       }
     },

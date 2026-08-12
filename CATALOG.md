@@ -15,11 +15,12 @@ A persistent bottom tab bar for app-like navigation, each tab an optional icon p
 
 ## `nav`
 
-Top navigation bar: brand/logo text, a row of links, and an optional call-to-action button. Place first.
+Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Place first.
 
 | field | type | required | notes |
 |---|---|---|---|
-| `brand` | string | yes |  |
+| `brand` | string |  |  |
+| `logo` | object |  |  |
 | `sticky` | boolean |  |  |
 | `links` | array |  |  |
 | `cta` | object |  |  |
