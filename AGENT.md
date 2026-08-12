@@ -259,20 +259,28 @@ As an edit op on an existing site, it is one line:
 [ { "op": "addBlock", "type": "credit", "config": { "label": "Powered by", "name": "AiToolK.it", "href": "https://aitoolk.it" } } ]
 ```
 
-## Header brand lockup
+## Brand lockup (`nav`, `footer`)
 
-The `nav` brand is a lockup, not one string — `brand` is the wordmark, `logo` is
-the image, and either half can stand alone:
+The brand is a lockup, not one string — `brand` is the wordmark, `logo` is the
+image, and either half can stand alone:
 
-- **Title only** — set `brand`, leave `logo` unset. This is the default.
+- **Title only** — set `brand`, leave `logo` unset. This is the default, and
+  renders exactly as it always has.
 - **Logo + title** — set `brand` *and* `logo.src`.
-- **Logo only** — set `logo.src` and set `brand` to `""` **explicitly**. Leaving
-  `brand` out falls back to `"Brand"`, which would sit next to the mark.
+- **Logo only** — set `logo.src` and set `brand` to `""` **explicitly**. In
+  `nav`, leaving `brand` out falls back to `"Brand"`, which would then sit next
+  to the mark.
 
 Use `logo.alt` to name the site when the mark stands alone; beside a visible
 wordmark the image is marked decorative, so it is not announced twice. An
 unusable or unsafe `logo.src` degrades to the wordmark rather than emitting a
 broken image. `logo.height` (16–64px) sizes the mark.
+
+Keep the two consistent: if a site has a mark, give it to `nav` **and**
+`footer`, usually with the wordmark in the header and either shape below.
+
+`app-shell` has no lockup — its `brand` is never drawn (it only names the tab
+bar for screen readers), so a logo there would render nothing.
 
 Set `logo.placeholder: true` to stand the built-in weblocks mark in while real
 artwork does not exist yet. It is **opt-in** — never add it to a site the author

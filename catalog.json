@@ -3195,7 +3195,7 @@
     },
     {
       "type": "footer",
-      "description": "Page footer: brand, tagline, a row of links, and a copyright line. Place last.",
+      "description": "Page footer: a brand lockup (wordmark text, a logo image, or both), a tagline, a row of links, and a copyright line. Place last.",
       "schema": {
         "type": "object",
         "properties": {
@@ -3203,6 +3203,32 @@
             "type": "string",
             "maxLength": 60,
             "default": ""
+          },
+          "logo": {
+            "type": "object",
+            "properties": {
+              "src": {
+                "type": "string",
+                "maxLength": 500,
+                "default": ""
+              },
+              "alt": {
+                "type": "string",
+                "maxLength": 120,
+                "default": ""
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 16,
+                "maximum": 64,
+                "default": 28
+              },
+              "placeholder": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "additionalProperties": false
           },
           "tagline": {
             "type": "string",

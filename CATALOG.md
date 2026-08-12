@@ -603,11 +603,12 @@ A one-line attribution — "Powered by / Created by / Managed by <name>" — wit
 
 ## `footer`
 
-Page footer: brand, tagline, a row of links, and a copyright line. Place last.
+Page footer: a brand lockup (wordmark text, a logo image, or both), a tagline, a row of links, and a copyright line. Place last.
 
 | field | type | required | notes |
 |---|---|---|---|
 | `brand` | string |  |  |
+| `logo` | object |  |  |
 | `tagline` | string |  |  |
 | `links` | array |  |  |
 | `copyright` | string |  |  |
