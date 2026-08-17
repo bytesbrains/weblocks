@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "package": "@bytesbrains/weblocks",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Block catalog for @bytesbrains/weblocks. Send this to the model as its API reference; it composes a SiteManifest ({ meta, design, blocks[] }) using ONLY these block types. The engine then validates and renders it.",
   "blockTypes": [
     "app-shell",
@@ -105,7 +105,7 @@
     },
     {
       "type": "nav",
-      "description": "Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Place first.",
+      "description": "Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Responsive with no configuration — a flat row on wide screens, collapsing behind a menu toggle on phones. Place first.",
       "schema": {
         "type": "object",
         "properties": {
