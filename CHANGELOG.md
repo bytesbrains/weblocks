@@ -5,6 +5,59 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.13.0 — 2026-08-18
+
+A brand lockup for the two bricks that carry a site's identity. Additive and
+**non-breaking** — every `0.12.x` manifest still validates and renders
+identically. Catalog stays at 54 types; `nav` and `footer` each gain one
+optional field.
+
+### Added
+- **`logo` on `nav` and `footer` (#77, #78).** The brand slot stops being a
+  single string and becomes a *lockup*: an optional image beside the wordmark,
+  where either half can stand alone. The three shapes fall out of what is set,
+  with no mode flag to keep in sync — `brand` alone is the wordmark exactly as
+  before, `brand` + `logo.src` puts a mark next to it, and `logo.src` with
+  `brand: ''` is a mark on its own, for the logos that already say the name.
+  Header and footer share `LOGO_FIELD` and the `<img>` builder, so a site's
+  identity cannot drift in shape between the top of the page and the bottom.
+
+  **With no logo the output is byte-for-byte what it was before** — no wrapper
+  span, no modifier class, no new CSS rule in the emitted stylesheet. A manifest
+  that never opted in cannot be disturbed by this, and neither can a downstream
+  stylesheet targeting `.blk-nav .brand`. The `.brand` rules are untouched; the
+  lockup adds only `.has-logo` and the image sizing.
+
+  Alt text follows what the mark is actually doing. Beside a visible wordmark it
+  is decorative and captioned empty — announcing the brand twice is worse than
+  not announcing the image at all. Standing alone in the header it takes
+  `logo.alt` and falls back to `"Home"`, because that lockup is a link and a
+  link must never be left without an accessible name; the footer mark is not a
+  link, so there it may legitimately stay decorative rather than have a name
+  invented for it. With both halves empty, no anchor is emitted at all.
+
+  Guarded like any other URL the caller supplies: `src` runs through
+  `sanitizeUrl`, and a hostile scheme degrades to the text-only lockup instead
+  of emitting a broken `<img>`. `height` is coerced and clamped to 16–64px at
+  render, not merely in the schema, because it is the one value interpolated
+  into a `style` attribute outside an escaper. No `loading="lazy"` on a header
+  brand — it is above the fold, where deferring it only delays LCP.
+
+- **`logo.placeholder`** opts a site into the built-in weblocks mark when no
+  `src` resolves — useful while composing, before real artwork exists. Off by
+  default and never inferred: this engine renders *other people's* sites, so a
+  mark they did not ask for must never appear in their header. The mark ships
+  inlined as a data URI rather than linked from `assets/`, since a rendered site
+  gets copied anywhere and a relative asset path would break on arrival.
+
+  `app-shell` deliberately takes no lockup: its `brand` is `display:none` and
+  exists only to name the bottom tab bar via `aria-label`, so an image there
+  would render nothing.
+
+### Changed
+- `undici` (dev-dependency) 7.28.0 → 7.29.0 (#76). No effect on the published
+  package.
+
 ## 0.12.0 — 2026-07-26
 
 An attribution brick. Additive and **non-breaking** — every `0.11.x` manifest
