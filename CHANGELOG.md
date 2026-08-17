@@ -5,6 +5,51 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.14.0 — 2026-08-18
+
+A header that survives a phone. **Non-breaking** — no change to the block
+catalog or the `SiteManifest` shape; every `0.13.x` manifest still validates,
+and above the breakpoint every one of them renders exactly as it did.
+
+### Added
+- **`nav` collapses on small screens (#79).** The link row was a flex container
+  with `flex-wrap:wrap` and nothing else, so a narrow viewport did the only
+  thing it could: spill the links onto a second and third row under the brand,
+  push the page down, and strand the CTA on a line of its own. Below 900px the
+  row now collapses behind a menu toggle and expands as a stacked panel — full
+  touch targets, separators, the CTA pinned to the top of the panel where it
+  stays one tap from the visitor.
+
+  **Nothing ships to make it work.** No island, no `<script>`, no hydration: the
+  toggle is a visually hidden checkbox driving `:checked ~ .links`, so the menu
+  opens with JavaScript disabled, blocked, or still in flight.
+  `<details>/<summary>` would be the better semantics — it is what `accordion`
+  uses — but a closed `<details>` hides its content through
+  `::details-content { content-visibility: hidden }`, which no child rule can
+  override, and a server-rendered `open` is one choice baked into one static
+  file while the state we need differs by viewport. In a browser without
+  `::details-content` that route renders a *desktop* header with no visible
+  links at all. The checkbox has no such failure mode.
+
+  The trade-off is announcement: the control reads as a checkbox named "Menu"
+  rather than an expandable button, and `aria-expanded` is deliberately absent —
+  without JavaScript it could only ever be a hardcoded `false`, which becomes a
+  lie the moment the panel opens. A stale ARIA state is worse than none. The
+  bars are `aria-hidden`, the name is visually hidden text, and keyboard focus
+  draws a visible ring on the label.
+
+  The breakpoint is measured, not guessed: laying all 136 starter-template navs
+  out and counting which wrap gives 5 still wrapping at 800px, 1 at 850–900, and
+  none from 950 up. 900 clears 135 of the 136; the straggler (five links and a
+  21-character CTA) wraps to a second row between 900 and 950 exactly as it does
+  today.
+
+  Above the breakpoint the toggle is `display:none` on both halves, so it
+  contributes no box, no flex child and no computed style — the wide row is laid
+  out by the same rules as before, and the pre-lockup snapshot still passes with
+  the toggle stripped. A nav with no links and no CTA has nothing to collapse and
+  emits no toggle at all, so its render is untouched byte-for-byte.
+
 ## 0.13.0 — 2026-08-18
 
 A brand lockup for the two bricks that carry a site's identity. Additive and

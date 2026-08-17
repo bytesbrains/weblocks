@@ -27,13 +27,23 @@ const footer = (c: Record<string, unknown> = {}) => render(footerSpec, c);
 
 // ── No regression: output captured from `main`, before the lockup existed ─────
 
+/**
+ * The responsive menu toggle (#79) is the only markup added to `nav` since this
+ * snapshot was captured, and only when there is something to collapse. Stripping
+ * it must give the pre-lockup render back exactly — so this keeps checking the
+ * original bytes rather than re-baselining them.
+ */
+const withoutToggle = (html: string): string =>
+  html.replace(/<input class="menu-toggle"[\s\S]*?<\/label>\n {4}/, '');
+
 test('nav with no logo is byte-identical to the pre-lockup render', () => {
+  // Nothing to collapse — no toggle is emitted at all, so this one is untouched.
   assert.equal(
     nav(),
     '<nav class="blk-nav" data-sticky="false" aria-label="Primary">\n  <div class="wrap">\n    <a class="brand" href="#">Brand</a>\n    <div class="links"></div>\n  </div>\n</nav>',
   );
   assert.equal(
-    nav({ brand: 'Acme', links: [{ label: 'Docs', href: '#d' }, { label: 'Pricing', href: '#p' }], cta: { label: 'Start', href: '#s' }, sticky: true }),
+    withoutToggle(nav({ brand: 'Acme', links: [{ label: 'Docs', href: '#d' }, { label: 'Pricing', href: '#p' }], cta: { label: 'Start', href: '#s' }, sticky: true })),
     '<nav class="blk-nav" data-sticky="true" aria-label="Primary">\n  <div class="wrap">\n    <a class="brand" href="#">Acme</a>\n    <div class="links"><a href="#d">Docs</a><a href="#p">Pricing</a><a class="cta" href="#s">Start</a></div>\n  </div>\n</nav>',
   );
 });
