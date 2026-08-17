@@ -15,7 +15,7 @@ A persistent bottom tab bar for app-like navigation, each tab an optional icon p
 
 ## `nav`
 
-Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Place first.
+Top navigation bar: a brand lockup (wordmark text, a logo image, or both), a row of links, and an optional call-to-action button. Set `logo.src` for artwork and clear `brand` for a logo-only header. Responsive with no configuration — a flat row on wide screens, collapsing behind a menu toggle on phones. Place first.
 
 | field | type | required | notes |
 |---|---|---|---|
