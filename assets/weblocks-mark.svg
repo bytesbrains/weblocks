@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="weblocks">
+  <g stroke="#16375e" stroke-width="2.2" stroke-linejoin="round">
+    <path fill="#f5b942" d="M32 5 6 20l26 15z"/>
+    <path fill="#e8382f" d="M32 5l26 15-26 15z"/>
+    <path fill="#f0a32b" d="M6 20l26 15v13L6 33z"/>
+    <path fill="#0e9c8c" d="M6 33l26 15v13L6 46z"/>
+    <path fill="#2e6fd0" d="M58 20 32 35v13l26-15z"/>
+    <path fill="#16375e" d="M58 33 32 48v13l26-15z"/>
+  </g>
+  <g fill="#16375e" opacity=".25">
+    <ellipse cx="23" cy="19" rx="5.4" ry="3.1"/>
+    <ellipse cx="41" cy="19" rx="5.4" ry="3.1"/>
+  </g>
+  <path fill="#fff" d="M54.1 37.6 35.9 48.1v8.05l18.2-10.5z"/>
+</svg>
