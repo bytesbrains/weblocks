@@ -49,6 +49,34 @@ test('parseManifestResponse extracts fenced JSON, coerces + validates', () => {
   assert.ok(renderSite(r.manifest).includes('Fresh every morning'));
 });
 
+// Issue #89: the composing model reaches for a real-world value the enum has no
+// room for. The page it wrote is complete and renders; only that one word has to
+// settle for the declared default, so the reply is a warning, not a failure.
+test('parseManifestResponse keeps a page whose enum missed, and returns it repaired', () => {
+  const r = parseManifestResponse(JSON.stringify({
+    meta: { title: 'Thali House' },
+    blocks: [
+      { type: 'hero', config: { headline: 'Maharashtrian thali, all day' } },
+      { type: 'reviews', config: { title: 'What guests say', items: [
+        { rating: 5, quote: 'Best thali in Pune.', source: 'zomato' },
+        { rating: 5, quote: 'Worth the queue.', source: 'Google Reviews' },
+      ] } },
+    ],
+  }));
+  assert.equal(r.ok, true, r.errors.join('; '));
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.warnings.length, 2, r.warnings.join('; '));
+  assert.ok(r.warnings.every((w) => /source: ".*" is not one of/.test(w)), r.warnings.join('; '));
+
+  const items = r.manifest.blocks[1]!.config.items as Array<{ source: string; quote: string }>;
+  assert.deepEqual(items.map((i) => i.source), ['other', 'other'], 'repaired in the manifest the caller keeps');
+  assert.equal(items[0]!.quote, 'Best thali in Pune.', 'the rest of the block is untouched');
+
+  const html = renderSite(r.manifest);
+  assert.ok(html.includes('Best thali in Pune.'));
+  assert.ok(html.includes('Maharashtrian thali, all day'));
+});
+
 test('parseManifestResponse flags a manifest that uses an unknown type', () => {
   const r = parseManifestResponse(JSON.stringify({ blocks: [{ type: 'carousel3d', config: {} }] }));
   assert.equal(r.ok, false);

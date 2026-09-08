@@ -26,11 +26,32 @@ test('missing required is a WARNING, not a hard error (renders with default)', (
   assert.equal(r.value.name, 'fallback'); // renderer can still consume it
 });
 
-test('invalid enum / int are HARD-rejected and coerced to the default', () => {
-  const r = parse(S, { size: 'xl', cols: 7 });
+test('an out-of-oneOf int is HARD-rejected and coerced to the default', () => {
+  const r = parse(S, { cols: 7 });
   assert.equal(r.ok, false);
-  assert.equal(r.value.size, 'm');
   assert.equal(r.value.cols, 3);
+});
+
+// Issue #89: the enum fallback is declared by the schema, so an out-of-enum
+// string is a repair the caller can keep — not a reason to bin the whole input.
+test('an out-of-enum string is SOFT: substituted, warned about, still ok', () => {
+  const r = parse(S, { size: 'xl' });
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.value.size, 'm');
+  assert.ok(
+    r.warnings.includes('size: "xl" is not one of s | m | l — using "m"'),
+    r.warnings.join('; '),
+  );
+});
+
+test('a non-string enum value is repaired without throwing', () => {
+  for (const size of [7, true, { a: 1 }, ['m']]) {
+    const r = parse(S, { size });
+    assert.equal(r.ok, true);
+    assert.equal(r.value.size, 'm');
+    assert.ok(r.warnings.some((w) => w.startsWith('size: ')), r.warnings.join('; '));
+  }
 });
 
 test('string max truncates and warns (soft)', () => {

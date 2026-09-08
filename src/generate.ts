@@ -117,13 +117,20 @@ export async function generateSite(brief: string, callModel: ModelCall, opts: Ge
   return parseManifestResponse(raw);
 }
 
-/** Extract + coerce + validate a manifest from a model reply. Never throws. */
+/**
+ * Extract + coerce + validate a manifest from a model reply. Never throws.
+ *
+ * The manifest returned is the REPAIRED one, not the raw coercion: defaults
+ * filled in, and every near-miss enum swapped for its declared substitute. A
+ * composing model reaching for a value the catalog has no room for is the
+ * ordinary case, not a malformed reply, so the page it otherwise wrote
+ * correctly survives with a warning naming the field it had to settle.
+ */
 export function parseManifestResponse(text: string): ComposeResult {
   const json = extractJson(text);
   if (json === undefined) return { ok: false, manifest: emptyManifest(), errors: ['no JSON object in model reply'], warnings: [] };
-  const manifest = coerceManifest(json);
-  const v = validateManifest(manifest);
-  return { ok: v.ok, manifest, errors: v.errors, warnings: v.warnings };
+  const v = validateManifest(coerceManifest(json));
+  return { ok: v.ok, manifest: v.value, errors: v.errors, warnings: v.warnings };
 }
 
 // ── Edit: message + manifest → ops → new manifest ──────────────────────────────

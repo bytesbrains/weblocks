@@ -2,12 +2,21 @@
  * A tiny, dependency-free schema layer — the "studs" of a brick.
  *
  * It is the contract the AI must satisfy, and it separates two severities so
- * edit ops can be strict about garbage yet lenient about incompleteness:
- *   - errors (HARD): wrong type, invalid enum, out-of-range int, non-array →
- *     the op is malformed; reject it (illegal states unrepresentable).
- *   - warnings (SOFT): a required field is missing, or a value was truncated to
- *     its max → apply with the default/truncation (the total renderer copes),
- *     and tell the author.
+ * edit ops can be strict about garbage yet lenient about incompleteness. The
+ * line is REPAIRABILITY, not wrongness:
+ *   - errors (HARD): wrong type, out-of-range int, non-array → the value cannot
+ *     be repaired without inventing meaning; reject it (illegal states
+ *     unrepresentable).
+ *   - warnings (SOFT): a required field is missing, a value was truncated to its
+ *     max, or a string missed its enum → the schema already declares the
+ *     substitute, so apply it (the total renderer copes) and tell the author.
+ *
+ * An out-of-enum string is soft on purpose. It is the near-miss a composing
+ * model makes most often — a real-world value the enum has no room for
+ * (`"zomato"` for a review source), or the right value in the wrong case
+ * (`"Google Reviews"` for `google`). The field falls back to its declared
+ * default and the other fifty fields of a good page survive; rejecting the whole
+ * manifest over one word does not make it more correct, only absent.
  *
  * [parse] ALWAYS returns a fully-defaulted `value`, so the renderer never sees a
  * hole even when the input was partial. (In production these descriptors would
@@ -65,8 +74,11 @@ function parseField(field: Field, raw: unknown, path: string, ctx: Ctx): unknown
     case 'enum': {
       const fallback = field.default ?? field.values[0] ?? '';
       if (!present) return missing(field.required, path, ctx, fallback);
+      // SOFT: the schema names the substitute, so repair rather than reject.
+      // The message carries the offending value — the author cannot widen an
+      // enum they are never shown missing.
       if (typeof raw !== 'string' || !field.values.includes(raw)) {
-        ctx.errors.push(`${path}: must be one of ${field.values.join(' | ')}`);
+        ctx.warnings.push(`${path}: ${show(raw)} is not one of ${field.values.join(' | ')} — using "${fallback}"`);
         return fallback;
       }
       return raw;
@@ -112,6 +124,18 @@ function parseField(field: Field, raw: unknown, path: string, ctx: Ctx): unknown
 function missing<T>(isRequired: boolean | undefined, path: string, ctx: Ctx, fallback: T): T {
   if (isRequired) ctx.warnings.push(`${path}: missing`);
   return fallback;
+}
+
+/**
+ * A short, always-safe rendering of a rejected value for a message. Never
+ * `JSON.stringify` — [parse] must not throw on a cyclic or exotic input.
+ */
+function show(v: unknown): string {
+  if (typeof v === 'string') return `"${v.length > 40 ? `${v.slice(0, 40)}…` : v}"`;
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+  if (Array.isArray(v)) return 'an array';
+  if (typeof v === 'object') return 'an object';
+  return typeof v;
 }
 
 /** Wrong type/shape → error (hard); returns the default so render stays total. */

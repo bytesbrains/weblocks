@@ -39,14 +39,26 @@ test('addBlock rejects an unknown type (no-op)', () => {
   assert.equal(r.manifest, m, 'manifest unchanged on failure');
 });
 
-test('addBlock with missing content succeeds (warning), rejects a bad enum (error)', () => {
+test('addBlock with missing content succeeds (warning), rejects an unrepairable value (error)', () => {
   const ok = applyOp(base(), { op: 'addBlock', type: 'hero' }); // headline missing → warning
   assert.equal(ok.ok, true);
   assert.ok(ok.warnings.some((w) => /headline: missing/.test(w)));
 
-  const bad = applyOp(base(), { op: 'addBlock', type: 'gallery', config: { layout: 'spiral' } }); // bad enum → error
+  const bad = applyOp(base(), { op: 'addBlock', type: 'gallery', config: { columns: 'lots' } }); // wrong type → error
   assert.equal(bad.ok, false);
-  assert.match(bad.errors[0]!, /layout/);
+  assert.match(bad.errors[0]!, /columns/);
+});
+
+// Issue #89: an out-of-enum value is a repair, not a rejection — the op applies
+// with the declared default and the stored config carries the substitute, so a
+// near-miss word never costs the whole edit.
+test('addBlock substitutes an out-of-enum value and applies (warning)', () => {
+  const r = applyOp(base(), { op: 'addBlock', type: 'gallery', config: { layout: 'spiral' } });
+  assert.equal(r.ok, true);
+  assert.deepEqual(r.errors, []);
+  assert.ok(r.warnings.some((w) => /layout: "spiral" is not one of/.test(w)), r.warnings.join('; '));
+  const added = r.manifest.blocks.find((b) => b.id === r.id)!;
+  assert.equal(added.config.layout, 'grid', 'the bad value is gone from the manifest, not carried');
 });
 
 test('updateBlock merges a patch and re-validates', () => {
