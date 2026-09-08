@@ -22,6 +22,17 @@ test('every template manifest passes validateManifest', () => {
   }
 });
 
+// Issue #89: `validateManifest` now hands back a repaired manifest. Across all
+// 160 templates that repair must be render-NEUTRAL — it only fills in what the
+// renderer was already defaulting for itself, so persisting `value` can never
+// change a page.
+test('the repaired manifest renders byte-identically to the input', () => {
+  for (const t of Object.values(TEMPLATES)) {
+    const v = validateManifest(t.manifest);
+    assert.equal(renderSite(v.value), renderSite(t.manifest), `${t.id} rendered differently after repair`);
+  }
+});
+
 test('every template renders a complete, self-contained document', () => {
   for (const t of Object.values(TEMPLATES)) {
     const html = renderSite(t.manifest);

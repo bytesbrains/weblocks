@@ -68,11 +68,21 @@ A tiny, dependency-free descriptor language — the "studs" of a brick. `parse`
 always returns a fully-defaulted value, and it separates two severities so edit
 ops can be strict about garbage yet lenient about incompleteness:
 
-- **errors (HARD)** — wrong type, invalid enum, out-of-range int, non-array. The
-  op is malformed → reject it.
-- **warnings (SOFT)** — a required field is missing, or a value was truncated to
-  its max. Apply with the default/truncation (the total renderer copes) and tell
-  the author.
+The line between them is **repairability**, not wrongness:
+
+- **errors (HARD)** — wrong type, out-of-range int, non-array. The value cannot
+  be repaired without inventing meaning → reject the op.
+- **warnings (SOFT)** — a required field is missing, a value was truncated to its
+  max, or a string missed its enum. The schema already declares the substitute →
+  apply it (the total renderer copes) and tell the author.
+
+An out-of-enum string is soft deliberately. It is the near-miss a composing model
+makes most often — a real-world value the enum has no room for, or the right
+value in the wrong case — and the fallback is a value the schema itself names.
+Rejecting a whole manifest over one word does not make it more correct, only
+absent. `validateBlock` / `validateManifest` return that repair as `value`
+alongside the verdict, so the caller keeps the substituted manifest rather than
+the input it was just told is wrong.
 
 Field kinds: `string`, `enum`, `boolean`, `int`, `object`, `array`. All text is
 run through `escapeHtml` / `escapeAttr` on render, and every URL through
