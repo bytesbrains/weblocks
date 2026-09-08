@@ -21,7 +21,14 @@ export interface Validation<T = unknown> {
   ok: boolean;
   errors: string[];   // hard — reject
   warnings: string[]; // soft — applied with defaults
-  /** The input with defaults applied and every repairable value substituted. */
+  /**
+   * The input with defaults applied and every repairable value substituted.
+   *
+   * Present whatever `ok` says — a hard error means the repair could not reach
+   * everything (an unknown block type has no schema to repair against), so this
+   * is the closest renderable thing to the input, NOT a validated result. Check
+   * `ok` before treating it as one.
+   */
   value: T;
 }
 
