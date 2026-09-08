@@ -5,6 +5,67 @@ follows [semantic versioning](https://semver.org): the **block catalog** and the
 **`SiteManifest` shape** are the public contract — additive block/field changes
 are minor, breaking changes to either are major.
 
+## 0.15.0 — 2026-09-08
+
+A near-miss word no longer costs the page. **Non-breaking for manifests** — no
+change to the block catalog or the `SiteManifest` shape; every `0.14.x` manifest
+still validates and renders byte-identically (asserted across all 160 starter
+templates). What changes is the *verdict*: a manifest rejected for one
+out-of-enum string is now accepted with a warning, and `Validation` gains a
+`value` field carrying the repaired input.
+
+### Fixed
+- **One out-of-enum string discarded a whole renderable page (#89).** `parse`
+  computed the right substitute for an invalid enum — the field's own declared
+  default — recorded a HARD error, and then threw the substitute away: `ok` came
+  back false, and every caller kept the raw value it had just been told was
+  wrong. The sanitized version existed for exactly one stack frame and was never
+  returned to anyone. A single word was enough to bin a complete twelve-block
+  manifest that `renderSite` would have turned into 30 KB of correct HTML.
+
+  The words in question are not garbage. They are a composing model being
+  accurate about a world the enum has no room for — `"zomato"` for a review
+  source whose values run `google | yelp | facebook | trustpilot | tripadvisor |
+  app-store | other`, or `"Google Reviews"` where the enum wants the literal
+  `google`. The catalog carries **41 enum fields across 26 of its 54 block
+  types**, so any of them could cost a page this way.
+
+  The line between the two severities is now **repairability, not wrongness**.
+  An out-of-enum string is a warning: the schema itself names the substitute,
+  which makes it the same kind of thing as a truncated string — not the same kind
+  as a string where an integer belongs. Wrong type, out-of-range int and
+  non-array stay hard, because those cannot be repaired without inventing
+  meaning. The message now carries the offending value and what replaced it
+  (`source: "zomato" is not one of google | … | other — using "other"`), since an
+  author cannot widen an enum they are never shown missing.
+
+### Added
+- **`validateBlock` / `validateManifest` return the repair as `value`.** `parse`
+  computes it either way; a caller that only got `ok: false` had to choose
+  between shipping a value it had been told was wrong and discarding work that
+  was otherwise fine. `parseManifestResponse` now hands back the repaired
+  manifest rather than the raw coercion, so the bad value is genuinely gone from
+  what a host persists instead of surviving inside a manifest marked invalid.
+
+  Render-neutral by construction: `renderSite` already ran every config through
+  `parse`, so the repair only materializes what the renderer was defaulting for
+  itself. All 160 starter templates render byte-identically before and after, and
+  a test asserts it. Manifests grow ~5% (6,887 → 7,234 bytes average across those
+  templates), and `ops.ts` has always stored the parsed config — so an edited
+  manifest was already shaped this way.
+
+### Changed
+- **`Validation` is now `Validation<T = unknown>`, with a `value` field.**
+  Additive for anyone reading a validation result; a caller *constructing* one by
+  hand needs the new field. `value` is present whatever `ok` says — on a hard
+  error the repair could not reach everything (an unknown block type has no
+  schema to repair against), so it is the closest renderable thing to the input,
+  not a validated result.
+
+- **`validateManifest` no longer mutates and no longer discards.** It builds a
+  new manifest, leaves the caller's input untouched, and preserves a config it
+  has no schema to repair against.
+
 ## 0.14.0 — 2026-08-18
 
 A header that survives a phone. **Non-breaking** — no change to the block
