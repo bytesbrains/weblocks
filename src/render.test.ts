@@ -127,6 +127,30 @@ test('validateManifest passes a well-formed manifest', () => {
   assert.equal(validateManifest(full).ok, true);
 });
 
+// Issue #89: `parse` computes the repair either way — returning it is what lets
+// a caller keep the page instead of choosing between a known-bad value and
+// nothing.
+test('validateManifest returns the repaired manifest, leaving the input untouched', () => {
+  const input = manifest([
+    { id: 'g1', type: 'gallery', visible: true, config: { layout: 'spiral', items: [{ src: '/a.jpg' }] } },
+  ]);
+  const v = validateManifest(input);
+  assert.equal(v.ok, true, v.errors.join('; '));
+  assert.equal(v.value.blocks[0]!.config.layout, 'grid', 'near-miss enum substituted');
+  assert.equal(v.value.blocks[0]!.config.columns, 3, 'defaults filled in');
+  assert.equal(v.value.blocks[0]!.id, 'g1', 'block identity preserved');
+  assert.equal(input.blocks[0]!.config.layout, 'spiral', 'the caller\'s manifest is not mutated');
+  assert.notEqual(v.value, input, 'a new manifest, not the same object');
+});
+
+test('validateManifest hands back an unknown-type config unchanged', () => {
+  const v = validateManifest(manifest([
+    { id: 'x', type: 'not-a-real-block', visible: true, config: { keep: 'me' } },
+  ]));
+  assert.equal(v.ok, false);
+  assert.equal(v.value.blocks[0]!.config.keep, 'me', 'nothing to repair against — config survives');
+});
+
 // ── in-page anchors: nav links scroll (issue #26) ───────────────────────────────
 
 const anchored = (): SiteManifest => manifest([
